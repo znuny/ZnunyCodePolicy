@@ -109,13 +109,23 @@ ignore = Frontend/Tests/**/*
 [+TidyAll::Plugin::OTRS::Legal::AddressUpdate]
 select = doc/**/*.xml
 
-[+TidyAll::Plugin::OTRS::Legal::LicenseValidator]
+; ---
+; ZnunyCodePolicy
+; ---
+;[+TidyAll::Plugin::OTRS::Legal::LicenseValidator]
+[+TidyAll::Plugin::Znuny::Legal::LicenseValidator]
+; ---
 select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,vue,dist,sh,skel,xml,sopm}
 ignore = COPYING RELEASE CREDITS
 ignore = Kernel/Config.pm Kernel/Config/**/ZZZ*.pm Kernel/Config/Files/User/*.pm
 ignore = Kernel/WebApp.conf.dist
 ignore = scripts/auto_build/spec/templates/**/*
-ignore = scripts/test/sample/Loader/*.min.{css,js}
+; ---
+; ZnunyCodePolicy
+; ---
+;ignore = scripts/test/sample/Loader/*.min.{css,js}
+ignore = scripts/test/sample/Loader/*.{css,js}
+; ---
 ignore = scripts/test/sample/SysConfig/Migration/**/ZZZ*.pm
 ignore = scripts/DBUpdate{To6,}/TaskConfig/*.yml.dist
 ignore = var/httpd/htdocs/common/**/*.css
@@ -124,7 +134,12 @@ ignore = **/*.tt.sh
 ; devshare
 ignore = **/*.json.dist
 
-[+TidyAll::Plugin::OTRS::Legal::ReplaceCopyright]
+; ---
+; ZnunyCodePolicy
+; ---
+;[+TidyAll::Plugin::OTRS::Legal::ReplaceCopyright]
+[+TidyAll::Plugin::Znuny::Legal::ReplaceCopyright]
+; ---
 select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,vue,dist,tmpl,sh,skel,xml,sopm,html,service,conf,example,template}
 select = .*.dist .bash_completion
 select = var/cron/*
@@ -134,6 +149,21 @@ ignore = Kernel/Config.pm Kernel/Config/**/ZZZ*.pm
 ignore = module-format.xml,codesyntax.xml,language-translations.xml,writing-otrs-application.xml,test-mechanism.xml
 ; Don't run this in the CI to avoid updates on year changes. It is enough to update the code when it is changed.
 only_modes = cli editor commit
+
+; ---
+; ZnunyCodePolicy
+; ---
+[+TidyAll::Plugin::Znuny::Legal::UpdateCopyright]
+select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,vue,dist,tmpl,sh,skel,xml,sopm,html,service,conf,example,template}
+select = .*.dist .bash_completion
+select = var/cron/*
+select = var/git/hooks/*-receive
+select = documentation.yml
+ignore = Kernel/Config.pm Kernel/Config/**/ZZZ*.pm
+ignore = module-format.xml,codesyntax.xml,language-translations.xml,writing-otrs-application.xml,test-mechanism.xml
+; Don't run this in the CI to avoid updates on year changes. It is enough to update the code when it is changed.
+only_modes = cli editor commit
+; ---
 
 [+TidyAll::Plugin::OTRS::Legal::SOPMLicense]
 select = *.{opm,sopm}
