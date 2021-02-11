@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 # --
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
+# Copyright (C) 2012-2021 Znuny GmbH, https://znuny.com/
 # --
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -116,6 +117,22 @@ $TidyAll->DetermineFrameworkVersionFromDirectory();
 $TidyAll->GetFileListFromDirectory();
 
 my @Files;
+# ---
+# ZnunyCodePolicy
+# ---
+my @ChangedFiles;
+my @ChangedFilesFullPath;
+
+# Fetch all changed files, staged and unstaged
+my $GitStatusOutput = capturex( 'git', "status", "--porcelain" );
+my @ChangedFilesOfGitOutput = grep { -f && !-l } ( $GitStatusOutput =~ /^\s*[MA]+\s+(.*)/gm );
+push @ChangedFilesOfGitOutput, grep { -f && !-l } ( $GitStatusOutput =~ /^\s*RM?+\s+(.*?)\s+->\s+(.*)/gm );
+for my $ChangedFile (@ChangedFilesOfGitOutput) {
+    chomp $ChangedFile;
+    push @ChangedFilesFullPath, ( File::Spec->catfile( $RootDir, $ChangedFile ) );
+    push @ChangedFiles, $ChangedFile;
+}
+# ---
 
 if ($All) {
 
@@ -140,15 +157,21 @@ elsif ( defined $Cached && length $Cached ) {
     }
 }
 else {
-    my $Output = capturex( 'git', "status", "--porcelain" );
+# ---
+# ZnunyCodePolicy
+# ---
+#     my $Output = capturex( 'git', "status", "--porcelain" );
+#
+#     # Fetch all changed files, staged and unstaged
+#     my @ChangedFiles = grep { -f && !-l } ( $Output =~ /^\s*[MA]+\s+(.*)/gm );
+#     push @ChangedFiles, grep { -f && !-l } ( $Output =~ /^\s*RM?+\s+(.*?)\s+->\s+(.*)/gm );
+#     for my $ChangedFile (@ChangedFiles) {
+#         chomp $ChangedFile;
+#         push @Files, ( File::Spec->catfile( $RootDir, $ChangedFile ) );
+#     }
 
-    # Fetch all changed files, staged and unstaged
-    my @ChangedFiles = grep { -f && !-l } ( $Output =~ /^\s*[MA]+\s+(.*)/gm );
-    push @ChangedFiles, grep { -f && !-l } ( $Output =~ /^\s*RM?+\s+(.*?)\s+->\s+(.*)/gm );
-    for my $ChangedFile (@ChangedFiles) {
-        chomp $ChangedFile;
-        push @Files, ( File::Spec->catfile( $RootDir, $ChangedFile ) );
-    }
+    @Files = @ChangedFilesFullPath;
+# ---
 
     # Always include all SOPM files to verify the file list.
     for my $SOPMFile ( map { File::Spec->abs2rel( $_, $RootDir ) } grep { !-l $_ } glob("$RootDir/*.sopm") ) {
@@ -160,6 +183,13 @@ else {
 
 # Safeguard: ignore non-regular files and symlinks (causes TidyAll errors).
 @Files = grep { -f && !-l } @Files;
+# ---
+# ZnunyCodePolicy
+# ---
+@ChangedFilesFullPath = grep { -f && !-l } @ChangedFilesFullPath;
+
+$TidyAll::Znuny::ChangedFiles = \@ChangedFiles;
+# ---
 
 my @GlobalResults = $TidyAll->ProcessPathsParallel(
     Processes => $Processes,

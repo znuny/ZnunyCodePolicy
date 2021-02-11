@@ -15,11 +15,46 @@ use utf8;
 
 use scripts::test::ZnunyCodePolicyPlugins;
 
+use TidyAll::Znuny;
+
+$TidyAll::Znuny::ChangedFiles = [
+    'Kernel/System/Coffee.pm',
+];
+
 my @Tests = (
     {
         Name      => "6.0 - Found OTRS copyright!",
+        Filename  => 'Kernel/System/UNCHANGEDCoffee.pm',
+        Plugins   => [qw(TidyAll::Plugin::Znuny::Legal::UpdateZnunyCopyright)],
+        Framework => '6.0',
+        Source    => <<'EOF',
+# --
+# Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+package Kernel::System::UNCHANGEDCoffee;
+EOF
+        Result    => <<'EOF',
+# --
+# Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+package Kernel::System::UNCHANGEDCoffee;
+EOF
+        Exception => 0,
+    },
+    {
+        Name      => "6.0 - Found OTRS copyright!",
         Filename  => 'Kernel/System/Coffee.pm',
-        Plugins   => [qw(TidyAll::Plugin::Znuny::Legal::UpdateCopyright)],
+        Plugins   => [qw(TidyAll::Plugin::Znuny::Legal::UpdateZnunyCopyright)],
         Framework => '6.0',
         Source    => <<'EOF',
 # --
@@ -49,7 +84,7 @@ EOF
     {
         Name      => "6.0 - Found no OTRS copyright!",
         Filename  => 'Kernel/System/Coffee.pm',
-        Plugins   => [qw(TidyAll::Plugin::Znuny::Legal::UpdateCopyright)],
+        Plugins   => [qw(TidyAll::Plugin::Znuny::Legal::UpdateZnunyCopyright)],
         Framework => '6.0',
         Source    => <<'EOF',
 # --

@@ -19,7 +19,7 @@ my @Tests = (
     {
         Name      => "6.0 - Changed year in copyright!",
         Filename  => 'Kernel/System/Coffee.pm',
-        Plugins   => [qw(TidyAll::Plugin::Znuny::Legal::ReplaceCopyright)],
+        Plugins   => [qw(TidyAll::Plugin::Znuny::Legal::ReplaceOTRSCopyright)],
         Framework => '6.0',
         Source    => <<'EOF',
 # --
