@@ -115,7 +115,12 @@ select = doc/**/*.xml
 ;[+TidyAll::Plugin::OTRS::Legal::LicenseValidator]
 [+TidyAll::Plugin::Znuny::Legal::LicenseValidator]
 ; ---
-select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,vue,dist,sh,skel,xml,sopm}
+; ---
+; ZnunyCodePolicy
+; ---
+;select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,vue,dist,sh,skel,xml,sopm}
+select = **/*.{pl,pm,psgi,t,tt,js,css,scss}
+; ---
 ignore = COPYING RELEASE CREDITS
 ignore = Kernel/Config.pm Kernel/Config/**/ZZZ*.pm Kernel/Config/Files/User/*.pm
 ignore = Kernel/WebApp.conf.dist
@@ -140,7 +145,12 @@ ignore = **/*.json.dist
 ;[+TidyAll::Plugin::OTRS::Legal::ReplaceCopyright]
 [+TidyAll::Plugin::Znuny::Legal::ReplaceCopyright]
 ; ---
-select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,vue,dist,tmpl,sh,skel,xml,sopm,html,service,conf,example,template}
+; ---
+; ZnunyCodePolicy
+; ---
+;select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,vue,dist,tmpl,sh,skel,xml,sopm,html,service,conf,example,template}
+select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,dist,tmpl}
+; ---
 select = .*.dist .bash_completion
 select = var/cron/*
 select = var/git/hooks/*-receive
@@ -154,7 +164,7 @@ only_modes = cli editor commit
 ; ZnunyCodePolicy
 ; ---
 [+TidyAll::Plugin::Znuny::Legal::UpdateCopyright]
-select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,vue,dist,tmpl,sh,skel,xml,sopm,html,service,conf,example,template}
+select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,vue,dist,tmpl}
 select = .*.dist .bash_completion
 select = var/cron/*
 select = var/git/hooks/*-receive
