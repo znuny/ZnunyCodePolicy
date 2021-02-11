@@ -85,7 +85,7 @@ sub DieWithError {
 This will color the given text (see Term::ANSIColor::color()) if ANSI output is available and active, otherwise the text
 stays unchanged.
 
-    my $PossiblyColoredText = _Color('green', $Text);
+    my $PossiblyColoredText = $Object->_Color('green', $Text);
 
 =cut
 
@@ -188,11 +188,23 @@ sub GetZnunyCopyrightString {
     return $Copyright;
 }
 
+sub GetChangedFiles {
+    my %ChangedFiles = map { $_ => 1} @{ $TidyAll::Znuny::ChangedFiles // [] };
+    return \%ChangedFiles;
+}
+
+sub IsFileChanged {
+    my ( $Self, $FilePath ) = @_;
+
+    my $ChangedFiles = $Self->GetChangedFiles();
+    return $ChangedFiles->{$FilePath} ? 1 : 0;
+}
+
 =head2 ()
 
 returns path of file or code.
 
-    my $FilePath = $Object->($File);
+    my $FilePath = $Object->FilePath($File);
 
     $File = \bless( [
        '/var/folders/47/mj945dss3gsd9sf1f4b8pbhh0000gn/T/Code-TidyAll-lbxB/scripts/test/Coffee.t',
@@ -204,7 +216,7 @@ returns path of file or code.
 
     # OR
 
-    my $FilePath = $Object->($Code);
+    my $FilePath = $Object->FilePath($Code);
 
 Returns:
 

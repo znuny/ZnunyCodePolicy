@@ -7,7 +7,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package TidyAll::Plugin::Znuny::Legal::UpdateCopyright;
+package TidyAll::Plugin::Znuny::Legal::UpdateZnunyCopyright;
 ## nofilter(TidyAll::Plugin::OTRS::Perl::Time)
 
 use strict;
@@ -26,6 +26,13 @@ sub transform_source {
     return $Code if $Self->IsThirdpartyModule();
 
     my $Copyright = $Self->GetZnunyCopyrightString();
+
+    # Only changed files will be updated.
+    # This allows to run the code policy for unchanged files without updating
+    # the copyright.
+    my $FilePath      = $Self->FilePath($Code);
+    my $FileIsChanged = $Self->IsFileChanged($FilePath);
+    return $Code if !$FileIsChanged;
 
     #
     # Check if a Znuny copyright is already present and replace it with the current one.
@@ -54,6 +61,13 @@ sub validate_source {
     # Don't warn about missing copyright in thirdparty code.
     return $Code if $Self->IsThirdpartyModule();
 
+    # Only changed files will be updated.
+    # This allows to run the code policy for unchanged files without updating
+    # the copyright.
+    my $FilePath      = $Self->FilePath($Code);
+    my $FileIsChanged = $Self->IsFileChanged($FilePath);
+    return $Code if !$FileIsChanged;
+
     return if $Code =~ m{^.*?Copyright.*?Znuny}m;
 
     my $Copyright = $Self->GetZnunyCopyrightString();
@@ -61,7 +75,6 @@ sub validate_source {
     my $Message = "File is missing copyright in header section. Add the following string:\n\n"
         . "$Copyright\n";
 
-    my $FilePath = $Self->FilePath($Code);
     $Self->Print(
         Package  => __PACKAGE__,
         Priority => 'error',

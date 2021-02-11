@@ -143,7 +143,7 @@ ignore = **/*.json.dist
 ; ZnunyCodePolicy
 ; ---
 ;[+TidyAll::Plugin::OTRS::Legal::ReplaceCopyright]
-[+TidyAll::Plugin::Znuny::Legal::ReplaceCopyright]
+[+TidyAll::Plugin::Znuny::Legal::ReplaceOTRSCopyright]
 ; ---
 ; ---
 ; ZnunyCodePolicy
@@ -163,7 +163,7 @@ only_modes = cli editor commit
 ; ---
 ; ZnunyCodePolicy
 ; ---
-[+TidyAll::Plugin::Znuny::Legal::UpdateCopyright]
+[+TidyAll::Plugin::Znuny::Legal::UpdateZnunyCopyright]
 select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,vue,dist,tmpl}
 select = .*.dist .bash_completion
 select = var/cron/*

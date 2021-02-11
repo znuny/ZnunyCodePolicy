@@ -7,7 +7,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package TidyAll::Plugin::Znuny::Legal::ReplaceCopyright;
+package TidyAll::Plugin::Znuny::Legal::ReplaceOTRSCopyright;
 ## nofilter(TidyAll::Plugin::OTRS::Perl::Time)
 
 use strict;
