@@ -55,7 +55,7 @@ GetOptions(
 
 if ($Help) {
     print <<"EOF";
-Usage: OTRSCodePolicy/bin/otrs.CodePolicy.pl [options]
+Usage: ZnunyCodePolicy/bin/otrs.CodePolicy.pl [options]
 
     Performs OTRS code policy checks. Run this script from the toplevel directory
     of your module. By default it will only process files which are staged for
