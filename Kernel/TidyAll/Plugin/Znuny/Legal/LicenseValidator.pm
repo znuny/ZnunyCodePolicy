@@ -24,8 +24,6 @@ sub transform_source {
     # Remove "This software is part of the OTRS project".
     $Code =~ s{\n ^=head1 \s+ TERMS \s+ AND \s+ CONDITIONS .*? ^=cut\n?}{}smx;
 
-    return $Code if $Self->IsThirdpartyModule();
-
     return $Code;
 }
 
@@ -35,8 +33,7 @@ sub validate_file {
     return if $Self->IsPluginDisabled( Filename => $Filename );
 
     my $Code = $Self->_GetFileContents($Filename);
-    return $Code if $Self->IsOriginalOTRSCode($Code);
-    return $Code if $Self->IsThirdpartyModule();
+    return $Code if !$Self->IsOriginalZnunyCode($Code);
 
     my $CorrectLicenseHeaderFound;
 

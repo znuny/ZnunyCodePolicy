@@ -175,10 +175,22 @@ sub IsOriginalOTRSCode {
     return;
 }
 
+sub IsOriginalZnunyCode {
+    my ( $Self, $Code ) = @_;
+
+    return if $Self->IsOriginalOTRSCode($Code);
+    return if $Self->IsThirdpartyModule();
+
+    return 1 if $Code =~ m{Copyright \(C\) 2021(-20\d{2})? Znuny GmbH}sm;
+
+    return;
+}
+
 sub GetZnunyCopyrightString {
     my $CopyrightYear = '2021'; # start year of Znuny fork
 
     my ( $Sec, $Min, $Hour, $Day, $Month, $Year ) = localtime( time() );
+    $Year += 1900;
     if ( $Year > 2021 ) {
         $CopyrightYear .= "-$Year";
     }
