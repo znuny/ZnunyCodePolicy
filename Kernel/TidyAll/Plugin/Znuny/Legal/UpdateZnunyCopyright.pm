@@ -30,7 +30,9 @@ sub transform_source {
     # Only changed files will be updated.
     # This allows to run the code policy for unchanged files without updating
     # the copyright.
-    my $FilePath      = $Self->FilePath($Code);
+    my $FilePath = $Self->FilePath($Code);
+    return $Code if !defined $FilePath;
+
     my $FileIsChanged = $Self->IsFileChanged($FilePath);
     return $Code if !$FileIsChanged;
 
@@ -59,14 +61,16 @@ sub validate_source {
     return if $Self->IsPluginDisabled( Code => $Code );
 
     # Don't warn about missing copyright in thirdparty code.
-    return $Code if $Self->IsThirdpartyModule();
+    return if $Self->IsThirdpartyModule();
 
     # Only changed files will be updated.
     # This allows to run the code policy for unchanged files without updating
     # the copyright.
-    my $FilePath      = $Self->FilePath($Code);
+    my $FilePath = $Self->FilePath($Code);
+    return if !defined $FilePath;
+
     my $FileIsChanged = $Self->IsFileChanged($FilePath);
-    return $Code if !$FileIsChanged;
+    return if !$FileIsChanged;
 
     return if $Code =~ m{^.*?Copyright.*?Znuny}m;
 

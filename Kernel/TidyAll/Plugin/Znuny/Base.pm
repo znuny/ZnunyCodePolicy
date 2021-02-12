@@ -208,6 +208,8 @@ sub GetChangedFiles {
 sub IsFileChanged {
     my ( $Self, $FilePath ) = @_;
 
+    return if !defined $FilePath;
+
     my $ChangedFiles = $Self->GetChangedFiles();
     return $ChangedFiles->{$FilePath} ? 1 : 0;
 }
