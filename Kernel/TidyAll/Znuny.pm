@@ -29,21 +29,18 @@ use Perl::Tidy;
 # ---
 # ZnunyCodePolicy
 # ---
-our $ProductName = 'Znuny';
-# ---
-our $FrameworkVersionMajor = 0;
-our $FrameworkVersionMinor = 0;
-our $ThirdpartyModule      = 0;
-our @FileList              = ();    # all files in current repository
-# ---
-# ZnunyCodePolicy
-# ---
 use File::Spec;
 use Cwd;
 our $DataDir;
 our $OTRSRootDir;
 our $CPRootDir;
 our $PackageName;
+our $ProductName = 'Znuny';
+# ---
+our $FrameworkVersionMajor = 0;
+our $FrameworkVersionMinor = 0;
+our $ThirdpartyModule      = 0;
+our @FileList              = ();    # all files in current repository
 # ---
 
 sub new_from_conf_file {
@@ -150,6 +147,14 @@ sub DetermineFrameworkVersionFromDirectory {
             "  If this is not correct, you can change the <Vendor> tag in your SOPM.\n";
     }
 
+# ---
+# ZnunyCodePolicy
+# ---
+# define global otrs variables
+    $TidyAll::OTRS::FrameworkVersionMajor = $FrameworkVersionMajor;
+    $TidyAll::OTRS::FrameworkVersionMinor = $FrameworkVersionMinor;
+    $TidyAll::OTRS::ThirdpartyModule      = $ThirdpartyModule;
+# ---
     return;
 }
 
@@ -324,6 +329,12 @@ sub GetFileListFromDirectory {
     return if @FileList;
 
     @FileList = $Self->FindFilesInDirectory( Directory => $Self->{root_dir} );
+# ---
+# ZnunyCodePolicy
+# ---
+# define global otrs variables
+    @TidyAll::OTRS::FileList = @FileList;
+# ---
 
     return;
 }
