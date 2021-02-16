@@ -35,6 +35,11 @@ use Code::TidyAll;
 use IPC::System::Simple qw(capturex);
 
 use TidyAll::OTRS;
+# ---
+# ZnunyCodePolicy
+# ---
+use TidyAll::Znuny;
+# ---
 
 # Ensure UTF8 output works.
 binmode( \*STDOUT, ':encoding(UTF-8)' );
@@ -104,7 +109,20 @@ my $ConfigurationFile = $BinDir . '/../Kernel/TidyAll/tidyallrc';
 
 my $RootDir = getcwd();
 
-my $TidyAll = TidyAll::OTRS->new_from_conf_file(
+# ---
+# ZnunyCodePolicy
+# ---
+# create
+# my $TidyAll = TidyAll::OTRS->new_from_conf_file(
+#     $ConfigurationFile,
+#     check_only => 0,
+#     mode       => $Mode // 'cli',
+#     root_dir   => $RootDir,
+#     data_dir   => File::Spec->tmpdir(),
+#     verbose    => $Verbose ? 1 : 0,
+# );
+
+my $TidyAll = TidyAll::Znuny->new_from_conf_file(
     $ConfigurationFile,
     check_only => 0,
     mode       => $Mode // 'cli',
@@ -112,6 +130,7 @@ my $TidyAll = TidyAll::OTRS->new_from_conf_file(
     data_dir   => File::Spec->tmpdir(),
     verbose    => $Verbose ? 1 : 0,
 );
+# ---
 
 $TidyAll->DetermineFrameworkVersionFromDirectory();
 $TidyAll->GetFileListFromDirectory();
@@ -120,6 +139,9 @@ my @Files;
 # ---
 # ZnunyCodePolicy
 # ---
+# workaround to avoid "only used once" warnings
+$TidyAll::Znuny::ChangedFiles = $TidyAll::Znuny::ChangedFiles;
+
 my @ChangedFiles;
 my @ChangedFilesFullPath;
 
