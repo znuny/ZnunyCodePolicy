@@ -179,6 +179,16 @@ only_modes = cli editor commit
 select = *.{opm,sopm}
 
 ;
+; CodeStyle
+;
+
+[+TidyAll::Plugin::Znuny::CodeStyle::LabelCheck]
+select = **/*.{pl,pm}
+ignore = Custom/Kernel/**/*
+ignore = Kernel/cpan-lib/**/* Custom/Kernel/cpan-lib/**/*
+ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
+
+;
 ; POT/PO
 ;
 
