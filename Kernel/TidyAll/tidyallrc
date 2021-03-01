@@ -67,6 +67,13 @@ select = var/cron/*
 [+TidyAll::Plugin::OTRS::Common::ValidateFilename]
 select = *
 
+; ---
+; ZnunyCodePolicy
+; ---
+[+TidyAll::Plugin::Znuny::Common::Contributors]
+select = AUTHORS.md
+; ---
+
 ;
 ; Cron
 ;
