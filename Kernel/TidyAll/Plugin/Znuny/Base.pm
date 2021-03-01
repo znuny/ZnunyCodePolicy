@@ -134,16 +134,17 @@ sub GetScope {
 
 sub GetPackageName {
     my ($Self) = @_;
-    return $TidyAll::Znuny::PackageName;
+    return $TidyAll::Znuny::PackageName // '';
 }
 
 sub GetCondensedPackageName {
     my ($Self) = @_;
 
     my $PackageName          = $Self->GetPackageName();
-    my $CondensedPackageName = $PackageName;
-    $CondensedPackageName    =~ s{-}{}g;
+    my $CondensedPackageName = $PackageName // '';
+    return $CondensedPackageName if !$CondensedPackageName;
 
+    $CondensedPackageName    =~ s{-}{}g;
     return $CondensedPackageName;
 }
 
@@ -257,11 +258,13 @@ sub FilePath {
     }
     # sopm
     if ($Content =~ m{^\<\?xml\s[^\<]+<otrs_package}xms){
-        $FilePath = $Self->GetPackageName() . '.sopm';
+        my $GetPackageName = $Self->GetPackageName();
+        $FilePath = $GetPackageName . '.sopm';
     }
     # xml
     if ($Content =~ m{^\<\?xml\s[^\<]+<otrs_config}xms){
-        $FilePath = $Self->GetCondensedPackageName() . '.xml';
+        my $GetCondensedPackageName = $Self->GetCondensedPackageName();
+        $FilePath = $GetCondensedPackageName . '.xml';
     }
 
     return $FilePath;
