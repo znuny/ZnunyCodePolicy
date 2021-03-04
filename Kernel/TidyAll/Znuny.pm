@@ -132,7 +132,7 @@ sub DetermineFrameworkVersionFromDirectory {
 # ZnunyCodePolicy
 # ---
 #            "This seems to be a module not copyrighted by OTRS AG. File copyright will not be changed.\n";
-            "This software seems to be not copyrighted by Znuny GmbH. File copyright will not be changed.\n";
+            "This software seems to be not copyrighted by Znuny GmbH.\n";
 # ---
     }
     else {
@@ -141,7 +141,7 @@ sub DetermineFrameworkVersionFromDirectory {
 # ZnunyCodePolicy
 # ---
 #            "This module seems to be copyrighted by OTRS AG. File copyright will automatically be assigned to OTRS AG.\n";
-            "This software seems to be copyrighted by Znuny GmbH. File copyright will automatically be assigned to Znuny GmbH.\n";
+            "This software seems to be copyrighted by Znuny GmbH (or OTRS AG).\n";
 # ---
         print
             "  If this is not correct, you can change the <Vendor> tag in your SOPM.\n";
