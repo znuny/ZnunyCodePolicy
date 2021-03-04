@@ -438,7 +438,12 @@ select = *.{opm,sopm}
 [+TidyAll::Plugin::OTRS::SOPM::PackageRequired]
 select = *.{opm,sopm}
 
-[+TidyAll::Plugin::OTRS::SOPM::RequiredElements]
+; ---
+; ZnunyCodePolicy
+; ---
+;[+TidyAll::Plugin::OTRS::SOPM::RequiredElements]
+[+TidyAll::Plugin::Znuny::SOPM::RequiredElements]
+; ---
 select = *.{sopm}
 
 [+TidyAll::Plugin::OTRS::SOPM::XSDValidator]
