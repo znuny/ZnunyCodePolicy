@@ -3,6 +3,7 @@
 ## Required CPAN modules
 
 * Perl::Critic
+* Perl::Critic::Moose
 * Perl::Tidy
 * XML::Parser
 * Algorithm::Diff
@@ -11,7 +12,7 @@
 ## Installation
 
 ```bash
-    sudo cpanm -i Perl::Critic Perl::Tidy XML::Parser Algorithm::Diff Code::TidyAll
+    sudo cpanm -i Perl::Critic Perl::Tidy XML::Parser Algorithm::Diff Code::TidyAll Perl::Critic::Moose
 ```
 
 ## Usage
