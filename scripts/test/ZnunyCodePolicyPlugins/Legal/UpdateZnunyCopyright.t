@@ -20,6 +20,9 @@ use TidyAll::Plugin::Znuny::Base;
 
 my $ZnunyCopyrightString = TidyAll::Plugin::Znuny::Base::GetZnunyCopyrightString();
 
+my ( $Sec, $Min, $Hour, $Day, $Month, $Year ) = localtime( time() );
+$Year += 1900;
+
 $TidyAll::Znuny::ChangedFiles = [
     'Kernel/System/Coffee.pm',
 ];
@@ -41,9 +44,10 @@ my @Tests = (
 
 package Kernel::System::UNCHANGEDCoffee;
 EOF
-        Result    => <<'EOF',
+        Result    => <<"EOF",
 # --
-# Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
+# Copyright (C) 2001-$Year OTRS AG, https://otrs.com/
+# $ZnunyCopyrightString
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -72,7 +76,7 @@ package Kernel::System::Coffee;
 EOF
         Result    => <<"EOF",
 # --
-# Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
+# Copyright (C) 2001-$Year OTRS AG, https://otrs.com/
 # $ZnunyCopyrightString
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see

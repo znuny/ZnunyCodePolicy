@@ -24,18 +24,6 @@ sub transform_source {
 
     # Don't replace copyright in thirdparty code.
     return $Code if $Self->IsThirdpartyModule();
-# ---
-# ZnunyCodePolicy
-# ---
-    # Only changed files will be updated.
-    # This allows to run the code policy for unchanged files without updating
-    # the copyright.
-    my $FilePath = $Self->FilePath($Code);
-    return $Code if !defined $FilePath;
-
-    my $FileIsChanged = $Self->IsFileChanged($FilePath);
-    return $Code if !$FileIsChanged;
-# ---
 
     # Replace <URL>http://otrs.org/</URL> with <URL>https://otrs.com/</URL>
     $Code =~ s{ ^ ( \s* ) \< URL \> .+? \< \/ URL \> }{$1<URL>https://otrs.com/</URL>}xmsg;
