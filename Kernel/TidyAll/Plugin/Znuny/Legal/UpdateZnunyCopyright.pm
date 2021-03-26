@@ -31,7 +31,7 @@ sub transform_source {
     # Check if a Znuny copyright is already present and replace it with the current one.
     #
     if ( $Code =~ m{^.*?Copyright.*?Znuny}m ) {
-        $Code =~ s{^(.*?)Copyright.*?Znuny.*?$}{$1$Copyright}mg;
+        $Code =~ s{^(.*?)Copyright.*?Znuny.*?znuny\.(?:com|org)\/(.*?)$}{$1$Copyright$2}mg;
         return $Code;
     }
 
