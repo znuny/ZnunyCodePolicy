@@ -84,7 +84,6 @@
         <File Permission="660" Location="Kernel/TidyAll/Plugin/OTRS/Migrations/OTRS6/PerlConfigFileFormat.pm" />
         <File Permission="660" Location="Kernel/TidyAll/Plugin/OTRS/Migrations/OTRS6/PermissionDataNotInSession.pm" />
         <File Permission="660" Location="Kernel/TidyAll/Plugin/OTRS/Migrations/OTRS6/SysConfig.pm" />
-        <File Permission="660" Location="Kernel/TidyAll/Plugin/OTRS/Migrations/OTRS6/TimeObject.pm" />
         <File Permission="660" Location="Kernel/TidyAll/Plugin/OTRS/Migrations/OTRS6/TimeZoneOffset.pm" />
         <File Permission="660" Location="Kernel/TidyAll/Plugin/OTRS/Migrations/OTRS6/XMLFrontendNavigation.pm" />
         <File Permission="660" Location="Kernel/TidyAll/Plugin/OTRS/Migrations/OTRS7/DeprecatedSettings.pm" />

@@ -587,13 +587,6 @@ ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 select = **/*.{pl,pm,psgi,t}
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
-[+TidyAll::Plugin::OTRS::Migrations::OTRS6::TimeObject]
-select = **/*.{pl,pm,psgi,t}
-ignore = Kernel/System/Time.pm
-ignore = scripts/test/Time.t
-ignore = scripts/test/Time/**/*.t
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-
 [+TidyAll::Plugin::OTRS::Migrations::OTRS6::TimeZoneOffset]
 select = **/*.{pl,pm,psgi,t}
 ignore = Kernel/Config/Files/ZZZ*.pm
