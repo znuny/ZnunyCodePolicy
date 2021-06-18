@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2012-2019 Znuny GmbH, http://znuny.com/
+# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -36,7 +36,7 @@ sub validate_file {    ## no critic
     my $UnknownLabelMessage = '';
 
     LINE:
-    for my $Line ( split "\n", $Code ) {
+    for my $Line ( split /\n/, $Code ) {
         $LineCounter++;
         if ( $Line =~ m{\A\s*($LabelRegex)\:} ) {
             my $Label = $1;

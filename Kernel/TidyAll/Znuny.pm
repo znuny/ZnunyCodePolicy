@@ -1,12 +1,16 @@
 # --
 # Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
-# Copyright (C) 2012-2021 Znuny GmbH, https://znuny.com/
+# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
-
+# ---
+# ZnunyCodePolicy
+# ---
+## nofilter(TidyAll::Plugin::OTRS::Common::Origin)
+# ---
 package TidyAll::Znuny;
 
 use strict;
@@ -36,11 +40,13 @@ our $OTRSRootDir;
 our $CPRootDir;
 our $PackageName;
 our $ProductName = 'Znuny';
+
 # ---
 our $FrameworkVersionMajor = 0;
 our $FrameworkVersionMinor = 0;
 our $ThirdpartyModule      = 0;
 our @FileList              = ();    # all files in current repository
+
 # ---
 
 sub new_from_conf_file {
@@ -73,12 +79,14 @@ sub DetermineFrameworkVersionFromDirectory {
         my ( $VersionMajor, $VersionMinor ) = $Content[1] =~ m{^VERSION\s+=\s+(\d+)\.(\d+)\.}xms;
         $FrameworkVersionMajor = $VersionMajor;
         $FrameworkVersionMinor = $VersionMinor;
+
 # ---
-# ZnunyCodePolicy
+        # ZnunyCodePolicy
 # ---
         if ( $Content[0] =~ m{\APRODUCT\s*=\s*(.*)} ) {
             $ProductName = $1;
         }
+
 # ---
     }
     else {
@@ -107,9 +115,9 @@ sub DetermineFrameworkVersionFromDirectory {
                 }
 
 # ---
-# ZnunyCodePolicy
+                # ZnunyCodePolicy
 # ---
-#                elsif ( $Line =~ m{<Vendor>} && $Line !~ m{OTRS} ) {
+                #                elsif ( $Line =~ m{<Vendor>} && $Line !~ m{OTRS} ) {
                 elsif ( $Line =~ m{<Vendor>} && $Line !~ m{OTRS|Znuny} ) {
 
 # ---
@@ -128,32 +136,37 @@ sub DetermineFrameworkVersionFromDirectory {
 
     if ($ThirdpartyModule) {
         print
+
 # ---
-# ZnunyCodePolicy
+            # ZnunyCodePolicy
 # ---
-#            "This seems to be a module not copyrighted by OTRS AG. File copyright will not be changed.\n";
+            #            "This seems to be a module not copyrighted by OTRS AG. File copyright will not be changed.\n";
             "This software seems to be not copyrighted by Znuny GmbH.\n";
+
 # ---
     }
     else {
         print
+
 # ---
 # ZnunyCodePolicy
 # ---
 #            "This module seems to be copyrighted by OTRS AG. File copyright will automatically be assigned to OTRS AG.\n";
             "This software seems to be copyrighted by Znuny GmbH (or OTRS AG).\n";
+
 # ---
         print
             "  If this is not correct, you can change the <Vendor> tag in your SOPM.\n";
     }
 
 # ---
-# ZnunyCodePolicy
+    # ZnunyCodePolicy
 # ---
-# define global otrs variables
+    # define global otrs variables
     $TidyAll::OTRS::FrameworkVersionMajor = $FrameworkVersionMajor;
     $TidyAll::OTRS::FrameworkVersionMinor = $FrameworkVersionMinor;
     $TidyAll::OTRS::ThirdpartyModule      = $ThirdpartyModule;
+
 # ---
     return;
 }
@@ -196,10 +209,11 @@ sub ProcessPathsParallel {
     my @GlobalResults;
 
 # ---
-# ZnunyCodePolicy
+    # ZnunyCodePolicy
 # ---
-#     print "OTRSCodePolicy will use up to $Processes parallel processes.\n";
+    #     print "OTRSCodePolicy will use up to $Processes parallel processes.\n";
     print "ZnunyCodePolicy will use up to $Processes parallel processes.\n";
+
 # ---
 
     # To store results from child processes.
@@ -329,11 +343,13 @@ sub GetFileListFromDirectory {
     return if @FileList;
 
     @FileList = $Self->FindFilesInDirectory( Directory => $Self->{root_dir} );
+
 # ---
-# ZnunyCodePolicy
+    # ZnunyCodePolicy
 # ---
-# define global otrs variables
+    # define global otrs variables
     @TidyAll::OTRS::FileList = @FileList;
+
 # ---
 
     return;
@@ -423,12 +439,16 @@ sub SetOTRSRootDir {
 
     $DataDir     = $Self->{data_dir};
     $OTRSRootDir = $Self->{root_dir};
+
+    return 1;
 }
 
 sub SetCPRootDir {
     my ( $Self, $BinDir ) = @_;
     $CPRootDir = $BinDir;
     $CPRootDir =~ s{/bin}{};
+
+    return 1;
 }
 
 sub SetPackageName {
@@ -438,8 +458,11 @@ sub SetPackageName {
     return if @SOPMFilenames != 1;
 
     my $SOPMFile = shift @SOPMFilenames;
-    $SOPMFile    =~ s{\A(.*)\.sopm\z}{$1};
+    $SOPMFile =~ s{\A(.*)\.sopm\z}{$1};
     $PackageName = $1;
+
+    return 1;
 }
+
 # ---
 1;

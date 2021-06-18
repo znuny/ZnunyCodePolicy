@@ -1,12 +1,17 @@
 # --
 # Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
-# Copyright (C) 2012-2021 Znuny GmbH, https://znuny.com/
+# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
-
+# ---
+# ZnunyCodePolicy
+# ---
+## nofilter(TidyAll::Plugin::OTRS::Common::Origin)
+## nofilter(TidyAll::Plugin::OTRS::Perl::Time)
+# ---
 package TidyAll::Plugin::Znuny::Base;
 
 use strict;
@@ -14,11 +19,13 @@ use warnings;
 
 use Encode();
 use TidyAll::Znuny;
+
 # ---
 # ZnunyCodePolicy
 # ---
 use Term::ANSIColor();
 use Path::Tiny;
+
 # ---
 
 use parent qw(Code::TidyAll::Plugin);
@@ -29,11 +36,13 @@ sub IsPluginDisabled {
     my $PluginPackage = ref $Self;
 
     if ( !defined $Param{Code} && !defined $Param{Filename} ) {
+
 # ---
-# ZnunyCodePolicy
+        # ZnunyCodePolicy
 # ---
-#         print STDERR "Need Code or Filename!\n";
+        #         print STDERR "Need Code or Filename!\n";
         print STDERR "Need code or filename in plugin package $PluginPackage!\n";
+
 # ---
         die;
     }
@@ -73,10 +82,11 @@ sub DieWithError {
     chomp $Error;
 
 # ---
-# ZnunyCodePolicy
+    # ZnunyCodePolicy
 # ---
-#     die _Color( 'yellow', ref($Self) ) . "\n" . _Color( 'red', $Error ) . "\n";
+    #     die _Color( 'yellow', ref($Self) ) . "\n" . _Color( 'red', $Error ) . "\n";
     die $Self->_Color( 'yellow', ref($Self) ) . "\n" . $Self->_Color( 'red', $Error ) . "\n";
+
 # ---
 }
 
@@ -89,13 +99,14 @@ stays unchanged.
 
 =cut
 
-
 sub _Color {
+
 # ---
-# ZnunyCodePolicy
+    # ZnunyCodePolicy
 # ---
-#     my ( $Color, $Text ) = @_;
+    #     my ( $Color, $Text ) = @_;
     my ( $Self, $Color, $Text ) = @_;
+
 # ---
 
     return $Text if $ENV{OTRSCODEPOLICY_NOCOLOR};
@@ -144,14 +155,14 @@ sub GetCondensedPackageName {
     my $CondensedPackageName = $PackageName // '';
     return $CondensedPackageName if !$CondensedPackageName;
 
-    $CondensedPackageName    =~ s{-}{}g;
+    $CondensedPackageName =~ s{-}{}g;
     return $CondensedPackageName;
 }
 
 sub IsFileInCustomDirectory {
     my ( $Self, $Filename ) = @_;
 
-    my $IsFileInCustomDirectory = ( index( $Filename, 'Custom/') == -1 ? 0 : 1 );
+    my $IsFileInCustomDirectory = ( index( $Filename, 'Custom/' ) == -1 ? 0 : 1 );
     return $IsFileInCustomDirectory;
 }
 
@@ -161,7 +172,8 @@ sub IsCustomizedOTRSCode {
     if (
         $Code =~ m{Copyright \(C\) 2001-20\d{2} OTRS AG}sm
         && $Code =~ m{\$origin:}sm
-    ) {
+        )
+    {
         return 1;
     }
 
@@ -188,7 +200,7 @@ sub IsOriginalZnunyCode {
 }
 
 sub GetZnunyCopyrightString {
-    my $CopyrightYear = '2021'; # start year of Znuny fork
+    my $CopyrightYear = '2021';    # start year of Znuny fork
 
     my ( $Sec, $Min, $Hour, $Day, $Month, $Year ) = localtime( time() );
     $Year += 1900;
@@ -202,7 +214,7 @@ sub GetZnunyCopyrightString {
 }
 
 sub GetChangedFiles {
-    my %ChangedFiles = map { $_ => 1} @{ $TidyAll::Znuny::ChangedFiles // [] };
+    my %ChangedFiles = map { $_ => 1 } @{ $TidyAll::Znuny::ChangedFiles // [] };
     return \%ChangedFiles;
 }
 
@@ -243,7 +255,7 @@ sub FilePath {
     my ( $Self, $Content ) = @_;
 
     # File
-    if ( ref $Content eq 'Path::Tiny' ){
+    if ( ref $Content eq 'Path::Tiny' ) {
         $Content =~ s{.*\/Code-TidyAll-[^\/]+\/}{}x;
         return $Content;
     }
@@ -251,18 +263,20 @@ sub FilePath {
     # Code
 
     # package Kernel::System::Coffee;
-    (my $FilePath) = $Content =~ m{^package \s ([^;]+);}xms;
+    ( my $FilePath ) = $Content =~ m{^package \s ([^;]+);}xms;
     if ($FilePath) {
         $FilePath =~ s{::}{/}g;
         $FilePath .= '.pm';
     }
+
     # sopm
-    if ($Content =~ m{^\<\?xml\s[^\<]+<otrs_package}xms){
+    if ( $Content =~ m{^\<\?xml\s[^\<]+<otrs_package}xms ) {
         my $GetPackageName = $Self->GetPackageName();
         $FilePath = $GetPackageName . '.sopm';
     }
+
     # xml
-    if ($Content =~ m{^\<\?xml\s[^\<]+<otrs_config}xms){
+    if ( $Content =~ m{^\<\?xml\s[^\<]+<otrs_config}xms ) {
         my $GetCondensedPackageName = $Self->GetCondensedPackageName();
         $FilePath = $GetCondensedPackageName . '.xml';
     }
@@ -272,7 +286,7 @@ sub FilePath {
 
 =head2 Print()
 
-    $Self->Print(
+    $Object->Print(
         Priority => 'error',
         Message  => 'Your package <Description></Description> ends with at least two dots. Should be only one.',
     );
@@ -290,11 +304,11 @@ sub Print {
     my $Message = '';
 
     my $PreOutput = "[$Param{Priority}] for the next file:\n";
-    if ($Param{FilePath}){
+    if ( $Param{FilePath} ) {
         $PreOutput = "[$Param{Priority}] $Param{FilePath}\n";
     }
 
-    my %PriorityColorMap =(
+    my %PriorityColorMap = (
         'success'   => 'green',
         'transform' => 'green',
         'warning'   => 'yellow',
@@ -302,8 +316,8 @@ sub Print {
         'error'     => 'red',
     );
 
-    $Message = $Self->_Color($PriorityColorMap{$Param{Priority}}, $Param{Message});
-    $Package = $Self->_Color($PriorityColorMap{$Param{Priority}}, $Param{Package});
+    $Message = $Self->_Color( $PriorityColorMap{ $Param{Priority} }, $Param{Message} );
+    $Package = $Self->_Color( $PriorityColorMap{ $Param{Priority} }, $Param{Package} );
 
     my $OutputMessage = <<"OUT";
 $Package
@@ -311,7 +325,7 @@ $Package
 $Message
 OUT
 
-    if($Param{Priority} eq 'error'){
+    if ( $Param{Priority} eq 'error' ) {
         die $OutputMessage;
     }
     else {
@@ -321,6 +335,7 @@ OUT
 
     return;
 }
+
 # ---
 
 1;

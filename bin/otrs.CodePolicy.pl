@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # --
-# Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
-# Copyright (C) 2012-2021 Znuny GmbH, https://znuny.com/
+# Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
+# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
 # --
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,6 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
+# ---
+# ZnunyCodePolicy
+# ---
+## nofilter(TidyAll::Plugin::OTRS::Common::Origin)
+# ---
 use strict;
 use warnings;
 
@@ -35,10 +40,12 @@ use Code::TidyAll;
 use IPC::System::Simple qw(capturex);
 
 use TidyAll::OTRS;
+
 # ---
 # ZnunyCodePolicy
 # ---
 use TidyAll::Znuny;
+
 # ---
 
 # Ensure UTF8 output works.
@@ -130,12 +137,14 @@ my $TidyAll = TidyAll::Znuny->new_from_conf_file(
     data_dir   => File::Spec->tmpdir(),
     verbose    => $Verbose ? 1 : 0,
 );
+
 # ---
 
 $TidyAll->DetermineFrameworkVersionFromDirectory();
 $TidyAll->GetFileListFromDirectory();
 
 my @Files;
+
 # ---
 # ZnunyCodePolicy
 # ---
@@ -146,7 +155,7 @@ my @ChangedFiles;
 my @ChangedFilesFullPath;
 
 # Fetch all changed files, staged and unstaged
-my $GitStatusOutput = capturex( 'git', "status", "--porcelain" );
+my $GitStatusOutput         = capturex( 'git', "status", "--porcelain" );
 my @ChangedFilesOfGitOutput = grep { -f && !-l } ( $GitStatusOutput =~ /^\s*[MA]+\s+(.*)/gm );
 push @ChangedFilesOfGitOutput, grep { -f && !-l } ( $GitStatusOutput =~ /^\s*RM?+\s+(.*?)\s+->\s+(.*)/gm );
 for my $ChangedFile (@ChangedFilesOfGitOutput) {
@@ -154,6 +163,7 @@ for my $ChangedFile (@ChangedFilesOfGitOutput) {
     push @ChangedFilesFullPath, ( File::Spec->catfile( $RootDir, $ChangedFile ) );
     push @ChangedFiles, $ChangedFile;
 }
+
 # ---
 
 if ($All) {
@@ -180,19 +190,20 @@ elsif ( defined $Cached && length $Cached ) {
 }
 else {
 # ---
-# ZnunyCodePolicy
+    # ZnunyCodePolicy
 # ---
-#     my $Output = capturex( 'git', "status", "--porcelain" );
-#
-#     # Fetch all changed files, staged and unstaged
-#     my @ChangedFiles = grep { -f && !-l } ( $Output =~ /^\s*[MA]+\s+(.*)/gm );
-#     push @ChangedFiles, grep { -f && !-l } ( $Output =~ /^\s*RM?+\s+(.*?)\s+->\s+(.*)/gm );
-#     for my $ChangedFile (@ChangedFiles) {
-#         chomp $ChangedFile;
-#         push @Files, ( File::Spec->catfile( $RootDir, $ChangedFile ) );
-#     }
+    #     my $Output = capturex( 'git', "status", "--porcelain" );
+    #
+    #     # Fetch all changed files, staged and unstaged
+    #     my @ChangedFiles = grep { -f && !-l } ( $Output =~ /^\s*[MA]+\s+(.*)/gm );
+    #     push @ChangedFiles, grep { -f && !-l } ( $Output =~ /^\s*RM?+\s+(.*?)\s+->\s+(.*)/gm );
+    #     for my $ChangedFile (@ChangedFiles) {
+    #         chomp $ChangedFile;
+    #         push @Files, ( File::Spec->catfile( $RootDir, $ChangedFile ) );
+    #     }
 
     @Files = @ChangedFilesFullPath;
+
 # ---
 
     # Always include all SOPM files to verify the file list.
@@ -205,12 +216,14 @@ else {
 
 # Safeguard: ignore non-regular files and symlinks (causes TidyAll errors).
 @Files = grep { -f && !-l } @Files;
+
 # ---
 # ZnunyCodePolicy
 # ---
 @ChangedFilesFullPath = grep { -f && !-l } @ChangedFilesFullPath;
 
 $TidyAll::Znuny::ChangedFiles = \@ChangedFiles;
+
 # ---
 
 my @GlobalResults = $TidyAll->ProcessPathsParallel(

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2012-2019 Znuny GmbH, http://znuny.com/
+# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -38,7 +38,8 @@ sub validate_file {    ## no critic
 
     return if !length $ErrorMessage;
 
-    my $Message = "Don't (implicitly) use the default variable \$_. Variables should have meaningful names.$ErrorMessage";
+    my $Message
+        = "Don't (implicitly) use the default variable \$_. Variables should have meaningful names.$ErrorMessage";
 
     $Self->Print(
         Package  => __PACKAGE__,

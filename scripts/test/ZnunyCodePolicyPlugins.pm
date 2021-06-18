@@ -1,11 +1,14 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
-# Copyright (C) 2012-2019 Znuny GmbH, http://znuny.com/
+# Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
+# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
+## nofilter(TidyAll::Plugin::OTRS::Perl::PerlCritic)
+## nofilter(TidyAll::Plugin::OTRS::Perl::Pod::SpellCheck)
+
 package scripts::test::ZnunyCodePolicyPlugins;    ## no critic
 
 use strict;
@@ -13,7 +16,7 @@ use warnings;
 
 use File::Basename;
 use FindBin qw($RealBin);
-use lib dirname($RealBin) . '/Kernel/';          # find TidyAll
+use lib dirname($RealBin) . '/Kernel/';           # find TidyAll
 
 use utf8;
 
@@ -80,22 +83,21 @@ sub Run {
         #verbose    => 1,
     );
 
-
     TEST:
     for my $Test ( @{ $Param{Tests} } ) {
 
         NEEDED:
-        for my $Needed ( qw(Name Filename Plugins Framework Source) ) {
-            next NEEDED if defined $Test->{ $Needed };
-            my $Message = $Self->_Color('red', "$Test->{Name} - STDOUT");
+        for my $Needed (qw(Name Filename Plugins Framework Source)) {
+            next NEEDED if defined $Test->{$Needed};
+            my $Message = $Self->_Color( 'red', "$Test->{Name} - STDOUT" );
             $Self->True(
                 0,
                 $Message,
             );
         }
 
-        if (!defined $Test->{Exception} && !$Test->{Result} && !$Test->{STDOUT}){
-            my $Message = $Self->_Color('red', "Parameter 'Exception' or 'Result' or 'STDOUT' is needed!");
+        if ( !defined $Test->{Exception} && !$Test->{Result} && !$Test->{STDOUT} ) {
+            my $Message = $Self->_Color( 'red', "Parameter 'Exception' or 'Result' or 'STDOUT' is needed!" );
             $Self->True(
                 0,
                 $Message,
@@ -104,10 +106,10 @@ sub Run {
 
         # Set framework version in TidyAll so that plugins can use it.
         my ( $FrameworkVersionMajor, $FrameworkVersionMinor ) = $Test->{Framework} =~ m/(\d+)[.](\d+)/xms;
-        $TidyAll::OTRS::FrameworkVersionMajor                 = $FrameworkVersionMajor;
-        $TidyAll::OTRS::FrameworkVersionMinor                 = $FrameworkVersionMinor;
-        $TidyAll::OTRS::PackageName                           = $Test->{'TidyAll::OTRS::PackageName'} || 'ZnunyCodePolicy';
-        $TidyAll::OTRS::OTRSRootDir                           = $Test->{'TidyAll::OTRS::OTRSRootDir'} || $ConfigObject->Get('Home');
+        $TidyAll::OTRS::FrameworkVersionMajor = $FrameworkVersionMajor;
+        $TidyAll::OTRS::FrameworkVersionMinor = $FrameworkVersionMinor;
+        $TidyAll::OTRS::PackageName           = $Test->{'TidyAll::OTRS::PackageName'} || 'ZnunyCodePolicy';
+        $TidyAll::OTRS::OTRSRootDir           = $Test->{'TidyAll::OTRS::OTRSRootDir'} || $ConfigObject->Get('Home');
 
         my $Temp = $Test->{'TidyAll::OTRS::FileList'} || ['ZnunyCodePolicy.sopm'];
         @TidyAll::OTRS::FileList = @$Temp;
@@ -135,43 +137,42 @@ sub Run {
 
         my $Exception = $@;
 
-        if ($STDOUT){
+        if ($STDOUT) {
             $STDOUT =~ s/\x1b\[[0-9;]*m//g;
         }
 
-        if ($Exception){
+        if ($Exception) {
             $Exception =~ s/\x1b\[[0-9;]*m//g;
         }
 
         # make sure color is correct before check
-        if ($Test->{STDOUT} && $Test->{Result}) {
-            $Test->{STDOUT} = $Self->_Color('green', $Test->{STDOUT});
-            if ($STDOUT){
-                $STDOUT    = $Self->_Color('green', $STDOUT);
+        if ( $Test->{STDOUT} && $Test->{Result} ) {
+            $Test->{STDOUT} = $Self->_Color( 'green', $Test->{STDOUT} );
+            if ($STDOUT) {
+                $STDOUT = $Self->_Color( 'green', $STDOUT );
             }
-            if ($Exception){
-                $Exception = $Self->_Color('green', $Exception);
-            }
-        }
-        elsif ($Test->{STDOUT} && !$Test->{Exception}){
-            $Test->{STDOUT} = $Self->_Color('yellow', $Test->{STDOUT});
-            if ($STDOUT){
-                $STDOUT    = $Self->_Color('yellow', $STDOUT);
-            }
-            if ($Exception){
-                $Exception = $Self->_Color('yellow', $Exception);
+            if ($Exception) {
+                $Exception = $Self->_Color( 'green', $Exception );
             }
         }
-        elsif ($Test->{STDOUT} && $Test->{Exception}){
-            $Test->{STDOUT} = $Self->_Color('red', $Test->{STDOUT});
-            if ($STDOUT){
-                $STDOUT    = $Self->_Color('red', $STDOUT);
+        elsif ( $Test->{STDOUT} && !$Test->{Exception} ) {
+            $Test->{STDOUT} = $Self->_Color( 'yellow', $Test->{STDOUT} );
+            if ($STDOUT) {
+                $STDOUT = $Self->_Color( 'yellow', $STDOUT );
             }
-            if ($Exception){
-                $Exception = $Self->_Color('red', $Exception);
+            if ($Exception) {
+                $Exception = $Self->_Color( 'yellow', $Exception );
             }
         }
-
+        elsif ( $Test->{STDOUT} && $Test->{Exception} ) {
+            $Test->{STDOUT} = $Self->_Color( 'red', $Test->{STDOUT} );
+            if ($STDOUT) {
+                $STDOUT = $Self->_Color( 'red', $STDOUT );
+            }
+            if ($Exception) {
+                $Exception = $Self->_Color( 'red', $Exception );
+            }
+        }
 
         $Self->Is(
             $Exception ? 1 : 0,
@@ -179,7 +180,7 @@ sub Run {
             "$Test->{Name} - exception found: $@",
         );
 
-        if ($Test->{Exception} && $Test->{STDOUT}){
+        if ( $Test->{Exception} && $Test->{STDOUT} ) {
             $Self->Is(
                 $Exception,
                 $Test->{STDOUT},
@@ -187,7 +188,7 @@ sub Run {
             );
         }
 
-        if ($Test->{STDOUT} && $STDOUT){
+        if ( $Test->{STDOUT} && $STDOUT ) {
             $Self->Is(
                 $STDOUT,
                 $Test->{STDOUT},

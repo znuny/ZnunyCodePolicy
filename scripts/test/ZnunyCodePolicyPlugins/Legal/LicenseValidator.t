@@ -1,10 +1,12 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
+# Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
+# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
+## nofilter(TidyAll::Plugin::OTRS::Common::CustomizationMarkers)
 
 ## no critic (Modules::RequireExplicitPackage)
 use strict;
@@ -23,7 +25,7 @@ my @Tests = (
         Framework => '6.0',
         Source    => <<'EOF',
 # --
-# Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
+# Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -41,7 +43,7 @@ EOF
         Framework => '6.0',
         Source    => <<'EOF',
 # --
-# Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
+# Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -59,7 +61,7 @@ EOF
         Framework => '6.0',
         Source    => <<'EOF',
 # --
-# Copyright (C) 2021 Znuny GmbH, https://znuny.com/
+# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -68,7 +70,7 @@ EOF
 
 package Kernel::System::Coffee;
 EOF
-        STDOUT    => 'TidyAll::Plugin::Znuny::Legal::LicenseValidator
+        STDOUT => 'TidyAll::Plugin::Znuny::Legal::LicenseValidator
 
 No valid license header found. Remove any license text and add the following text to the header:
 
@@ -86,7 +88,7 @@ did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
         Framework => '6.0',
         Source    => <<'EOF',
 # --
-# Copyright (C) 2021 Znuny GmbH, https://znuny.com/
+# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you

@@ -1,5 +1,6 @@
 # --
-# Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
+# Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
+# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -14,198 +15,199 @@ use utf8;
 use scripts::test::ZnunyCodePolicyPlugins;
 
 my @Tests = (
-#     {
-#         Name      => 'Minimal valid SOPM.',
-#         Filename  => 'Test.pm',
-#         Plugins   => [qw(TidyAll::Plugin::Znuny::SOPM::RequiredElements)],
-#         Framework => '7.0',
-#         Source    => <<'EOF',
-# <?xml version="1.0" encoding="utf-8" ?>
-# <otrs_package version="1.0">
-#     <Name>ZnunyCodePolicy</Name>
-#     <Version>0.0.0</Version>
-#     <Framework>7.0.x</Framework>
-#     <Vendor>Znuny GmbH</Vendor>
-#     <URL>https://znuny.com/</URL>
-#     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
-#     <Description Lang="en" Translatable="1">OTRS code quality checks.</Description>
-#     <PackageIsDownloadable>0</PackageIsDownloadable>
-#     <PackageIsBuildable>0</PackageIsBuildable>
-#     <Filelist>
-#         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
-#     </Filelist>
-# </otrs_package>
-# EOF
-#         Exception => 0,
-#     },
-#     {
-#         Name      => 'Missing name.',
-#         Filename  => 'Test.pm',
-#         Plugins   => [qw(TidyAll::Plugin::Znuny::SOPM::RequiredElements)],
-#         Framework => '7.0',
-#         Source    => <<'EOF',
-# <?xml version="1.0" encoding="utf-8" ?>
-# <otrs_package version="1.0">
-#     <Version>0.0.0</Version>
-#     <Framework>7.0.x</Framework>
-#     <Vendor>Znuny GmbH</Vendor>
-#     <URL>https://znuny.com/</URL>
-#     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
-#     <Description Lang="en">OTRS code quality checks.</Description>
-#     <Filelist>
-#         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
-#     </Filelist>
-# </otrs_package>
-# EOF
-#         Exception => 1,
-#         STDOUT    => 'TidyAll::Plugin::Znuny::SOPM::RequiredElements
-# You have forgotten to use the element <Name>!
-# ',
-#     },
-#     {
-#         Name      => 'Missing description.',
-#         Filename  => 'Test.pm',
-#         Plugins   => [qw(TidyAll::Plugin::Znuny::SOPM::RequiredElements)],
-#         Framework => '7.0',
-#         Source    => <<'EOF',
-# <?xml version="1.0" encoding="utf-8" ?>
-# <otrs_package version="1.0">
-#     <Name>ZnunyCodePolicy</Name>
-#     <Version>0.0.0</Version>
-#     <Framework>7.0.x</Framework>
-#     <Vendor>Znuny GmbH</Vendor>
-#     <URL>https://znuny.com/</URL>
-#     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
-#     <Filelist>
-#         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
-#     </Filelist>
-# </otrs_package>
-# EOF
-#         Exception => 1,
-#         STDOUT    => 'TidyAll::Plugin::Znuny::SOPM::RequiredElements
-# You have forgotten to use the element <Description Lang="en">!
-# ',
-#     },
-#     {
-#         Name      => 'Missing version.',
-#         Filename  => 'Test.pm',
-#         Plugins   => [qw(TidyAll::Plugin::Znuny::SOPM::RequiredElements)],
-#         Framework => '7.0',
-#         Source    => <<'EOF',
-# <?xml version="1.0" encoding="utf-8" ?>
-# <otrs_package version="1.0">
-#     <Name>ZnunyCodePolicy</Name>
-#     <Framework>7.0.x</Framework>
-#     <Vendor>Znuny GmbH</Vendor>
-#     <URL>https://znuny.com/</URL>
-#     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
-#     <Description Lang="en">OTRS code quality checks.</Description>
-#     <Filelist>
-#         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
-#     </Filelist>
-# </otrs_package>
-# EOF
-#         Exception => 1,
-#         STDOUT    => 'TidyAll::Plugin::Znuny::SOPM::RequiredElements
-# You have forgotten to use the element <Version>!
-# ',
-#     },
-#     {
-#         Name      => 'Missing framework.',
-#         Filename  => 'Test.pm',
-#         Plugins   => [qw(TidyAll::Plugin::Znuny::SOPM::RequiredElements)],
-#         Framework => '7.0',
-#         Source    => <<'EOF',
-# <?xml version="1.0" encoding="utf-8" ?>
-# <otrs_package version="1.0">
-#     <Name>ZnunyCodePolicy</Name>
-#     <Version>0.0.0</Version>
-#     <Vendor>Znuny GmbH</Vendor>
-#     <URL>https://znuny.com/</URL>
-#     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
-#     <Description Lang="en">OTRS code quality checks.</Description>
-#     <Filelist>
-#         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
-#     </Filelist>
-# </otrs_package>
-# EOF
-#         Exception => 1,
-#         STDOUT    => 'TidyAll::Plugin::Znuny::SOPM::RequiredElements
-# You have forgotten to use the element <Framework>!
-# ',
-#     },
-#     {
-#         Name      => 'Missing vendor.',
-#         Filename  => 'Test.pm',
-#         Plugins   => [qw(TidyAll::Plugin::Znuny::SOPM::RequiredElements)],
-#         Framework => '7.0',
-#         Source    => <<'EOF',
-# <?xml version="1.0" encoding="utf-8" ?>
-# <otrs_package version="1.0">
-#     <Name>ZnunyCodePolicy</Name>
-#     <Version>0.0.0</Version>
-#     <Framework>7.0.x</Framework>
-#     <URL>https://znuny.com/</URL>
-#     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
-#     <Description Lang="en">OTRS code quality checks.</Description>
-#     <Filelist>
-#         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
-#     </Filelist>
-# </otrs_package>
-# EOF
-#         Exception => 1,
-#         STDOUT    => 'TidyAll::Plugin::Znuny::SOPM::RequiredElements
-# You have forgotten to use the element <Vendor>!
-# ',
-#     },
-#     {
-#         Name      => 'Missing URL.',
-#         Filename  => 'Test.pm',
-#         Plugins   => [qw(TidyAll::Plugin::Znuny::SOPM::RequiredElements)],
-#         Framework => '7.0',
-#         Source    => <<'EOF',
-# <?xml version="1.0" encoding="utf-8" ?>
-# <otrs_package version="1.0">
-#     <Name>ZnunyCodePolicy</Name>
-#     <Version>0.0.0</Version>
-#     <Framework>7.0.x</Framework>
-#     <Vendor>Znuny GmbH</Vendor>
-#     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
-#     <Description Lang="en">OTRS code quality checks.</Description>
-#     <Filelist>
-#         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
-#     </Filelist>
-# </otrs_package>
-# EOF
-#         Exception => 1,
-#         STDOUT    => 'TidyAll::Plugin::Znuny::SOPM::RequiredElements
-# You have forgotten to use the element <URL>!
-# ',
-#     },
-#     {
-#         Name      => 'Missing license.',
-#         Filename  => 'Test.pm',
-#         Plugins   => [qw(TidyAll::Plugin::Znuny::SOPM::RequiredElements)],
-#         Framework => '7.0',
-#         Source    => <<'EOF',
-# <?xml version="1.0" encoding="utf-8" ?>
-# <otrs_package version="1.0">
-#     <Name>ZnunyCodePolicy</Name>
-#     <Version>0.0.0</Version>
-#     <Framework>7.0.x</Framework>
-#     <Vendor>Znuny GmbH</Vendor>
-#     <URL>https://znuny.com/</URL>
-#     <Description Lang="en">OTRS code quality checks.</Description>
-#     <Filelist>
-#         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
-#     </Filelist>
-# </otrs_package>
-# EOF
-#         Exception => 1,
-#         STDOUT    => 'TidyAll::Plugin::Znuny::SOPM::RequiredElements
-# You have forgotten to use the element <License>!
-# ',
-#     },
+
+    #     {
+    #         Name      => 'Minimal valid SOPM.',
+    #         Filename  => 'Test.pm',
+    #         Plugins   => [qw(TidyAll::Plugin::Znuny::SOPM::RequiredElements)],
+    #         Framework => '7.0',
+    #         Source    => <<'EOF',
+    # <?xml version="1.0" encoding="utf-8" ?>
+    # <otrs_package version="1.0">
+    #     <Name>ZnunyCodePolicy</Name>
+    #     <Version>0.0.0</Version>
+    #     <Framework>7.0.x</Framework>
+    #     <Vendor>Znuny GmbH</Vendor>
+    #     <URL>https://znuny.com/</URL>
+    #     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
+    #     <Description Lang="en" Translatable="1">Znuny code quality checks.</Description>
+    #     <PackageIsDownloadable>0</PackageIsDownloadable>
+    #     <PackageIsBuildable>0</PackageIsBuildable>
+    #     <Filelist>
+    #         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
+    #     </Filelist>
+    # </otrs_package>
+    # EOF
+    #         Exception => 0,
+    #     },
+    #     {
+    #         Name      => 'Missing name.',
+    #         Filename  => 'Test.pm',
+    #         Plugins   => [qw(TidyAll::Plugin::Znuny::SOPM::RequiredElements)],
+    #         Framework => '7.0',
+    #         Source    => <<'EOF',
+    # <?xml version="1.0" encoding="utf-8" ?>
+    # <otrs_package version="1.0">
+    #     <Version>0.0.0</Version>
+    #     <Framework>7.0.x</Framework>
+    #     <Vendor>Znuny GmbH</Vendor>
+    #     <URL>https://znuny.com/</URL>
+    #     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
+    #     <Description Lang="en">Znuny code quality checks.</Description>
+    #     <Filelist>
+    #         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
+    #     </Filelist>
+    # </otrs_package>
+    # EOF
+    #         Exception => 1,
+    #         STDOUT    => 'TidyAll::Plugin::Znuny::SOPM::RequiredElements
+    # You have forgotten to use the element <Name>!
+    # ',
+    #     },
+    #     {
+    #         Name      => 'Missing description.',
+    #         Filename  => 'Test.pm',
+    #         Plugins   => [qw(TidyAll::Plugin::Znuny::SOPM::RequiredElements)],
+    #         Framework => '7.0',
+    #         Source    => <<'EOF',
+    # <?xml version="1.0" encoding="utf-8" ?>
+    # <otrs_package version="1.0">
+    #     <Name>ZnunyCodePolicy</Name>
+    #     <Version>0.0.0</Version>
+    #     <Framework>7.0.x</Framework>
+    #     <Vendor>Znuny GmbH</Vendor>
+    #     <URL>https://znuny.com/</URL>
+    #     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
+    #     <Filelist>
+    #         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
+    #     </Filelist>
+    # </otrs_package>
+    # EOF
+    #         Exception => 1,
+    #         STDOUT    => 'TidyAll::Plugin::Znuny::SOPM::RequiredElements
+    # You have forgotten to use the element <Description Lang="en">!
+    # ',
+    #     },
+    #     {
+    #         Name      => 'Missing version.',
+    #         Filename  => 'Test.pm',
+    #         Plugins   => [qw(TidyAll::Plugin::Znuny::SOPM::RequiredElements)],
+    #         Framework => '7.0',
+    #         Source    => <<'EOF',
+    # <?xml version="1.0" encoding="utf-8" ?>
+    # <otrs_package version="1.0">
+    #     <Name>ZnunyCodePolicy</Name>
+    #     <Framework>7.0.x</Framework>
+    #     <Vendor>Znuny GmbH</Vendor>
+    #     <URL>https://znuny.com/</URL>
+    #     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
+    #     <Description Lang="en">Znuny code quality checks.</Description>
+    #     <Filelist>
+    #         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
+    #     </Filelist>
+    # </otrs_package>
+    # EOF
+    #         Exception => 1,
+    #         STDOUT    => 'TidyAll::Plugin::Znuny::SOPM::RequiredElements
+    # You have forgotten to use the element <Version>!
+    # ',
+    #     },
+    #     {
+    #         Name      => 'Missing framework.',
+    #         Filename  => 'Test.pm',
+    #         Plugins   => [qw(TidyAll::Plugin::Znuny::SOPM::RequiredElements)],
+    #         Framework => '7.0',
+    #         Source    => <<'EOF',
+    # <?xml version="1.0" encoding="utf-8" ?>
+    # <otrs_package version="1.0">
+    #     <Name>ZnunyCodePolicy</Name>
+    #     <Version>0.0.0</Version>
+    #     <Vendor>Znuny GmbH</Vendor>
+    #     <URL>https://znuny.com/</URL>
+    #     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
+    #     <Description Lang="en">Znuny code quality checks.</Description>
+    #     <Filelist>
+    #         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
+    #     </Filelist>
+    # </otrs_package>
+    # EOF
+    #         Exception => 1,
+    #         STDOUT    => 'TidyAll::Plugin::Znuny::SOPM::RequiredElements
+    # You have forgotten to use the element <Framework>!
+    # ',
+    #     },
+    #     {
+    #         Name      => 'Missing vendor.',
+    #         Filename  => 'Test.pm',
+    #         Plugins   => [qw(TidyAll::Plugin::Znuny::SOPM::RequiredElements)],
+    #         Framework => '7.0',
+    #         Source    => <<'EOF',
+    # <?xml version="1.0" encoding="utf-8" ?>
+    # <otrs_package version="1.0">
+    #     <Name>ZnunyCodePolicy</Name>
+    #     <Version>0.0.0</Version>
+    #     <Framework>7.0.x</Framework>
+    #     <URL>https://znuny.com/</URL>
+    #     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
+    #     <Description Lang="en">Znuny code quality checks.</Description>
+    #     <Filelist>
+    #         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
+    #     </Filelist>
+    # </otrs_package>
+    # EOF
+    #         Exception => 1,
+    #         STDOUT    => 'TidyAll::Plugin::Znuny::SOPM::RequiredElements
+    # You have forgotten to use the element <Vendor>!
+    # ',
+    #     },
+    #     {
+    #         Name      => 'Missing URL.',
+    #         Filename  => 'Test.pm',
+    #         Plugins   => [qw(TidyAll::Plugin::Znuny::SOPM::RequiredElements)],
+    #         Framework => '7.0',
+    #         Source    => <<'EOF',
+    # <?xml version="1.0" encoding="utf-8" ?>
+    # <otrs_package version="1.0">
+    #     <Name>ZnunyCodePolicy</Name>
+    #     <Version>0.0.0</Version>
+    #     <Framework>7.0.x</Framework>
+    #     <Vendor>Znuny GmbH</Vendor>
+    #     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
+    #     <Description Lang="en">Znuny code quality checks.</Description>
+    #     <Filelist>
+    #         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
+    #     </Filelist>
+    # </otrs_package>
+    # EOF
+    #         Exception => 1,
+    #         STDOUT    => 'TidyAll::Plugin::Znuny::SOPM::RequiredElements
+    # You have forgotten to use the element <URL>!
+    # ',
+    #     },
+    #     {
+    #         Name      => 'Missing license.',
+    #         Filename  => 'Test.pm',
+    #         Plugins   => [qw(TidyAll::Plugin::Znuny::SOPM::RequiredElements)],
+    #         Framework => '7.0',
+    #         Source    => <<'EOF',
+    # <?xml version="1.0" encoding="utf-8" ?>
+    # <otrs_package version="1.0">
+    #     <Name>ZnunyCodePolicy</Name>
+    #     <Version>0.0.0</Version>
+    #     <Framework>7.0.x</Framework>
+    #     <Vendor>Znuny GmbH</Vendor>
+    #     <URL>https://znuny.com/</URL>
+    #     <Description Lang="en">Znuny code quality checks.</Description>
+    #     <Filelist>
+    #         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
+    #     </Filelist>
+    # </otrs_package>
+    # EOF
+    #         Exception => 1,
+    #         STDOUT    => 'TidyAll::Plugin::Znuny::SOPM::RequiredElements
+    # You have forgotten to use the element <License>!
+    # ',
+    #     },
     {
         Name      => 'Invalid content for PackageIsDownloadable flag.',
         Filename  => 'Test.pm',
@@ -220,7 +222,7 @@ my @Tests = (
     <Vendor>Znuny GmbH</Vendor>
     <URL>https://znuny.com/</URL>
     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
-    <Description Lang="en">OTRS code quality checks.</Description>
+    <Description Lang="en">Znuny code quality checks.</Description>
     <PackageIsDownloadable>test</PackageIsDownloadable>
     <PackageIsBuildable>0</PackageIsBuildable>
     <Filelist>
@@ -247,7 +249,7 @@ You have forgotten to use the element <PackageIsDownloadable>!
     <Vendor>Znuny GmbH</Vendor>
     <URL>https://znuny.com/</URL>
     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
-    <Description Lang="en">OTRS code quality checks.</Description>
+    <Description Lang="en">Znuny code quality checks.</Description>
     <Filelist>
         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
     </Filelist>
@@ -273,7 +275,7 @@ You have forgotten to use the element <PackageIsBuildable>!
     <Vendor>Znuny GmbH</Vendor>
     <URL>https://znuny.com/</URL>
     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
-    <Description Lang="en">OTRS code quality checks.</Description>
+    <Description Lang="en">Znuny code quality checks.</Description>
     <PackageIsDownloadable>0</PackageIsDownloadable>
     <PackageIsBuildable>0</PackageIsBuildable>
     <Filelist>
@@ -297,14 +299,14 @@ EOF
     <Vendor>Znuny GmbH</Vendor>
     <URL>https://znuny.com/</URL>
     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
-    <Description Lang="en">OTRS code quality checks.</Description>
+    <Description Lang="en">Znuny code quality checks.</Description>
     <Filelist>
         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
     </Filelist>
 </otrs_package>
 EOF
         Exception => 1,
-        STDOUT    =>  'TidyAll::Plugin::Znuny::SOPM::RequiredElements
+        STDOUT    => 'TidyAll::Plugin::Znuny::SOPM::RequiredElements
 You have forgotten to use the element <PackageIsDownloadable>!
 You have forgotten to use the element <PackageIsBuildable>!
 ',
@@ -323,7 +325,7 @@ You have forgotten to use the element <PackageIsBuildable>!
     <Vendor>Znuny GmbH</Vendor>
     <URL>https://znuny.com/</URL>
     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
-    <Description Lang="en">OTRS code quality checks.</Description>
+    <Description Lang="en">Znuny code quality checks.</Description>
     <PackageIsDownloadable>0</PackageIsDownloadable>
     <PackageIsBuildable>0</PackageIsBuildable>
     <Filelist>
@@ -347,14 +349,14 @@ EOF
     <Vendor>Znuny GmbH</Vendor>
     <URL>https://znuny.com/</URL>
     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
-    <Description Lang="en">OTRS code quality checks.</Description>
+    <Description Lang="en">Znuny code quality checks.</Description>
     <Filelist>
         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
     </Filelist>
 </otrs_package>
 EOF
         Exception => 1,
-        STDOUT    =>  'TidyAll::Plugin::Znuny::SOPM::RequiredElements
+        STDOUT    => 'TidyAll::Plugin::Znuny::SOPM::RequiredElements
 You have forgotten to use the element <PackageIsDownloadable>!
 You have forgotten to use the element <PackageIsBuildable>!
 ',
@@ -373,7 +375,7 @@ You have forgotten to use the element <PackageIsBuildable>!
     <Vendor>Znuny GmbH</Vendor>
     <URL>https://znuny.com/</URL>
     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
-    <Description Lang="en">OTRS code quality checks.</Description>
+    <Description Lang="en">Znuny code quality checks.</Description>
     <PackageIsDownloadable>0</PackageIsDownloadable>
     <PackageIsBuildable>0</PackageIsBuildable>
     <Filelist>
@@ -397,7 +399,7 @@ EOF
     <Vendor>Znuny GmbH</Vendor>
     <URL>https://znuny.com/</URL>
     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
-    <Description Lang="en">OTRS code quality checks.</Description>
+    <Description Lang="en">Znuny code quality checks.</Description>
     <Filelist>
         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
     </Filelist>
@@ -423,7 +425,7 @@ You have forgotten to use the element <PackageIsBuildable>!
     <Vendor>Znuny GmbH</Vendor>
     <URL>https://znuny.com/</URL>
     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
-    <Description Lang="en">OTRS code quality checks.</Description>
+    <Description Lang="en">Znuny code quality checks.</Description>
     <PackageIsDownloadable>0</PackageIsDownloadable>
     <PackageIsBuildable>0</PackageIsBuildable>
     <Filelist>
@@ -447,7 +449,7 @@ EOF
     <Vendor>Znuny GmbH</Vendor>
     <URL>https://znuny.com/</URL>
     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
-    <Description Lang="en">OTRS code quality checks.</Description>
+    <Description Lang="en">Znuny code quality checks.</Description>
     <Filelist>
         <File Permission="755" Location="bin/otrs.CodePolicy.pl" />
     </Filelist>

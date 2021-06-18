@@ -1,5 +1,6 @@
 # --
-# Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
+# Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
+# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -128,9 +129,9 @@ sub validate_file {
 sub _DataDiff {
     my ( $Self, %Param ) = @_;
 
-    for (qw(Data1 Data2)) {
-        if ( !defined $Param{$_} ) {
-            print STDERR "Need $_!\n";
+    for my $Needed (qw(Data1 Data2)) {
+        if ( !defined $Param{$Needed} ) {
+            print STDERR "Need $Needed!\n";
             return;
         }
     }

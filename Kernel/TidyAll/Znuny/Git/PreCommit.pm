@@ -1,10 +1,12 @@
 # --
-# Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
+# Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
+# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
+## nofilter(TidyAll::Plugin::OTRS::Common::Origin)
 
 package TidyAll::Znuny::Git::PreCommit;
 
@@ -28,20 +30,23 @@ use IPC::System::Simple qw(capturex run);
 use Try::Tiny;
 use TidyAll::OTRS;
 use Moo;
+
 # ---
 # ZnunyCodePolicy
 # ---
 use TidyAll::Znuny;
+
 # ---
 
 sub Run {
     my $Self = @_;
 
 # ---
-# ZnunyCodePolicy
+    # ZnunyCodePolicy
 # ---
-#     print "OTRSCodePolicy commit hook starting...\n";
+    #     print "OTRSCodePolicy commit hook starting...\n";
     print "ZnunyCodePolicy commit hook starting...\n";
+
 # ---
 
     my $ErrorMessage;
@@ -75,17 +80,18 @@ sub Run {
             $ScriptDirectory = dirname($0);
         }
         my $ConfigFile = $ScriptDirectory . '/../tidyallrc';
+
 # ---
-# ZnunyCodePolicy
+        # ZnunyCodePolicy
 # ---
-#
-#         my $TidyAll = TidyAll::OTRS->new_from_conf_file(
-#             $ConfigFile,
-#             check_only => 1,
-#             mode       => 'commit',
-#             root_dir   => $RootDir,
-#             data_dir   => File::Spec->tmpdir(),
-#         );
+        #
+        #         my $TidyAll = TidyAll::OTRS->new_from_conf_file(
+        #             $ConfigFile,
+        #             check_only => 1,
+        #             mode       => 'commit',
+        #             root_dir   => $RootDir,
+        #             data_dir   => File::Spec->tmpdir(),
+        #         );
         my $TidyAll = TidyAll::Znuny->new_from_conf_file(
             $ConfigFile,
             check_only => 1,
@@ -93,6 +99,7 @@ sub Run {
             root_dir   => $RootDir,
             data_dir   => File::Spec->tmpdir(),
         );
+
 # ---
         $TidyAll->DetermineFrameworkVersionFromDirectory();
         $TidyAll->GetFileListFromDirectory();

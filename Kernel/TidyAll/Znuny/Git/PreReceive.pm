@@ -1,10 +1,12 @@
 # --
-# Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
+# Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
+# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
+## nofilter(TidyAll::Plugin::OTRS::Common::Origin)
 
 package TidyAll::Znuny::Git::PreReceive;
 
@@ -28,10 +30,12 @@ use IPC::System::Simple qw(capturex run);
 use Try::Tiny;
 use TidyAll::OTRS;
 use Moo;
+
 # ---
 # ZnunyCodePolicys
 # ---
 use TidyAll::Znuny;
+
 # ---
 
 # Ignore these repositories on the server so that we can always push to them.
@@ -83,10 +87,11 @@ sub Run {
     try {
 
 # ---
-# ZnunyCodePolicy
+        # ZnunyCodePolicy
 # ---
-#         print "OTRSCodePolicy pre receive hook starting...\n";
+        #         print "OTRSCodePolicy pre receive hook starting...\n";
         print "ZnunyCodePolicy pre receive hook starting...\n";
+
 # ---
 
         my $Input = $Param{Input};
@@ -211,20 +216,22 @@ sub CreateTidyAll {
 
     # Find OTRSCodePolicy configuration
     my $ConfigFile = dirname(__FILE__) . '/../../tidyallrc';
+
 # ---
-# ZnunyCodePolicy
+    # ZnunyCodePolicy
 # ---
-#
-#     my $TidyAll = TidyAll::OTRS->new_from_conf_file(
-#         $ConfigFile,
-#         check_only => 1,
-#         mode       => 'commit',
-#     );
+    #
+    #     my $TidyAll = TidyAll::OTRS->new_from_conf_file(
+    #         $ConfigFile,
+    #         check_only => 1,
+    #         mode       => 'commit',
+    #     );
     my $TidyAll = TidyAll::Znuny->new_from_conf_file(
         $ConfigFile,
         check_only => 1,
         mode       => 'commit',
     );
+
 # ---
 
     # We cannot use these functions here because we have a bare git repository,

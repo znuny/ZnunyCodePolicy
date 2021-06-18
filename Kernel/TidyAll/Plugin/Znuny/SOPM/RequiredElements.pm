@@ -1,17 +1,20 @@
 # --
-# Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
-# Copyright (C) 2021 Znuny GmbH, https://znuny.com/
+# Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
+# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
+## nofilter(TidyAll::Plugin::OTRS::Common::Origin)
+## nofilter(TidyAll::Plugin::OTRS::Perl::PerlCritic)
 
 # ---
 # ZnunyCodePolicy
 # ---
 # package TidyAll::Plugin::OTRS::SOPM::RequiredElements;
 package TidyAll::Plugin::Znuny::SOPM::RequiredElements;
+
 # ---
 
 use strict;
@@ -22,23 +25,25 @@ use warnings;
 # ---
 # use parent qw(TidyAll::Plugin::OTRS::Base);
 use parent qw(TidyAll::Plugin::Znuny::Base);
+
 # ---
 
 sub transform_source {
     my ( $Self, $Code ) = @_;
 
 # ---
-# ZnunyCodePolicy
+    # ZnunyCodePolicy
 # ---
-#     return $Code if $Self->IsPluginDisabled( Code => $Code );
+    #     return $Code if $Self->IsPluginDisabled( Code => $Code );
     return $Code;
+
 # ---
 
     # Replace OTRS GmbH with OTRS AG
     $Code =~ s{ OTRS [ ]+ GmbH }{OTRS AG}xmsg;
 
     # Replace <URL>http://otrs.org/</URL> with <URL>https://otrs.org/</URL>
-#     $Code =~ s{ ^ ( \s* ) \< URL \> .+? \< \/ URL \> }{$1<URL>https://otrs.com/</URL>}xmsg;
+    # $Code =~ s{ ^ ( \s* ) \< URL \> .+? \< \/ URL \> }{$1<URL>https://otrs.com/</URL>}xmsg;
 
     # Replace Version
     $Code =~ s{ <Version> [^<>\n]* <\/Version> }{<Version>0.0.0</Version>}xmsg;
@@ -176,70 +181,85 @@ sub validate_source {
         $ErrorMessage
             .= "The Element <Table> is not allowed in sopm-files. Perhaps you mean <TableCreate>!\n";
     }
+
 # ---
-# ZnunyCodePolicy
+    # ZnunyCodePolicy
 # ---
-#     if ($BuildDate) {
-#         $ErrorMessage .= "<BuildDate> no longer used in .sopms!\n";
-#     }
-#     if ($BuildHost) {
-#         $ErrorMessage .= "<BuildHost> no longer used in .sopms!\n";
-#     }
+    #     if ($BuildDate) {
+    #         $ErrorMessage .= "<BuildDate> no longer used in .sopms!\n";
+    #     }
+    #     if ($BuildHost) {
+    #         $ErrorMessage .= "<BuildHost> no longer used in .sopms!\n";
+    #     }
 # ---
     if ( !$DescriptionEN ) {
+
 # ---
-# ZnunyCodePolicy
+        # ZnunyCodePolicy
 # ---
-#         $ErrorMessage .= "You have forgot to use the element <Description Lang=\"en\">!\n";
+        #         $ErrorMessage .= "You have forgot to use the element <Description Lang=\"en\">!\n";
         $ErrorMessage .= "You have forgotten to use the element <Description Lang=\"en\">!\n";
+
 # ---
     }
     if ( !$Name ) {
+
 # ---
-# ZnunyCodePolicy
+        # ZnunyCodePolicy
 # ---
-#        $ErrorMessage .= "You have forgot to use the element <Name>!\n";
+        #        $ErrorMessage .= "You have forgot to use the element <Name>!\n";
         $ErrorMessage .= "You have forgotten to use the element <Name>!\n";
+
 # ---
     }
     if ( !$Version ) {
+
 # ---
-# ZnunyCodePolicy
+        # ZnunyCodePolicy
 # ---
-#        $ErrorMessage .= "You have forgot to use the element <Version>!\n";
+        #        $ErrorMessage .= "You have forgot to use the element <Version>!\n";
         $ErrorMessage .= "You have forgotten to use the element <Version>!\n";
+
 # ---
     }
     if ( !$Framework ) {
+
 # ---
-# ZnunyCodePolicy
+        # ZnunyCodePolicy
 # ---
-#        $ErrorMessage .= "You have forgot to use the element <Framework>!\n";
+        #        $ErrorMessage .= "You have forgot to use the element <Framework>!\n";
         $ErrorMessage .= "You have forgotten to use the element <Framework>!\n";
+
 # ---
     }
     if ( !$Vendor ) {
+
 # ---
-# ZnunyCodePolicy
+        # ZnunyCodePolicy
 # ---
-#        $ErrorMessage .= "You have forgot to use the element <Vendor>!\n";
+        #        $ErrorMessage .= "You have forgot to use the element <Vendor>!\n";
         $ErrorMessage .= "You have forgotten to use the element <Vendor>!\n";
+
 # ---
     }
     if ( !$URL ) {
+
 # ---
-# ZnunyCodePolicy
+        # ZnunyCodePolicy
 # ---
-#        $ErrorMessage .= "You have forgot to use the element <URL>!\n";
+        #        $ErrorMessage .= "You have forgot to use the element <URL>!\n";
         $ErrorMessage .= "You have forgotten to use the element <URL>!\n";
+
 # ---
     }
     if ( !$License ) {
+
 # ---
-# ZnunyCodePolicy
+        # ZnunyCodePolicy
 # ---
-#        $ErrorMessage .= "You have forgot to use the element <License>!\n";
+        #        $ErrorMessage .= "You have forgot to use the element <License>!\n";
         $ErrorMessage .= "You have forgotten to use the element <License>!\n";
+
 # ---
     }
     if ($NameLength) {
@@ -266,20 +286,22 @@ sub validate_source {
             if ( !$DownloadFlag ) {
 
 # ---
-# ZnunyCodePolicy
+                # ZnunyCodePolicy
 # ---
-#                 $ErrorMessage .= "You have forgot to use the element <PackageIsDownloadable>!\n";
+                #                 $ErrorMessage .= "You have forgot to use the element <PackageIsDownloadable>!\n";
                 $ErrorMessage .= "You have forgotten to use the element <PackageIsDownloadable>!\n";
+
 # ---
             }
 
             if ( !$BuildFlag ) {
 
 # ---
-# ZnunyCodePolicy
+                # ZnunyCodePolicy
 # ---
-#                $ErrorMessage .= "You have forgot to use the element <PackageIsBuildable>!\n";
+                #                $ErrorMessage .= "You have forgot to use the element <PackageIsBuildable>!\n";
                 $ErrorMessage .= "You have forgotten to use the element <PackageIsBuildable>!\n";
+
 # ---
             }
         }
@@ -308,10 +330,12 @@ sub IsRestrictedPackage {
         Survey                  => 1,
         SystemMonitoring        => 1,
         TimeAccounting          => 1,
+
 # ---
-# ZnunyCodePolicy
+        # ZnunyCodePolicy
 # ---
-        ZnunyCodePolicy          => 1,
+        ZnunyCodePolicy => 1,
+
 # ---
 
         # ITSM packages (itsm.otrs.org)

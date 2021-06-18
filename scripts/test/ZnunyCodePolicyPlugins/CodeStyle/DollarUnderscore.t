@@ -1,10 +1,12 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
+# Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
+# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
+## nofilter(TidyAll::Plugin::OTRS::Perl::ForMy)
 
 ## no critic (Modules::RequireExplicitPackage)
 use strict;
@@ -28,7 +30,7 @@ my @Tests = (
         }
     }
 EOF
-        STDOUT    => "TidyAll::Plugin::Znuny::CodeStyle::DollarUnderscore
+        STDOUT => "TidyAll::Plugin::Znuny::CodeStyle::DollarUnderscore
 
 Don't (implicitly) use the default variable \$_. Variables should have meaningful names.\n\tLine 1:     for ( qw(1 2 3) ) {
 ",
