@@ -50,6 +50,24 @@ sub IsFrameworkVersionLessThan {
     return 0;
 }
 
+# ---
+# ZnunyCodePolicy
+# ---
+sub IsFrameworkVersionGreaterThan {
+    my ( $Self, $FrameworkVersionMajor, $FrameworkVersionMinor ) = @_;
+
+    if ($TidyAll::OTRS::FrameworkVersionMajor) {
+        return 1 if $TidyAll::OTRS::FrameworkVersionMajor > $FrameworkVersionMajor;
+        return 0 if $TidyAll::OTRS::FrameworkVersionMajor < $FrameworkVersionMajor;
+        return 1 if $TidyAll::OTRS::FrameworkVersionMinor > $FrameworkVersionMinor;
+        return 0;
+    }
+
+    # Default: if framework is unknown, return false (strict checks).
+    return 0;
+}
+# ---
+
 sub IsThirdpartyModule {
     my ($Self) = @_;
 

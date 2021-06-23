@@ -70,6 +70,24 @@ sub IsFrameworkVersionLessThan {
     return 0;
 }
 
+# ---
+# ZnunyCodePolicy
+# ---
+sub IsFrameworkVersionGreaterThan {
+    my ( $Self, $FrameworkVersionMajor, $FrameworkVersionMinor ) = @_;
+
+    if ($TidyAll::OTRS::FrameworkVersionMajor) {
+        return 1 if $TidyAll::OTRS::FrameworkVersionMajor > $FrameworkVersionMajor;
+        return 0 if $TidyAll::OTRS::FrameworkVersionMajor < $FrameworkVersionMajor;
+        return 1 if $TidyAll::OTRS::FrameworkVersionMinor > $FrameworkVersionMinor;
+        return 0;
+    }
+
+    # Default: if framework is unknown, return false (strict checks).
+    return 0;
+}
+# ---
+
 sub IsThirdpartyModule {
     my ($Self) = @_;
 
@@ -82,7 +100,7 @@ sub DieWithError {
     chomp $Error;
 
 # ---
-    # ZnunyCodePolicy
+# ZnunyCodePolicy
 # ---
     #     die _Color( 'yellow', ref($Self) ) . "\n" . _Color( 'red', $Error ) . "\n";
     die $Self->_Color( 'yellow', ref($Self) ) . "\n" . $Self->_Color( 'red', $Error ) . "\n";
@@ -102,7 +120,7 @@ stays unchanged.
 sub _Color {
 
 # ---
-    # ZnunyCodePolicy
+# ZnunyCodePolicy
 # ---
     #     my ( $Color, $Text ) = @_;
     my ( $Self, $Color, $Text ) = @_;
