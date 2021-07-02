@@ -189,6 +189,9 @@ only_modes = cli editor commit
 [+TidyAll::Plugin::OTRS::Legal::SOPMLicense]
 select = *.{opm,sopm}
 
+;
+; CodeStyle
+;
 [+TidyAll::Plugin::Znuny::CodeStyle::DollarUnderscore]
 select = **/*.{pl,pm}
 ignore = Custom/Kernel/**/*
@@ -197,15 +200,15 @@ ignore = scripts/test/sample/**/*
 ignore = **/*.{sopm,xml,sql},COPYING,RELEASE,CREDITS
 ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
 
-;
-; CodeStyle
-;
-
 [+TidyAll::Plugin::Znuny::CodeStyle::LabelCheck]
 select = **/*.{pl,pm}
 ignore = Custom/Kernel/**/*
 ignore = Kernel/cpan-lib/**/* Custom/Kernel/cpan-lib/**/*
 ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
+
+[+TidyAll::Plugin::Znuny::CodeStyle::TODOCheck]
+select = **/*
+ignore = **/*.eml
 
 ;
 ; POT/PO
