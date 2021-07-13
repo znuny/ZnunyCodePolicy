@@ -265,18 +265,18 @@
         <File Permission="660" Location="scripts/test/OTRSCodePolicyPlugins/XML/Configuration/UnitTestBlacklist.t" />
         <File Permission="660" Location="scripts/test/OTRSCodePolicyPlugins/XML/Database/KeyLength.t" />
         <File Permission="660" Location="scripts/test/OTRSCodePolicyPlugins/XML/Database/RequiredNameAttribute.t" />
-        <File Permission="660" Location="var/packagesetup/OTRSCodePolicy.pm" />
+        <File Permission="660" Location="var/packagesetup/ZnunyCodePolicy.pm" />
     </Filelist>
     <CodeInstall Type="post"><![CDATA[
-        $Kernel::OM->Get('var::packagesetup::OTRSCodePolicy')->CodeInstall();
+        $Kernel::OM->Get('var::packagesetup::ZnunyCodePolicy')->CodeInstall();
     ]]></CodeInstall>
     <CodeReinstall Type="post"><![CDATA[
-        $Kernel::OM->Get('var::packagesetup::OTRSCodePolicy')->CodeReinstall();
+        $Kernel::OM->Get('var::packagesetup::ZnunyCodePolicy')->CodeReinstall();
     ]]></CodeReinstall>
     <CodeUpgrade Type="post"><![CDATA[
-        $Kernel::OM->Get('var::packagesetup::OTRSCodePolicy')->CodeUpgrade();
+        $Kernel::OM->Get('var::packagesetup::ZnunyCodePolicy')->CodeUpgrade();
     ]]></CodeUpgrade>
     <CodeUninstall Type="pre"><![CDATA[
-        $Kernel::OM->Get('var::packagesetup::OTRSCodePolicy')->CodeUninstall();
+        $Kernel::OM->Get('var::packagesetup::ZnunyCodePolicy')->CodeUninstall();
     ]]></CodeUninstall>
 </otrs_package>

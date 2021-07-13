@@ -26,7 +26,7 @@ use lib dirname($RealBin) . '/../../';
 use lib dirname($RealBin) . '/../../Kernel/';    # find TidyAll
 use lib dirname($RealBin) . '/../../Kernel/cpan-lib';
 
-use TidyAll::OTRS::Git::PreReceive;
+use TidyAll::Znuny::Git::PreReceive;
 
-my $PreReceive = TidyAll::OTRS::Git::PreReceive->new();
+my $PreReceive = TidyAll::Znuny::Git::PreReceive->new();
 $PreReceive->Run();

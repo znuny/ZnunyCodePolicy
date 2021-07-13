@@ -2,4 +2,4 @@ image: registry.znuny.com/znuny/internal/docker-otrs6ci:stable
 
 include:
   - project: 'Znuny/Internal/Znuny'
-    file: '/templates/gitlab/ZnunyCodePolicy/base.yml'
+    file: '/templates/gitlab/CodePolicy/ZnunyCodePolicy.yml'

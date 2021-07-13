@@ -26,7 +26,7 @@ use lib dirname($RealBin) . '/../../';
 use lib dirname($RealBin) . '/../../Kernel/';    # find TidyAll
 use lib dirname($RealBin) . '/../../Kernel/cpan-lib';
 
-use TidyAll::OTRS::Git::PreCommit;
+use TidyAll::Znuny::Git::PreCommit;
 
 # skip merge commits
 if ( -e '.git/MERGE_MSG' ) {
@@ -34,5 +34,5 @@ if ( -e '.git/MERGE_MSG' ) {
     exit;
 }
 
-my $PreCommit = TidyAll::OTRS::Git::PreCommit->new();
+my $PreCommit = TidyAll::Znuny::Git::PreCommit->new();
 $PreCommit->Run();

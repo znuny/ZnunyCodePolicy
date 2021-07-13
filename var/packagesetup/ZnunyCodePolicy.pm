@@ -7,7 +7,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package var::packagesetup::OTRSCodePolicy;
+package var::packagesetup::ZnunyCodePolicy;
 
 use strict;
 use warnings;
@@ -18,7 +18,7 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-var::packagesetup::OTRSCodePolicy - Code to execute during package installation
+var::packagesetup::ZnunyCodePolicy - Code to execute during package installation
 
 =head1 DESCRIPTION
 
