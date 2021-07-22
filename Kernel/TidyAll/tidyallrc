@@ -67,12 +67,8 @@ select = var/cron/*
 [+TidyAll::Plugin::OTRS::Common::ValidateFilename]
 select = *
 
-; ---
-; ZnunyCodePolicy
-; ---
 [+TidyAll::Plugin::Znuny::Common::Contributors]
 select = AUTHORS.md
-; ---
 
 ;
 ; Cron
@@ -116,28 +112,16 @@ ignore = Frontend/Tests/**/*
 [+TidyAll::Plugin::OTRS::Legal::AddressUpdate]
 select = doc/**/*.xml
 
-; ---
-; ZnunyCodePolicy
-; ---
-;[+TidyAll::Plugin::OTRS::Legal::LicenseValidator]
+[+TidyAll::Plugin::OTRS::Legal::SOPMLicense]
+select = *.{opm,sopm}
+
 [+TidyAll::Plugin::Znuny::Legal::LicenseValidator]
-; ---
-; ---
-; ZnunyCodePolicy
-; ---
-;select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,vue,dist,sh,skel,xml,sopm}
 select = **/*.{pl,pm,psgi,t,tt,js,css,scss}
-; ---
 ignore = COPYING RELEASE CREDITS
 ignore = Kernel/Config.pm Kernel/Config/**/ZZZ*.pm Kernel/Config/Files/User/*.pm
 ignore = Kernel/WebApp.conf.dist
 ignore = scripts/auto_build/spec/templates/**/*
-; ---
-; ZnunyCodePolicy
-; ---
-;ignore = scripts/test/sample/Loader/*.min.{css,js}
 ignore = scripts/test/sample/Loader/*.{css,js}
-; ---
 ignore = scripts/test/sample/SysConfig/Migration/**/ZZZ*.pm
 ignore = scripts/DBUpdate{To6,}/TaskConfig/*.yml.dist
 ignore = var/httpd/htdocs/common/**/*.css
@@ -146,18 +130,8 @@ ignore = **/*.tt.sh
 ; devshare
 ignore = **/*.json.dist
 
-; ---
-; ZnunyCodePolicy
-; ---
-;[+TidyAll::Plugin::OTRS::Legal::ReplaceCopyright]
 [+TidyAll::Plugin::Znuny::Legal::ReplaceOTRSCopyright]
-; ---
-; ---
-; ZnunyCodePolicy
-; ---
-;select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,vue,dist,tmpl,sh,skel,xml,sopm,html,service,conf,example,template}
 select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,dist,tmpl}
-; ---
 select = .*.dist .bash_completion
 select = var/cron/*
 select = var/git/hooks/*-receive
@@ -167,9 +141,6 @@ ignore = module-format.xml,codesyntax.xml,language-translations.xml,writing-otrs
 ; Don't run this in the CI to avoid updates on year changes. It is enough to update the code when it is changed.
 only_modes = cli editor commit
 
-; ---
-; ZnunyCodePolicy
-; ---
 [+TidyAll::Plugin::Znuny::Legal::UpdateZnunyCopyright]
 select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,vue,dist,tmpl}
 select = .*.dist .bash_completion
@@ -184,15 +155,32 @@ ignore = var/httpd/htdocs/common/**/*
 ignore = **/*.yml.dist
 ; Don't run this in the CI to avoid updates on year changes. It is enough to update the code when it is changed.
 only_modes = cli editor commit
-; ---
 
-[+TidyAll::Plugin::OTRS::Legal::SOPMLicense]
-select = *.{opm,sopm}
 
 ;
 ; CodeStyle
 ;
+
+[+TidyAll::Plugin::Znuny::CodeStyle::ConsolePrintCheck]
+select = Kernel/System/Console/Command/**/*.pm Custom/Kernel/System/Console/Command/**/*.pm
+
+[+TidyAll::Plugin::Znuny::CodeStyle::CStyleForLoop]
+select = **/*.{pl,pm}
+ignore = Custom/Kernel/**/*
+ignore = Kernel/cpan-lib/**/* Custom/Kernel/cpan-lib/**/*
+ignore = scripts/test/sample/**/*
+ignore = **/*.{sopm,xml,sql},COPYING,RELEASE,CREDITS
+ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
+
 [+TidyAll::Plugin::Znuny::CodeStyle::DollarUnderscore]
+select = **/*.{pl,pm}
+ignore = Custom/Kernel/**/*
+ignore = Kernel/cpan-lib/**/* Custom/Kernel/cpan-lib/**/*
+ignore = scripts/test/sample/**/*
+ignore = **/*.{sopm,xml,sql},COPYING,RELEASE,CREDITS
+ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
+
+[+TidyAll::Plugin::Znuny::CodeStyle::GuardClause]
 select = **/*.{pl,pm}
 ignore = Custom/Kernel/**/*
 ignore = Kernel/cpan-lib/**/* Custom/Kernel/cpan-lib/**/*
@@ -206,9 +194,20 @@ ignore = Custom/Kernel/**/*
 ignore = Kernel/cpan-lib/**/* Custom/Kernel/cpan-lib/**/*
 ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
 
+[+TidyAll::Plugin::Znuny::CodeStyle::STDERRCheck]
+select = **/*.{pl,pm,psgi}
+select = Kernel/Config.pm.dist
+
 [+TidyAll::Plugin::Znuny::CodeStyle::TODOCheck]
 select = **/*
 ignore = **/*.eml
+
+;
+; Config
+;
+
+[+TidyAll::Plugin::Znuny::Config::ACLKeysLevel3Actions]
+select = Kernel/Config/**/*.xml
 
 ;
 ; POT/PO
@@ -231,6 +230,9 @@ select = locale/**/*.{pot,po}
 
 [+TidyAll::Plugin::OTRS::Perl::BinScripts]
 select = bin/*.pl
+
+[+TidyAll::Plugin::Znuny::Perl::CacheCleanup]
+select = **/*.{pl,pm}
 
 [+TidyAll::Plugin::OTRS::Perl::CacheNew]
 select = **/*.{pl,psgi,pm}
@@ -260,10 +262,22 @@ select = **/*.{pl,psgi,pm,t}
 select = Kernel/Config.pm.dist
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
+[+TidyAll::Plugin::Znuny::Perl::HashObjectMethodCall]
+select = **/*.{pl,pm,t}
+ignore = Custom/Kernel/**/*
+
 [+TidyAll::Plugin::OTRS::Perl::ISA]
 select = **/*.{pl,pm,psgi,t}
 select = Kernel/Config.pm.dist
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
+
+[+TidyAll::Plugin::Znuny::Perl::IsIntegerVariableCheck]
+select = **/*.{pl,pm}
+ignore = Custom/Kernel/**/*
+ignore = Kernel/cpan-lib/**/* Custom/Kernel/cpan-lib/**/*
+ignore = scripts/test/sample/**/*
+ignore = **/*.{sopm,xml,sql},COPYING,RELEASE,CREDITS
+ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
 
 [+TidyAll::Plugin::OTRS::Perl::LayoutObject]
 select = **/*.{pl,pm,psgi,t}
@@ -423,6 +437,30 @@ ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 [+TidyAll::Plugin::OTRS::Perl::WebApp::HeadGetWithoutBody]
 select = Kernel/WebApp/Controller/**/*.pm
 
+[+TidyAll::Plugin::Znuny::Perl::ObjectDependencies]
+select = **/*.{pm}
+select = Kernel/Config.pm.dist
+
+[+TidyAll::Plugin::Znuny::Perl::ObjectManagerDirectCall]
+select = **/*.{pl,pm,t}
+ignore = Custom/Kernel/**/*
+
+[+TidyAll::Plugin::Znuny::Perl::VariableCheck]
+select = **/*.{pl,pm}
+ignore = Custom/Kernel/**/*
+ignore = Kernel/cpan-lib/**/* Custom/Kernel/cpan-lib/**/*
+ignore = scripts/test/sample/**/*
+ignore = **/*.{sopm,xml,sql},COPYING,RELEASE,CREDITS
+ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
+
+;
+; SeleniumTest
+;
+
+[+TidyAll::Plugin::Znuny::SeleniumTest::RestoreDatabase]
+select = **/*.{t}
+ignore = Kernel/cpan-lib/**/* Custom/Kernel/cpan-lib/**/*
+
 ;
 ; SOPM
 ;
@@ -445,12 +483,7 @@ select = *.{opm,sopm}
 [+TidyAll::Plugin::OTRS::SOPM::PackageRequired]
 select = *.{opm,sopm}
 
-; ---
-; ZnunyCodePolicy
-; ---
-;[+TidyAll::Plugin::OTRS::SOPM::RequiredElements]
 [+TidyAll::Plugin::Znuny::SOPM::RequiredElements]
-; ---
 select = *.{sopm}
 
 [+TidyAll::Plugin::OTRS::SOPM::XSDValidator]
@@ -459,6 +492,9 @@ select = *.{sopm}
 ;
 ; TT
 ;
+
+[+TidyAll::Plugin::Znuny::TT::Breadcrumb]
+select = **/Admin*.tt
 
 [+TidyAll::Plugin::OTRS::TT::ScriptUsage]
 select = **/*.tt
