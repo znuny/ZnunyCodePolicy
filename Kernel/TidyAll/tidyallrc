@@ -441,9 +441,9 @@ select = Kernel/WebApp/Controller/**/*.pm
 select = **/*.{pm}
 select = Kernel/Config.pm.dist
 
-[+TidyAll::Plugin::Znuny::Perl::ObjectManagerDirectCall]
-select = **/*.{pl,pm,t}
-ignore = Custom/Kernel/**/*
+;[+TidyAll::Plugin::Znuny::Perl::ObjectManagerDirectCall]
+;select = **/*.{pl,pm,t}
+;ignore = Custom/Kernel/**/*
 
 [+TidyAll::Plugin::Znuny::Perl::VariableCheck]
 select = **/*.{pl,pm}
