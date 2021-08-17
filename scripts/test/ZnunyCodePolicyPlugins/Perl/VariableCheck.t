@@ -17,7 +17,8 @@ use scripts::test::ZnunyCodePolicyPlugins;
 
 my @Tests = (
     {
-        Name      => "6.0 - 'IsString' Man... It's nice that you are using the variable check function but you forgot the use:",
+        Name =>
+            "6.0 - 'IsString' Man... It's nice that you are using the variable check function but you forgot the use:",
         Filename  => 'Kernel/System/Znuny.pm',
         Plugins   => [qw(TidyAll::Plugin::Znuny::Perl::VariableCheck)],
         Framework => '6.0',
@@ -27,7 +28,8 @@ EOF
         Exception => 0,
     },
     {
-        Name      => "6.0 - 'IsStringWithData' Man... It's nice that you are using the variable check function but you forgot the use:",
+        Name =>
+            "6.0 - 'IsStringWithData' Man... It's nice that you are using the variable check function but you forgot the use:",
         Filename  => 'Kernel/System/Znuny.pm',
         Plugins   => [qw(TidyAll::Plugin::Znuny::Perl::VariableCheck)],
         Framework => '6.0',
@@ -37,7 +39,8 @@ EOF
         Exception => 0,
     },
     {
-        Name      => "6.0 - 'IsArrayRefWithData' Man... It's nice that you are using the variable check function but you forgot the use:",
+        Name =>
+            "6.0 - 'IsArrayRefWithData' Man... It's nice that you are using the variable check function but you forgot the use:",
         Filename  => 'Kernel/System/Znuny.pm',
         Plugins   => [qw(TidyAll::Plugin::Znuny::Perl::VariableCheck)],
         Framework => '6.0',
@@ -47,7 +50,8 @@ EOF
         Exception => 0,
     },
     {
-        Name      => "6.0 - 'IsHashRefWithData' Man... It's nice that you are using the variable check function but you forgot the use:",
+        Name =>
+            "6.0 - 'IsHashRefWithData' Man... It's nice that you are using the variable check function but you forgot the use:",
         Filename  => 'Kernel/System/Znuny.pm',
         Plugins   => [qw(TidyAll::Plugin::Znuny::Perl::VariableCheck)],
         Framework => '6.0',
@@ -57,7 +61,8 @@ EOF
         Exception => 0,
     },
     {
-        Name      => "6.0 - 'IsNumber' Man... It's nice that you are using the variable check function but you forgot the use:",
+        Name =>
+            "6.0 - 'IsNumber' Man... It's nice that you are using the variable check function but you forgot the use:",
         Filename  => 'Kernel/System/Znuny.pm',
         Plugins   => [qw(TidyAll::Plugin::Znuny::Perl::VariableCheck)],
         Framework => '6.0',
@@ -67,7 +72,8 @@ EOF
         Exception => 0,
     },
     {
-        Name      => "6.0 - 'IsInteger' Man... It's nice that you are using the variable check function but you forgot the use:",
+        Name =>
+            "6.0 - 'IsInteger' Man... It's nice that you are using the variable check function but you forgot the use:",
         Filename  => 'Kernel/System/Znuny.pm',
         Plugins   => [qw(TidyAll::Plugin::Znuny::Perl::VariableCheck)],
         Framework => '6.0',
@@ -77,7 +83,8 @@ EOF
         Exception => 0,
     },
     {
-        Name      => "6.0 - 'IsPositiveInteger' Man... It's nice that you are using the variable check function but you forgot the use:",
+        Name =>
+            "6.0 - 'IsPositiveInteger' Man... It's nice that you are using the variable check function but you forgot the use:",
         Filename  => 'Kernel/System/Znuny.pm',
         Plugins   => [qw(TidyAll::Plugin::Znuny::Perl::VariableCheck)],
         Framework => '6.0',
@@ -87,7 +94,8 @@ EOF
         Exception => 0,
     },
     {
-        Name      => "6.0 - 'IsIPv4Address' Man... It's nice that you are using the variable check function but you forgot the use:",
+        Name =>
+            "6.0 - 'IsIPv4Address' Man... It's nice that you are using the variable check function but you forgot the use:",
         Filename  => 'Kernel/System/Znuny.pm',
         Plugins   => [qw(TidyAll::Plugin::Znuny::Perl::VariableCheck)],
         Framework => '6.0',
@@ -97,7 +105,8 @@ EOF
         Exception => 0,
     },
     {
-        Name      => "6.0 - 'IsIPv6Address' Man... It's nice that you are using the variable check function but you forgot the use:",
+        Name =>
+            "6.0 - 'IsIPv6Address' Man... It's nice that you are using the variable check function but you forgot the use:",
         Filename  => 'Kernel/System/Znuny.pm',
         Plugins   => [qw(TidyAll::Plugin::Znuny::Perl::VariableCheck)],
         Framework => '6.0',
@@ -107,7 +116,8 @@ EOF
         Exception => 0,
     },
     {
-        Name      => "6.0 - 'IsMD5Sum' Man... It's nice that you are using the variable check function but you forgot the use:",
+        Name =>
+            "6.0 - 'IsMD5Sum' Man... It's nice that you are using the variable check function but you forgot the use:",
         Filename  => 'Kernel/System/Znuny.pm',
         Plugins   => [qw(TidyAll::Plugin::Znuny::Perl::VariableCheck)],
         Framework => '6.0',
@@ -117,7 +127,8 @@ EOF
         Exception => 0,
     },
     {
-        Name      => "6.0 - 'DataIsDifferent' Man... It's nice that you are using the variable check function but you forgot the use:",
+        Name =>
+            "6.0 - 'DataIsDifferent' Man... It's nice that you are using the variable check function but you forgot the use:",
         Filename  => 'Kernel/System/Znuny.pm',
         Plugins   => [qw(TidyAll::Plugin::Znuny::Perl::VariableCheck)],
         Framework => '6.0',

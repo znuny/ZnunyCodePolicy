@@ -27,7 +27,7 @@ my @Tests = (
     }
 EOF
         Exception => 0,
-        STDOUT => "[notice] for the next file:
+        STDOUT    => "[notice] for the next file:
 TidyAll::Plugin::Znuny::CodeStyle::CStyleForLoop
 
 NOTICE: Avoid C-style for-loops if possible.

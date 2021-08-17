@@ -25,7 +25,7 @@ my @Tests = (
 return if looks_like_number($Test);
 EOF
         Exception => 0,
-        STDOUT    =>'[notice] for the next file:
+        STDOUT    => '[notice] for the next file:
 TidyAll::Plugin::Znuny::Perl::IsIntegerVariableCheck
 
 NOTICE: Avoid looks_like_number since the result is not consistent on different systems.

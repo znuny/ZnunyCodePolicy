@@ -36,7 +36,9 @@ sub validate_file {    ## no critic
 
     return if !length $ErrorMessage;
 
-    my $Message = "Using Kernel::System::UnitTest::Helper with option RestoreDatabase within Selenium tests is most likely a mistake because data will get lost between requests." . $ErrorMessage;
+    my $Message
+        = "Using Kernel::System::UnitTest::Helper with option RestoreDatabase within Selenium tests is most likely a mistake because data will get lost between requests."
+        . $ErrorMessage;
 
     $Self->Print(
         Package  => __PACKAGE__,

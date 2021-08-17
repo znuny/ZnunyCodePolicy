@@ -119,7 +119,7 @@ sub validate_source {    ## no critic
 
     my @ObsoletDeclaredObjectDependencies;
     DECLAREDOBJECT:
-    for my $DeclaredObject (@DeclaredObjectDependencies){
+    for my $DeclaredObject (@DeclaredObjectDependencies) {
         next DECLAREDOBJECT if grep { $_ eq $DeclaredObject } @UsedObjects;
         push @ObsoletDeclaredObjectDependencies, $DeclaredObject;
     }

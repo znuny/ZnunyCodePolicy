@@ -86,6 +86,7 @@ sub IsFrameworkVersionGreaterThan {
     # Default: if framework is unknown, return false (strict checks).
     return 0;
 }
+
 # ---
 
 sub IsThirdpartyModule {

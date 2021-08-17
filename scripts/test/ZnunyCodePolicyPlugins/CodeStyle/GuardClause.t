@@ -18,9 +18,9 @@ use scripts::test::ZnunyCodePolicyPlugins;
 
 my @Tests = (
     {
-        Name      => "6.0 - NOTICE: Possible GuardClause before return. May be possible to invert the last if condition",
-        Filename  => 'Znuny.pm',
-        Plugins   => [qw(TidyAll::Plugin::Znuny::CodeStyle::GuardClause)],
+        Name     => "6.0 - NOTICE: Possible GuardClause before return. May be possible to invert the last if condition",
+        Filename => 'Znuny.pm',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::CodeStyle::GuardClause)],
         Framework => '6.0',
         Source    => <<'EOF',
     for my $Needed ( qw(1 2 3) ) {

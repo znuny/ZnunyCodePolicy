@@ -64,7 +64,8 @@ use Data::Dumper;
 # print STDERR 'Debug Dump - ModuleName - VariableName = ' . Dumper(\VariableName) . "\n";
 EOF
         Exception => 0,
-        Result    => '# Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+        Result =>
+            '# Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
 use Data::Dumper;
 # print STDERR \'Debug Dump - ModuleName - VariableName = \' . Dumper(\VariableName) . "\n";
 ',
@@ -92,7 +93,8 @@ use Data::Dumper;
 my $Test = 2; # and a comment with print STDERR in it
 EOF
         Exception => 0,
-        Result    => '# Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+        Result =>
+            '# Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
 use Data::Dumper;
 my $Test = 2; # and a comment with print STDERR in it
 ',

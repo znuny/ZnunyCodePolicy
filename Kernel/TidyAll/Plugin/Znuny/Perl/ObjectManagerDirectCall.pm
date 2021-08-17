@@ -37,7 +37,7 @@ sub validate_file {    ## no critic
     return if !$DirectCallLines;
 
     my $Message = "Direct ObjectManager call found:"
-    ."\n\n$DirectCallLines";
+        . "\n\n$DirectCallLines";
 
     $Self->Print(
         Package  => __PACKAGE__,

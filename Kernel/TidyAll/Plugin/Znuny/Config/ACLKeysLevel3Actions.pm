@@ -42,11 +42,11 @@ sub validate_source {    ## no critic
 
         last LINE if $Check{Registered};
 
-        if ($Line =~ /$Check{AdditionalRegEx}/ ){
+        if ( $Line =~ /$Check{AdditionalRegEx}/ ) {
             $Check{Registered} = 1;
         }
 
-        if ($Line =~ /$Check{NewFrontendRegEx}/ ){
+        if ( $Line =~ /$Check{NewFrontendRegEx}/ ) {
             push @{ $Check{Findings} }, "Line $LineCounter: $Line";
         }
     }
@@ -56,11 +56,12 @@ sub validate_source {    ## no critic
     return if $Check{Registered};
     return if !@{ $Check{Findings} };
 
-    $ErrorMessage .= "NOTICE: $Check{Name} - Found frontend module registration but no $Check{Registration} registration for the following.\nMaybe you wanna do this with yeahman.";
+    $ErrorMessage
+        .= "NOTICE: $Check{Name} - Found frontend module registration but no $Check{Registration} registration for the following.\nMaybe you wanna do this with yeahman.";
 
-    for my $Lines (@{ $Check{Findings} } ){
+    for my $Lines ( @{ $Check{Findings} } ) {
 
-        $ErrorMessage .=  "\n\t$Lines";
+        $ErrorMessage .= "\n\t$Lines";
     }
 
     return if !length $ErrorMessage;
