@@ -40,6 +40,7 @@ sub validate_file {
     # Search for first line of possible license header
     if ( $Code =~ m{^(# |// )?This software comes with ABSOLUTELY NO WARRANTY\. For details, see$}m ) {
         my $LinePrefix = $1;
+        return $Code if !$LinePrefix;
 
         my $ExpectedLicenseText = $LinePrefix . "This software comes with ABSOLUTELY NO WARRANTY. For details, see\n"
             . $LinePrefix . "the enclosed file COPYING for license information (AGPL). If you\n"

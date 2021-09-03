@@ -6,11 +6,9 @@
 # the enclosed file COPYING for license information (GPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
-# ---
-# ZnunyCodePolicy
-# ---
+
 ## nofilter(TidyAll::Plugin::OTRS::Common::Origin)
-# ---
+
 package TidyAll::Znuny;
 
 use strict;
@@ -30,9 +28,7 @@ use parent qw(Code::TidyAll);
 use Perl::Critic;
 use Perl::Tidy;
 
-# ---
-# ZnunyCodePolicy
-# ---
+
 use File::Spec;
 use Cwd;
 our $DataDir;
@@ -41,13 +37,11 @@ our $CPRootDir;
 our $PackageName;
 our $ProductName = 'Znuny';
 
-# ---
 our $FrameworkVersionMajor = 0;
 our $FrameworkVersionMinor = 0;
 our $ThirdpartyModule      = 0;
 our @FileList              = ();    # all files in current repository
 
-# ---
 
 sub new_from_conf_file {
     my ( $Class, $ConfigFile, %Param ) = @_;
@@ -80,19 +74,14 @@ sub DetermineFrameworkVersionFromDirectory {
         $FrameworkVersionMajor = $VersionMajor;
         $FrameworkVersionMinor = $VersionMinor;
 
-# ---
-        # ZnunyCodePolicy
-# ---
         if ( $Content[0] =~ m{\APRODUCT\s*=\s*(.*)} ) {
             $ProductName = $1;
         }
-
-# ---
     }
     else {
         # Now check if we have a module directory with an SOPM file in it.
-        my @SOPMFiles = glob $Self->{root_dir} . "/*.sopm";
-        if (@SOPMFiles) {
+        my @SOPMFiles = glob $Self->{root_dir} . "/*.sopm" || [];
+        if (@SOPMFiles && -r $SOPMFiles[0]) {
 
             # Use the highest framework version from the first SOPM file.
             my $FileHandle = IO::File->new( $SOPMFiles[0], 'r' );
@@ -113,14 +102,7 @@ sub DetermineFrameworkVersionFromDirectory {
                         $FrameworkVersionMinor = $VersionMinor;
                     }
                 }
-
-# ---
-                # ZnunyCodePolicy
-# ---
-                #                elsif ( $Line =~ m{<Vendor>} && $Line !~ m{OTRS} ) {
                 elsif ( $Line =~ m{<Vendor>} && $Line !~ m{OTRS|Znuny} ) {
-
-# ---
                     $ThirdpartyModule = 1;
                 }
             }
@@ -135,39 +117,19 @@ sub DetermineFrameworkVersionFromDirectory {
     }
 
     if ($ThirdpartyModule) {
-        print
-
-# ---
-            # ZnunyCodePolicy
-# ---
-            #            "This seems to be a module not copyrighted by OTRS AG. File copyright will not be changed.\n";
-            "This software seems to be not copyrighted by Znuny GmbH.\n";
-
-# ---
+        print "This software seems to be not copyrighted by Znuny GmbH.\n";
     }
     else {
-        print
+        print "This software seems to be copyrighted by Znuny GmbH (or OTRS AG).\n";
 
-# ---
-# ZnunyCodePolicy
-# ---
-#            "This module seems to be copyrighted by OTRS AG. File copyright will automatically be assigned to OTRS AG.\n";
-            "This software seems to be copyrighted by Znuny GmbH (or OTRS AG).\n";
-
-# ---
-        print
-            "  If this is not correct, you can change the <Vendor> tag in your SOPM.\n";
+        print "  If this is not correct, you can change the <Vendor> tag in your SOPM.\n";
     }
 
-# ---
-    # ZnunyCodePolicy
-# ---
     # define global otrs variables
     $TidyAll::OTRS::FrameworkVersionMajor = $FrameworkVersionMajor;
     $TidyAll::OTRS::FrameworkVersionMinor = $FrameworkVersionMinor;
     $TidyAll::OTRS::ThirdpartyModule      = $ThirdpartyModule;
 
-# ---
     return;
 }
 
@@ -208,13 +170,7 @@ sub ProcessPathsParallel {
 
     my @GlobalResults;
 
-# ---
-    # ZnunyCodePolicy
-# ---
-    #     print "OTRSCodePolicy will use up to $Processes parallel processes.\n";
     print "ZnunyCodePolicy will use up to $Processes parallel processes.\n";
-
-# ---
 
     # To store results from child processes.
     my $TempDirectory = File::Temp->newdir() || die "Could not create temporary directory: $!";
@@ -344,13 +300,8 @@ sub GetFileListFromDirectory {
 
     @FileList = $Self->FindFilesInDirectory( Directory => $Self->{root_dir} );
 
-# ---
-    # ZnunyCodePolicy
-# ---
     # define global otrs variables
     @TidyAll::OTRS::FileList = @FileList;
-
-# ---
 
     return;
 }
@@ -431,9 +382,6 @@ sub _Color {
     return Term::ANSIColor::color($Color) . $Text . Term::ANSIColor::color('reset');
 }
 
-# ---
-# ZnunyCodePolicy
-# ---
 sub SetOTRSRootDir {
     my ( $Self, %Param ) = @_;
 
@@ -464,5 +412,4 @@ sub SetPackageName {
     return 1;
 }
 
-# ---
 1;

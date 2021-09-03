@@ -20,6 +20,8 @@ sub transform_source {
     my ( $Self, $Code ) = @_;
 
     my $RootDir = $Self->GetOTRSRootDir();
+    return $Code if !$RootDir;
+
     chdir $RootDir;
 
     my @Lines = qx{git log --format="%aN <%aE>"};
