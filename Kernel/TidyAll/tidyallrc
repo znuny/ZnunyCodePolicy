@@ -343,11 +343,11 @@ ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 select = **/*.{pm}
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
-[+TidyAll::Plugin::OTRS::Perl::Pod::SpellCheck]
-select = **/*.{pm,pod}
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-; Ignore this slow plugin for more agile OTRSCodePolicy filter development with a custom mode "fast".
-except_modes = fast
+;[+TidyAll::Plugin::OTRS::Perl::Pod::SpellCheck]
+;select = **/*.{pm,pod}
+;ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
+;; Ignore this slow plugin for more agile OTRSCodePolicy filter development with a custom mode "fast".
+;except_modes = fast
 
 [+TidyAll::Plugin::OTRS::Perl::Pod::Validator]
 select = **/*.{pm,pod,pod.dist}
