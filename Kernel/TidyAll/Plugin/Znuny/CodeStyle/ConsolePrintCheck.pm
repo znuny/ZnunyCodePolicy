@@ -17,14 +17,13 @@ use parent qw(TidyAll::Plugin::Znuny::Base);
 
 =head1 SYNOPSIS
 
-This plugin checks deprecated print statements in OTRS / Znuny Console scripts
+Checks for deprecated print statements in console commands.
 
 =cut
 
-sub validate_file {    ## no critic
-    my ( $Self, $File ) = @_;
+sub validate_source {    ## no critic
+    my ( $Self, $Code ) = @_;
 
-    my $Code = $Self->_GetFileContents($File);
     return if $Self->IsPluginDisabled( Code => $Code );
 
     my $LineCounter  = 0;
@@ -39,18 +38,14 @@ sub validate_file {    ## no critic
 
     return if !length $ErrorMessage;
 
-    my $Message = "In console scripts use " . '$Self->Print("Hello World\n")'
-        . " instead of just print as in bin scripts for OTRS versions older than 5.\n"
-        . "If printing to a file handle, consider using Kernel::System::Main::FileWrite()."
+    my $Message = 'Use $Self->Print("Hello World\n") in console commands instead of "print"' . ".\n"
+        . "If writing to a file, consider using Kernel::System::Main::FileWrite()."
         . $ErrorMessage;
 
-
-    $Self->Print(
-        Package  => __PACKAGE__,
-        Priority => 'notice',
+    $Self->AddMessage(
         Message  => $Message,
+        Priority => 'notice',
     );
-
 }
 
 1;

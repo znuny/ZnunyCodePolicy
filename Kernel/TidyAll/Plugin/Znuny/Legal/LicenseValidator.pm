@@ -1,6 +1,6 @@
 # --
 # Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
-# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
+# Copyright (C) 2012-2022 Znuny GmbH, https://znuny.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -27,12 +27,10 @@ sub transform_source {
     return $Code;
 }
 
-sub validate_file {
-    my ( $Self, $Filename ) = @_;
+sub validate_source {
+    my ( $Self, $Code ) = @_;
 
-    return if $Self->IsPluginDisabled( Filename => $Filename );
-
-    my $Code = $Self->_GetFileContents($Filename);
+    return if $Self->IsPluginDisabled( Code => $Code );
     return $Code if !$Self->IsOriginalZnunyCode($Code);
 
     my $CorrectLicenseHeaderFound;
@@ -53,18 +51,12 @@ sub validate_file {
 
     return if $CorrectLicenseHeaderFound;
 
-    my $Message = "No valid license header found. Remove any license text and add the following text to the header:\n\n"
-        . "This software comes with ABSOLUTELY NO WARRANTY. For details, see\n"
-        . "the enclosed file COPYING for license information (AGPL). If you\n"
-        . "did not receive this file, see http://www.gnu.org/licenses/agpl.txt.\n";
+    my $Message = "No valid license header found. Remove any license text and add the following text to the header:\n"
+        . "    This software comes with ABSOLUTELY NO WARRANTY. For details, see\n"
+        . "    the enclosed file COPYING for license information (AGPL). If you\n"
+        . "    did not receive this file, see http://www.gnu.org/licenses/agpl.txt.\n";
 
-    my $FilePath = $Self->FilePath($Code) || $Filename->[0];
-    $Self->Print(
-        Package  => __PACKAGE__,
-        Priority => 'error',
-        Message  => $Message,
-        FilePath => $FilePath,
-    );
+    $Self->AddErrorMessage($Message);
 
     return;
 }

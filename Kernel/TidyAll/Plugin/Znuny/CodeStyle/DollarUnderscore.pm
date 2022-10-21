@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
+# Copyright (C) 2012-2022 Znuny GmbH, https://znuny.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -13,12 +13,10 @@ use warnings;
 
 use parent qw(TidyAll::Plugin::Znuny::Base);
 
-sub validate_file {    ## no critic
-    my ( $Self, $File ) = @_;
+sub validate_source {    ## no critic
+    my ( $Self, $Code ) = @_;
 
-    my $Code = $Self->_GetFileContents($File);
     return if $Self->IsPluginDisabled( Code => $Code );
-    return if $Self->IsCustomizedOTRSCode($Code);
 
     my $Counter      = 0;
     my $ErrorMessage = '';
@@ -41,11 +39,7 @@ sub validate_file {    ## no critic
     my $Message
         = "Don't (implicitly) use the default variable \$_. Variables should have meaningful names.$ErrorMessage";
 
-    $Self->Print(
-        Package  => __PACKAGE__,
-        Priority => 'error',
-        Message  => $Message,
-    );
+    $Self->AddErrorMessage($Message);
 
     return;
 }

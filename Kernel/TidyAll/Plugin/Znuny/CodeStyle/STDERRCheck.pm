@@ -26,7 +26,7 @@ sub validate_source {    ## no critic
     for my $Line ( split /\n/, $Code ) {
         $Counter++;
 
-        next LINE if $Line !~ m{(print\s+STDERR)};
+        next LINE if $Line !~ m{\A[^#]*(print\s+STDERR)};
 
         my $PrintSTDERRPosition = index( $Line, $1 );
         my $CommentPosition     = index( $Line, '#' );
@@ -38,13 +38,9 @@ sub validate_source {    ## no critic
 
     return if !length $ErrorMessage;
 
-    my $Message = "Don't forget to remove debug code like `print STDERR (...)\n$ErrorMessage";
+    my $Message = "Remove debug code 'print STDERR'.\n$ErrorMessage";
 
-    $Self->Print(
-        Package  => __PACKAGE__,
-        Priority => 'notice',
-        Message  => $Message,
-    );
+    $Self->AddErrorMessage($Message);
 
     return;
 }

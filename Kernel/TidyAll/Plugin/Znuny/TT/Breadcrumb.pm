@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2012-2019 Znuny GmbH, http://znuny.com/
+# Copyright (C) 2012-2021 Znuny GmbH, http://znuny.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -13,31 +13,20 @@ use warnings;
 
 use parent qw(TidyAll::Plugin::Znuny::Base);
 
-=head1 SYNOPSIS
+sub validate_source {
+    my ( $Self, $Code ) = @_;
 
-Checks for missing unit test in package
-
-=cut
-
-sub validate_file {    ## no critic
-    my ( $Self, $File ) = @_;
-
-    my $Code = $Self->_GetFileContents($File);
     return if $Self->IsPluginDisabled( Code => $Code );
-    return if $Self->IsFrameworkVersionLessThan( 6, 0 );
     return if $Code =~ m{\[% INCLUDE "Breadcrumb\.tt" Path = BreadcrumbPath %\]};
 
-    my $Message = 'Found no Breadcrumb / BreadcrumbPath.\n'
-        . 'Please add a valid BreadcrumbPath to this template.'
+    my $Message = "Found no breadcrumbs in admin template. Add/adjust the following:\n"
         . '[% INCLUDE "Breadcrumb.tt" Path = BreadcrumbPath %]'
-        . '[See: https://github.com/OTRS/otrs/blob/rel-6_0/Kernel/Output/HTML/Templates/Standard/AdminUser.tt#L13';
+        . '[See: https://github.com/znuny/Znuny/blob/1d2c412eebf80e74e6be1ac0529be09c1e1c6067/Kernel/Output/HTML/Templates/Standard/AdminUser.tt#L30';
 
-    $Self->Print(
-        Package  => __PACKAGE__,
-        Priority => 'notice',
+    $Self->AddMessage(
         Message  => $Message,
+        Priority => 'notice',
     );
-
 }
 
 1;

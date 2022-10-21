@@ -13,10 +13,9 @@ use warnings;
 
 use base qw(TidyAll::Plugin::Znuny::Base);
 
-sub validate_file {    ## no critic
-    my ( $Self, $File ) = @_;
+sub validate_source {
+    my ( $Self, $Code ) = @_;
 
-    my $Code = $Self->_GetFileContents($File);
     return if $Self->IsPluginDisabled( Code => $Code );
     return if $Code =~ m{no \s warnings \s 'redefine';}xms;
     return if $Code =~ m{^ \# \s+ \$origin}xms;
@@ -26,23 +25,21 @@ sub validate_file {    ## no critic
 
     LINE:
     for my $Line ( split /\n/, $Code ) {
-
         $LineCounter++;
 
         next LINE if $Line !~ m{\$Kernel::OM->Get\('Kernel::[^']+'\)->};
 
-        $DirectCallLines .= "\tLine $LineCounter: $Line\n";
+        $DirectCallLines .= "Line $LineCounter: $Line\n";
     }
 
     return if !$DirectCallLines;
 
-    my $Message = "Direct ObjectManager call found:"
-        . "\n\n$DirectCallLines";
+    my $Message = "Don't use direct object manager calls. Fetch the object in a separate variable first.\n"
+        . "$DirectCallLines";
 
-    $Self->Print(
-        Package  => __PACKAGE__,
-        Priority => 'notice',
+    $Self->AddMessage(
         Message  => $Message,
+        Priority => 'notice',
     );
 
     return;

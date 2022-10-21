@@ -1,5 +1,15 @@
-image: registry.znuny.com/znuny/internal/docker-otrs6ci:stable
+image: registry.znuny.com/znuny/internal/docker-znuny-ci:6.4
 
 include:
   - project: 'Znuny/Internal/Znuny'
-    file: '/templates/gitlab/CodePolicy/ZnunyCodePolicy.yml'
+    file: '/templates/gitlab/default/default.yml'
+
+default:
+  before_script:
+    - /run.sh
+    - yum install -y "perl(LWP::Protocol::https)" "perl(Perl::Tidy)" "perl(Perl::Critic)"
+    - cpanm Config::INI::Reader
+    - cpanm Code::TidyAll
+    - yum install -y nodejs
+    - su -c "perl /opt/otrs/bin/znuny.CodePolicy.pl --install-eslint" -s /bin/bash otrs
+    - su -c "perl /opt/otrs/bin/otrs.Console.pl Dev::UnitTest::Run --verbose --directory TidyAll/Plugin/Znuny" -s /bin/bash otrs

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2012-2016 Znuny GmbH, http://znuny.com/
+# Copyright (C) 2012-2021 Znuny GmbH, http://znuny.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -17,14 +17,13 @@ use base qw(TidyAll::Plugin::Znuny::Base);
 
 =head1 SYNOPSIS
 
-This plugin checks for missing uses of the variablecheck if functions are used.
+Checks for missing "use" statement for Kernel::System::VariableCheck.
 
 =cut
 
-sub validate_file {    ## no critic
-    my ( $Self, $File ) = @_;
+sub validate_source {    ## no critic
+    my ( $Self, $Code ) = @_;
 
-    my $Code = $Self->_GetFileContents($File);
     return if $Self->IsPluginDisabled( Code => $Code );
 
     my $VariableCheckFunction = qr{
@@ -48,14 +47,10 @@ sub validate_file {    ## no critic
     return if $Code !~ $VariableCheckFunction;
     return if $Code =~ $VariableCheckUse;
 
-    my $Message = "Man... It's nice that you are using the variable check function but you forgot the use:"
-    ."\n\nuse Kernel::System::VariableCheck qw(:all);";
+    my $Message = "'use' statement for Kernel::System::VariableCheck is missing:\n"
+    ."use Kernel::System::VariableCheck qw(:all);";
 
-    $Self->Print(
-        Package  => __PACKAGE__,
-        Priority => 'notice',
-        Message  => $Message,
-    );
+    $Self->AddErrorMessage($Message);
 
     return;
 }

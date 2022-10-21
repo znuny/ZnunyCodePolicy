@@ -2,160 +2,29 @@
 ; Global ignores
 ;
 
-; Ignore all CPAN content.
+; Ignore all CPAN files.
 ignore = Kernel/cpan-lib/**/* Custom/Kernel/cpan-lib/**/*
-; Ignore all dynamic/temporary data.
+
+; Ignore all dynamic/temporary files.
 ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
+
 ; Ignore thirdparty content.
 ignore = **/thirdparty/**/*
+
 ; Ignore Loader cache files.
 ignore = **/{js-cache,css-cache}/**/*
+
 ; Ignore test data files.
-;ignore = scripts/test/sample/**/*
+ignore = scripts/test/sample/**/*
+
 ; Ignore vagrant instance contents of the CI provisioner.
 ignore = var/Vagrant/Instances/**/*
+
 ; node.js packages
-ignore = node_modules/**/*
-ignore = Frontend/Vendor/**/*
-; Webpack generated output files
-ignore = var/public/dist/**/*
+ignore = **/node_modules/**/*
 
-;
-; Common
-;
-
-[+TidyAll::Plugin::OTRS::Common::CRLFLineEndings]
-select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,vue,dist,tmpl,sh,skel,xml,sopm,html,service,conf}
-
-[+TidyAll::Plugin::OTRS::Common::NoFilter]
-select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,vue,dist,tmpl,sh,skel,xml,sopm,html}
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-
-[+TidyAll::Plugin::OTRS::Common::Origin]
-select = **/*.{pl,psgi,pm,t,js,css,tt,xml,sopm}
-ignore = Kernel/Config/Files/ZZZ*.pm
-; Ignore docbook documentations
-ignore = */content/**/*.xml
-
-[+TidyAll::Plugin::OTRS::Common::CustomizationMarkersTT]
-select = Custom/Kernel/Output/HTML/**/*.tt
-select = Kernel/Output/HTML/**/*.tt
-
-[+TidyAll::Plugin::OTRS::Common::CustomizationMarkers]
-select = **/*.{pl,psgi,pm,t,js,css,tt}
-ignore = Kernel/Config.pm
-ignore = Kernel/Config/GenericAgent.pm
-ignore = Kernel/Config/Files/ZZZ*.pm
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-
-[+TidyAll::Plugin::OTRS::XML::Docbook::ReplaceSupportEmail]
-select = doc/**/*.xml
-
-[+TidyAll::Plugin::OTRS::XML::Docbook::RemoveContactChapter]
-select = doc/**/*.xml
-
-[+TidyAll::Plugin::OTRS::Common::ProhibitEmailAddresses]
-select = **/*.{pl,pm,psgi,t,tt,js,xml,sopm}
-
-;[+TidyAll::Plugin::OTRS::Common::TranslatableStringsSpellCheck]
-;select = **/*.{pl,pm,tt,js,xml}
-
-[+TidyAll::Plugin::OTRS::Common::RemoveCVSIDs]
-select = **/*.{pl,pm,psgi,t,xml,tt,dist,spec,js}
-select = var/cron/*
-
-[+TidyAll::Plugin::OTRS::Common::ValidateFilename]
-select = *
-
-[+TidyAll::Plugin::Znuny::Common::Contributors]
-select = AUTHORS.md
-
-;
-; Cron
-;
-
-[+TidyAll::Plugin::OTRS::Cron::CronScripts]
-select = var/cron/*.dist
-
-;
-; JavaScript
-;
-
-[+TidyAll::Plugin::OTRS::JavaScript::DebugCode]
-select = **/*.js
-ignore = scripts/webpack/**/*
-
-[+TidyAll::Plugin::OTRS::JavaScript::UnloadEvent]
-select = **/*.js **/*.tt
-
-[+TidyAll::Plugin::OTRS::JavaScript::FileName]
-select = **/*.js
-ignore = **/test/*
-
-[+TidyAll::Plugin::OTRS::JavaScript::FileNameUnitTest]
-select = var/httpd/htdocs/js/test/*.js
-
-[+TidyAll::Plugin::OTRS::JavaScript::ESLint]
-select = **/*.{js,vue}
-ignore = scripts/test/sample/Loader/**/*
-; Ignore this slow plugin for more agile OTRSCodePolicy filter development with a custom mode "fast".
-except_modes = fast
-
-[+TidyAll::Plugin::OTRS::JavaScript::Vue::EventListeners]
-select = Frontend/**/*.{js,vue}
-ignore = Frontend/Tests/**/*
-
-;
-; Legal
-;
-
-[+TidyAll::Plugin::OTRS::Legal::AddressUpdate]
-select = doc/**/*.xml
-
-[+TidyAll::Plugin::OTRS::Legal::SOPMLicense]
-select = *.{opm,sopm}
-
-[+TidyAll::Plugin::Znuny::Legal::LicenseValidator]
-select = **/*.{pl,pm,psgi,t,tt,js,css,scss}
-ignore = COPYING RELEASE CREDITS
-ignore = Kernel/Config.pm Kernel/Config/**/ZZZ*.pm Kernel/Config/Files/User/*.pm
-ignore = Kernel/WebApp.conf.dist
-ignore = scripts/auto_build/spec/templates/**/*
-ignore = scripts/test/sample/Loader/*.{css,js}
-ignore = scripts/test/sample/SysConfig/Migration/**/ZZZ*.pm
-ignore = scripts/DBUpdate{To6,}/TaskConfig/*.yml.dist
-ignore = var/httpd/htdocs/common/**/*.css
-; OTRSContinuousIntegrationProvisioner - deployment template includes
-ignore = **/*.tt.sh
-; devshare
-ignore = **/*.json.dist
-
-[+TidyAll::Plugin::Znuny::Legal::ReplaceOTRSCopyright]
-select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,dist,tmpl}
-select = .*.dist .bash_completion
-select = var/cron/*
-select = var/git/hooks/*-receive
-select = documentation.yml
-ignore = Kernel/Config.pm Kernel/Config/**/ZZZ*.pm
-ignore = module-format.xml,codesyntax.xml,language-translations.xml,writing-otrs-application.xml,test-mechanism.xml
-; Don't run this in the CI to avoid updates on year changes. It is enough to update the code when it is changed.
-only_modes = cli editor commit
-
-[+TidyAll::Plugin::Znuny::Legal::UpdateZnunyCopyright]
-select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,vue,dist,tmpl}
-select = .*.dist .bash_completion
-select = var/cron/*
-select = var/git/hooks/*-receive
-select = documentation.yml
-ignore = Kernel/Config.pm Kernel/Config/**/ZZZ*.pm
-ignore = module-format.xml,codesyntax.xml,language-translations.xml,writing-otrs-application.xml,test-mechanism.xml
-ignore = scripts/test/sample/**/*
-ignore = scripts/auto_build/**/*.tt
-ignore = var/httpd/htdocs/common/**/*
-ignore = **/*.yml.dist
-; Don't run this in the CI to avoid updates on year changes. It is enough to update the code when it is changed.
-only_modes = cli editor commit
-
+; TidyAll and plugins
+ignore = Kernel/TidyAll/**/*
 
 ;
 ; CodeStyle
@@ -203,6 +72,35 @@ select = **/*
 ignore = **/*.eml
 
 ;
+; Common
+;
+
+[+TidyAll::Plugin::Znuny::Common::Contributors]
+select = AUTHORS.md
+
+[+TidyAll::Plugin::Znuny::Common::NoFilter]
+select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,vue,dist,tmpl,sh,skel,xml,sopm,html}
+ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
+
+[+TidyAll::Plugin::Znuny::Common::CustomizationMarkers]
+select = **/*.{pl,psgi,pm,t,js,css,tt}
+ignore = Kernel/Config.pm
+ignore = Kernel/Config/GenericAgent.pm
+ignore = Kernel/Config/Files/ZZZ*.pm
+ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
+
+[+TidyAll::Plugin::Znuny::Common::CustomizationMarkersTT]
+select = Custom/Kernel/Output/HTML/**/*.tt
+select = Kernel/Output/HTML/**/*.tt
+
+[+TidyAll::Plugin::Znuny::Common::Origin]
+select = **/*.{pl,psgi,pm,t,js,css,tt,xml,sopm}
+ignore = Kernel/Config/Files/ZZZ*.pm
+
+[+TidyAll::Plugin::Znuny::Common::ValidateFilename]
+select = *
+
+;
 ; Config
 ;
 
@@ -210,63 +108,85 @@ ignore = **/*.eml
 select = Kernel/Config/**/*.xml
 
 ;
-; POT/PO
+; JavaScript
 ;
 
-[+TidyAll::Plugin::OTRS::PO::DocbookLint]
-select = i18n/**/*.{pot,po}
-select = locale/**/*.{pot,po}
+[+TidyAll::Plugin::Znuny::JavaScript::DebugCode]
+select = **/*.js
 
-[+TidyAll::Plugin::OTRS::PO::HTMLTags]
-select = i18n/**/*.{pot,po}
+[+TidyAll::Plugin::Znuny::JavaScript::ESLint]
+select = **/*.js
+ignore = scripts/test/sample/Loader/**/*
+; Ignore this slow plugin with custom mode "fast".
+except_modes = fast
 
-[+TidyAll::Plugin::OTRS::PO::msgfmt]
-select = i18n/**/*.{pot,po}
-select = locale/**/*.{pot,po}
+[+TidyAll::Plugin::Znuny::JavaScript::FileName]
+select = **/*.js
+ignore = **/test/*
+
+[+TidyAll::Plugin::Znuny::JavaScript::FileNameUnitTest]
+select = var/httpd/htdocs/js/test/*.js
+
+[+TidyAll::Plugin::Znuny::JavaScript::UnloadEvent]
+select = **/*.js **/*.tt
 
 ;
 ; Perl
 ;
 
-[+TidyAll::Plugin::OTRS::Perl::BinScripts]
-select = bin/*.pl
+[+TidyAll::Plugin::Znuny::Perl::PerlCritic]
+select = **/*.{pl,pm,psgi,t}
+ignore = Kernel/Config.pm
+ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
+ignore = scripts/test/sample/**/*
+ignore = var/processes/examples/**/*
+; Ignore this slow plugin with custom mode "fast".
+except_modes = fast
+
+[+TidyAll::Plugin::Znuny::Perl::Pod::FunctionPod]
+select = **/*.pm
+ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
+
+[+TidyAll::Plugin::Znuny::Perl::Pod::NamePod]
+select = **/*.pm
+ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
+
+[+TidyAll::Plugin::Znuny::Perl::Pod::Validator]
+select = **/*.{pm,pod,pod.dist}
+ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
+
+[+TidyAll::Plugin::Znuny::Perl::Tests::Helper]
+select = **/*.t
+
+[+TidyAll::Plugin::Znuny::Perl::DBObject]
+select = Kernel/Modules/**/*.pm Custom/Kernel/Modules/**/*.pm
 
 [+TidyAll::Plugin::Znuny::Perl::CacheCleanup]
 select = **/*.{pl,pm}
 
-[+TidyAll::Plugin::OTRS::Perl::CacheNew]
-select = **/*.{pl,psgi,pm}
-select = Kernel/Config.pm.dist
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-
-[+TidyAll::Plugin::OTRS::Perl::DBObject]
+[+TidyAll::Plugin::Znuny::Perl::DieExit]
 select = Kernel/Modules/**/*.pm Custom/Kernel/Modules/**/*.pm
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
-[+TidyAll::Plugin::OTRS::Perl::DieExit]
-select = Kernel/Modules/**/*.pm Custom/Kernel/Modules/**/*.pm
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-
-[+TidyAll::Plugin::OTRS::Perl::Dumper]
+[+TidyAll::Plugin::Znuny::Perl::Dumper]
 select = **/*.{pl,pm,psgi}
 select = Kernel/Config.pm.dist
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
-[+TidyAll::Plugin::OTRS::Perl::ForeachToFor]
+[+TidyAll::Plugin::Znuny::Perl::ForeachToFor]
 select = **/*.{pl,pm,psgi,t}
 select = Kernel/Config.pm.dist
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
-[+TidyAll::Plugin::OTRS::Perl::ForMy]
+[+TidyAll::Plugin::Znuny::Perl::ForMy]
 select = **/*.{pl,psgi,pm,t}
 select = Kernel/Config.pm.dist
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
-[+TidyAll::Plugin::Znuny::Perl::HashObjectMethodCall]
+[+TidyAll::Plugin::Znuny::Perl::HashObjectFunctionCall]
 select = **/*.{pl,pm,t}
 ignore = Custom/Kernel/**/*
 
-[+TidyAll::Plugin::OTRS::Perl::ISA]
+[+TidyAll::Plugin::Znuny::Perl::ISA]
 select = **/*.{pl,pm,psgi,t}
 select = Kernel/Config.pm.dist
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
@@ -279,7 +199,7 @@ ignore = scripts/test/sample/**/*
 ignore = **/*.{sopm,xml,sql},COPYING,RELEASE,CREDITS
 ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
 
-[+TidyAll::Plugin::OTRS::Perl::LayoutObject]
+[+TidyAll::Plugin::Znuny::Perl::LayoutObject]
 select = **/*.{pl,pm,psgi,t}
 select = Kernel/Config.pm.dist
 ignore = scripts/test/**/*
@@ -288,162 +208,105 @@ ignore = Kernel/System/Web/* Custom/Kernel/System/Web/*
 ignore = Kernel/System/DynamicField/**/* Custom/Kernel/System/DynamicField/**/*
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
-[+TidyAll::Plugin::OTRS::Perl::NoExitInConsoleCommands]
+[+TidyAll::Plugin::Znuny::Perl::NoExitInConsoleCommands]
 select = Kernel/System/Console/Command/**/*.pm Custom/Kernel/System/Console/Command/**/*.pm
 
-[+TidyAll::Plugin::OTRS::Perl::NoShebangLine]
+[+TidyAll::Plugin::Znuny::Perl::NoShebangLine]
 select = **/*.{pm,t}
 select = Kernel/Config.pm.dist
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
-[+TidyAll::Plugin::OTRS::Perl::ObjectDependencies]
-select = **/*.{pm}
+[+TidyAll::Plugin::Znuny::Perl::ObjectDependencies]
+select = **/*.pm
 select = Kernel/Config.pm.dist
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
-[+TidyAll::Plugin::OTRS::Perl::ObjectManagerCreation]
-select = **/*.{pm}
+[+TidyAll::Plugin::Znuny::Perl::ObjectManagerCreation]
+select = **/*.pm
 select = Kernel/Config.pm.dist
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
-[+TidyAll::Plugin::OTRS::Perl::ObjectNameSpace]
+[+TidyAll::Plugin::Znuny::Perl::ObjectManagerDirectCall]
+select = **/*.{pl,pm,t}
+ignore = Custom/Kernel/**/*
+
+[+TidyAll::Plugin::Znuny::Perl::ObjectNameSpace]
 select = **/*.{pl,pm,t}
 select = Kernel/Config.pm.dist
 ignore = Kernel/Modules/**/* Custom/Kernel/Modules/**/*
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
-[+TidyAll::Plugin::OTRS::Perl::ParamObject]
+[+TidyAll::Plugin::Znuny::Perl::ParamObject]
 select = **/*.{pl,psgi}
 select = Kernel/System/**/*.pm Custom/Kernel/System/**/*.pm
 ignore = Kernel/System/Web/* Custom/Kernel/System/Web/*
 ignore = Kernel/System/DynamicField/**/* Custom/Kernel/System/DynamicField/**/*
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
-[+TidyAll::Plugin::OTRS::Perl::PerlCritic]
-select = **/*.{pl,pm,psgi,t}
-ignore = Kernel/Config.pm
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-ignore = scripts/test/sample/**/*
-; Ignore this slow plugin for more agile OTRSCodePolicy filter development with a custom mode "fast".
-except_modes = fast
-
-[+TidyAll::Plugin::OTRS::Perl::PerlTidy]
+[+TidyAll::Plugin::Znuny::Perl::PerlTidy]
 select = **/*.{pl,pm,psgi,t}
 ignore = Kernel/Config.pm Kernel/Config/Defaults.pm Kernel/Config/**/ZZZ*.pm Kernel/Config/Files/User/*.pm
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 argv = -l=120 -i=4 -ci=4 -vt=0 -vtc=0 -cti=0 -pt=1 -bt=1 -sbt=1 -bbt=1 -nsfs -nolq -bbao -nola -ndnl -cab=0
-; Ignore this slow plugin for more agile OTRSCodePolicy filter development with a custom mode "fast".
+; Ignore this slow plugin with custom mode "fast".
 except_modes = fast
 
-[+TidyAll::Plugin::OTRS::Perl::Pod::FunctionPod]
-select = **/*.{pm}
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-
-[+TidyAll::Plugin::OTRS::Perl::Pod::NamePod]
-select = **/*.{pm}
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-
-;[+TidyAll::Plugin::OTRS::Perl::Pod::SpellCheck]
-;select = **/*.{pm,pod}
-;ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-;; Ignore this slow plugin for more agile OTRSCodePolicy filter development with a custom mode "fast".
-;except_modes = fast
-
-[+TidyAll::Plugin::OTRS::Perl::Pod::Validator]
-select = **/*.{pm,pod,pod.dist}
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-
-[+TidyAll::Plugin::OTRS::Perl::Print]
+[+TidyAll::Plugin::Znuny::Perl::Print]
 select = Kernel/Modules/**/*.pm Custom/Kernel/Modules/**/*.pm
 
-; $Kernel::OM must not be used in the base WebApp infrastructure, only
-;   in controllers, controller utility packages and the plugin
-;   providing Kernel::OM to the controllers.
-[+TidyAll::Plugin::OTRS::Perl::ProhibitObjectManager]
-select = Kernel/WebApp.pm
-select = Kernel/WebApp/*.pm
-ignore = Kernel/WebApp/Plugin/**/*.pm
-ignore = Kernel/WebApp/Plugin/*ProvideObjectManager.pm
-
-[+TidyAll::Plugin::OTRS::Perl::ProhibitMojoJSON]
-select = **/*.{pm}
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-
-[+TidyAll::Plugin::OTRS::Perl::Require]
+[+TidyAll::Plugin::Znuny::Perl::Require]
 select = **/*.{pl,psgi,pm,t}
 select = Kernel/Config.pm.dist
 ignore = scripts/test/Selenium/**/*.t
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
-[+TidyAll::Plugin::OTRS::Perl::ShebangLine]
+[+TidyAll::Plugin::Znuny::Perl::ShebangLine]
 select = **/*.{pl,psgi}
 
-[+TidyAll::Plugin::OTRS::Perl::SortKeys]
+[+TidyAll::Plugin::Znuny::Perl::SortKeys]
 select = **/*.{pl,pm,psgi,t}
 select = Kernel/Config.pm.dist
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
-[+TidyAll::Plugin::OTRS::Perl::SubDeclaration]
+[+TidyAll::Plugin::Znuny::Perl::SubDeclaration]
 select = **/*.{pl,pm,psgi,t}
 select = Kernel/Config.pm.dist
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
-[+TidyAll::Plugin::OTRS::Perl::SyntaxCheck]
+[+TidyAll::Plugin::Znuny::Perl::SyntaxCheck]
 select = **/*.{pl,pm,psgi,t}
 select = Kernel/Config.pm.dist
-; Ignore this slow plugin for more agile OTRSCodePolicy filter development with a custom mode "fast".
+; Ignore this slow plugin with custom mode "fast".
 except_modes = fast
 
-[+TidyAll::Plugin::OTRS::Perl::Tests::Helper]
-select = **/*.{t}
-
-[+TidyAll::Plugin::OTRS::Perl::Tests::Roles]
-select = Kernel/Test/Case/**/*.{pm}
-select = Custom/Kernel/Test/Case/**/*.{pm}
-
-[+TidyAll::Plugin::OTRS::Perl::Tests::UserID]
-select = Kernel/Test/**/*.{pm}
-select = Custom/Kernel/Test/**/*.{pm}
-
-[+TidyAll::Plugin::OTRS::Perl::Time]
+[+TidyAll::Plugin::Znuny::Perl::Time]
 select = **/*.{pl,pm,psgi,t}
 select = Kernel/Config.pm.dist
 ignore = scripts/test/**/*
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
-[+TidyAll::Plugin::OTRS::Perl::Translatable]
+[+TidyAll::Plugin::Znuny::Perl::Translatable]
 select = **/*.{pl,pm,psgi,t}
 ignore = Kernel/Config.pm Kernel/Config/**/ZZZ*.pm
 ignore = Kernel/Language.pm
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 ignore = scripts/test/**/*
 
-[+TidyAll::Plugin::OTRS::Perl::TranslationEncoding]
+[+TidyAll::Plugin::Znuny::Perl::TranslationEncoding]
 select = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
-[+TidyAll::Plugin::OTRS::Perl::UnitTestConfigChanges]
+[+TidyAll::Plugin::Znuny::Perl::UnitTestConfigChanges]
 select = scripts/test/**/*.{t}
 
-[+TidyAll::Plugin::OTRS::Perl::UseParent]
+[+TidyAll::Plugin::Znuny::Perl::UseParent]
 select = **/*.pm **/*.pm.skel
 select = Kernel/Config.pm.dist
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
-[+TidyAll::Plugin::OTRS::Perl::UseWarnings]
+[+TidyAll::Plugin::Znuny::Perl::UseWarnings]
 select = **/*.{pl,pm,psgi,t}
 select = Kernel/Config.pm.dist
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-
-[+TidyAll::Plugin::OTRS::Perl::WebApp::HeadGetWithoutBody]
-select = Kernel/WebApp/Controller/**/*.pm
-
-[+TidyAll::Plugin::Znuny::Perl::ObjectDependencies]
-select = **/*.{pm}
-select = Kernel/Config.pm.dist
-
-;[+TidyAll::Plugin::Znuny::Perl::ObjectManagerDirectCall]
-;select = **/*.{pl,pm,t}
-;ignore = Custom/Kernel/**/*
 
 [+TidyAll::Plugin::Znuny::Perl::VariableCheck]
 select = **/*.{pl,pm}
@@ -454,40 +317,52 @@ ignore = **/*.{sopm,xml,sql},COPYING,RELEASE,CREDITS
 ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
 
 ;
-; SeleniumTest
+; POT/PO
 ;
 
-[+TidyAll::Plugin::Znuny::SeleniumTest::RestoreDatabase]
-select = **/*.{t}
-ignore = Kernel/cpan-lib/**/* Custom/Kernel/cpan-lib/**/*
+[+TidyAll::Plugin::Znuny::PO::DocbookLint]
+select = i18n/**/*.{pot,po}
+select = locale/**/*.{pot,po}
+
+[+TidyAll::Plugin::Znuny::PO::HTMLTags]
+select = i18n/**/*.{pot,po}
+
+[+TidyAll::Plugin::Znuny::PO::msgfmt]
+select = i18n/**/*.{pot,po}
+select = locale/**/*.{pot,po}
 
 ;
 ; SOPM
 ;
 
-[+TidyAll::Plugin::OTRS::SOPM::CodeTags]
-select = *.{opm,sopm}
+[+TidyAll::Plugin::Znuny::SOPM::CodeTags]
+select = *.sopm
 
-[+TidyAll::Plugin::OTRS::SOPM::FileList]
-select = *.{opm,sopm}
+[+TidyAll::Plugin::Znuny::SOPM::FileList]
+select = *.sopm
+only_modes = cli
 
-[+TidyAll::Plugin::OTRS::SOPM::FileRights]
-select = *.{opm,sopm}
+[+TidyAll::Plugin::Znuny::SOPM::FileRights]
+select = *.sopm
 
-[+TidyAll::Plugin::OTRS::SOPM::Name]
-select = *.{sopm}
+[+TidyAll::Plugin::Znuny::SOPM::License]
+select = *.sopm
 
-[+TidyAll::Plugin::OTRS::SOPM::OndemandTestingPresent]
-select = *.{opm,sopm}
-
-[+TidyAll::Plugin::OTRS::SOPM::PackageRequired]
-select = *.{opm,sopm}
+[+TidyAll::Plugin::Znuny::SOPM::Name]
+select = *.sopm
 
 [+TidyAll::Plugin::Znuny::SOPM::RequiredElements]
-select = *.{sopm}
+select = *.sopm
 
-[+TidyAll::Plugin::OTRS::SOPM::XSDValidator]
-select = *.{sopm}
+[+TidyAll::Plugin::Znuny::SOPM::XSDValidator]
+select = *.sopm
+
+;
+; SQL
+;
+
+[+TidyAll::Plugin::Znuny::SQL::ReservedWords]
+select = **/*.{xml,sopm}
 
 ;
 ; TT
@@ -496,31 +371,24 @@ select = *.{sopm}
 [+TidyAll::Plugin::Znuny::TT::Breadcrumb]
 select = **/Admin*.tt
 
-[+TidyAll::Plugin::OTRS::TT::ScriptUsage]
+[+TidyAll::Plugin::Znuny::TT::ScriptUsage]
 select = **/*.tt
 
-[+TidyAll::Plugin::OTRS::TT::TranslationFilter]
+[+TidyAll::Plugin::Znuny::TT::TranslationFilter]
 select = **/*.tt
-
-;
-; SQL
-;
-
-[+TidyAll::Plugin::OTRS::SQL::ReservedWords]
-select = **/*.{xml,opm,sopm}
 
 ;
 ; Whitespace
 ;
 
-[+TidyAll::Plugin::OTRS::Whitespace::FourSpaces]
+[+TidyAll::Plugin::Znuny::Whitespace::FourSpaces]
 select = **/*.{opm,sopm}
 
-[+TidyAll::Plugin::OTRS::Whitespace::Tabs]
+[+TidyAll::Plugin::Znuny::Whitespace::Tabs]
 select = **/*.{pl,pm,psgi,t,tt,js,xml,opm,sopm}
 ignore = Kernel/Config.pm Kernel/Config/**/ZZZ*.pm
 
-[+TidyAll::Plugin::OTRS::Whitespace::TrailingWhitespace]
+[+TidyAll::Plugin::Znuny::Whitespace::TrailingWhitespace]
 select = **/*.{pl,pm,psgi,t,tt,js,xml,opm,sopm,md}
 ignore = Kernel/Config.pm Kernel/Config/**/ZZZ*.pm
 
@@ -528,154 +396,79 @@ ignore = Kernel/Config.pm Kernel/Config/**/ZZZ*.pm
 ; XML
 ;
 
-[+TidyAll::Plugin::OTRS::XML::ConfigSyntax]
+[+TidyAll::Plugin::Znuny::XML::ConfigDescription]
+select = Kernel/Config/**/*.xml
+
+[+TidyAll::Plugin::Znuny::XML::ConfigSyntax]
 select = **/*.xml
 ignore = development/samples/config/*.xml
-; ignore .xml files in documentation
+; ignore XML files in documentation
 ignore = doc/**/*.xml
 ignore = en/content/**/*.xml
 ignore = de/content/**/*.xml
 ignore = hu/content/**/*.xml
 
-[+TidyAll::Plugin::OTRS::XML::ConfigDescription]
+[+TidyAll::Plugin::Znuny::XML::Lint]
+select = **/*.{xml,xsd}
+
+[+TidyAll::Plugin::Znuny::XML::LintWithOurParsers]
+select = ;**/*.xml
+
+[+TidyAll::Plugin::Znuny::XML::Configuration::Navigation]
 select = Kernel/Config/**/*.xml
 
-[+TidyAll::Plugin::OTRS::XML::Configuration::Navigation]
+[+TidyAll::Plugin::Znuny::XML::Configuration::UnitTestBlacklist]
 select = Kernel/Config/**/*.xml
 
-[+TidyAll::Plugin::OTRS::XML::Configuration::UnitTestBlacklist]
+[+TidyAll::Plugin::Znuny::XML::Configuration::XSDValidator]
 select = Kernel/Config/**/*.xml
 
-[+TidyAll::Plugin::OTRS::XML::Configuration::XSDValidator]
-select = Kernel/Config/**/*.xml
-
-[+TidyAll::Plugin::OTRS::XML::Configuration::YAMLIndentation]
-select = Kernel/Config/**/*.xml
-
-[+TidyAll::Plugin::OTRS::XML::Configuration::YAMLValidator]
-select = Kernel/Config/**/*.xml
-
-[+TidyAll::Plugin::OTRS::XML::Database::KeyLength]
+[+TidyAll::Plugin::Znuny::XML::Database::KeyLength]
 select = scripts/database/otrs-schema.xml
 select = *.{sopm}
 
-[+TidyAll::Plugin::OTRS::XML::Database::XSDValidator]
+[+TidyAll::Plugin::Znuny::XML::Database::XSDValidator]
 select = scripts/database/*.xml
 select = scripts/database/update/*.xml
 
-[+TidyAll::Plugin::OTRS::XML::Docbook::BinScripts]
-select = doc/**/*.xml
-;select = en/content/**/*.xml
-
-[+TidyAll::Plugin::OTRS::XML::Docbook::ImageOutput]
-select = doc/**/*.xml
-select = en/content/**/*.xml
-
-[+TidyAll::Plugin::OTRS::XML::Docbook::XSDValidator]
-select = doc/**/*.xml
-;select = en/content/**/*.xml
-
-[+TidyAll::Plugin::OTRS::XML::WSDL::XSDValidator]
+[+TidyAll::Plugin::Znuny::XML::WSDL::XSDValidator]
 select = **/*.wsdl
+ignore = development/**/*
 
-[+TidyAll::Plugin::OTRS::XML::WADL::XSDValidator]
+[+TidyAll::Plugin::Znuny::XML::WADL::XSDValidator]
 select = **/*.wadl
-
-[+TidyAll::Plugin::OTRS::XML::Lint]
-select = **/*.{xml,xsd}
-
-[+TidyAll::Plugin::OTRS::XML::LintWithOurParsers]
-select = ;**/*.xml
+ignore = development/**/*
 
 ;
-; Migrations OTRS 5
+; Legal
 ;
 
-[+TidyAll::Plugin::OTRS::Migrations::OTRS5::HeaderlineFilename]
-select = **/*.{pl,pm,psgi,t,tt,js,spec}
+[+TidyAll::Plugin::Znuny::Legal::LicenseValidator]
+select = **/*.{pl,pm,psgi,t,tt,js,css,scss}
+ignore = COPYING RELEASE CREDITS
+ignore = Kernel/Config.pm Kernel/Config/**/ZZZ*.pm Kernel/Config/Files/User/*.pm
+ignore = scripts/auto_build/spec/templates/**/*
+ignore = scripts/test/sample/Loader/*.{css,js}
+ignore = scripts/test/sample/SysConfig/Migration/**/ZZZ*.pm
+ignore = var/httpd/htdocs/common/**/*.css
+
+[+TidyAll::Plugin::Znuny::Legal::UpdateOTRSCopyright]
+select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,dist,tmpl}
 select = .*.dist .bash_completion
-ignore = Kernel/Config/Files/ZZZ*.pm
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
+select = var/cron/*
+select = var/git/hooks/*-receive
+ignore = Kernel/Config.pm Kernel/Config/**/ZZZ*.pm
+; Don't run this in the CI to avoid updates on year changes. It is enough to update the code when it is changed.
+only_modes = cli editor commit
 
-[+TidyAll::Plugin::OTRS::Migrations::OTRS5::OutputFilterPre]
-select = Kernel/Config/**/*.xml
-
-[+TidyAll::Plugin::OTRS::Migrations::OTRS5::Popup]
-select = **/*.tt
-
-[+TidyAll::Plugin::OTRS::Migrations::OTRS5::StatisticsPreview]
-select = Kernel/System/Stats/Dynamic/*.pm
-
-;
-; Migrations OTRS 6
-;
-
-[+TidyAll::Plugin::OTRS::Migrations::OTRS6::DateTime]
-select = **/*.{pl,pm,psgi,t}
-ignore = Kernel/Config/Files/ZZZ*.pm
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-
-[+TidyAll::Plugin::OTRS::Migrations::OTRS6::PerlConfigFileFormat]
-select = Kernel/Config/Files/*.pm
-
-[+TidyAll::Plugin::OTRS::Migrations::OTRS6::PermissionDataNotInSession]
-select = **/*.{pl,pm,psgi,t}
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-
-[+TidyAll::Plugin::OTRS::Migrations::OTRS6::SysConfig]
-select = **/*.{pl,pm,psgi,t}
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-
-[+TidyAll::Plugin::OTRS::Migrations::OTRS6::TimeZoneOffset]
-select = **/*.{pl,pm,psgi,t}
-ignore = Kernel/Config/Files/ZZZ*.pm
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-
-[+TidyAll::Plugin::OTRS::Migrations::OTRS6::XMLFrontendNavigation]
-select = Kernel/Config/**/*.xml
-
-;
-; Migrations OTRS 7
-;
-
-[+TidyAll::Plugin::OTRS::Migrations::OTRS7::DeprecatedSettings]
-select = Kernel/Config/**/*.xml
-
-[+TidyAll::Plugin::OTRS::Migrations::OTRS7::TranslatableStringsPlaceholders]
-select = **/*.{pl,pm,tt,js,xml,html.tmpl}
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-
-[+TidyAll::Plugin::OTRS::Migrations::OTRS7::WebAppNoLegacyCode]
-select = Kernel/WebApp.pm
-select = Kernel/WebApp/**/*.{pl,pm}
-
-;
-; Migrations OTRS 8
-;
-
-[+TidyAll::Plugin::OTRS::Migrations::OTRS8::UselessComments]
-select = **/*.{pl,pm,psgi,t}
-ignore = Kernel/Config/Files/ZZZ*.pm
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-
-[+TidyAll::Plugin::OTRS::Migrations::OTRS8::NewTestsNoLegacyCode]
-select = Kernel/Test/**/*.pm
-
-;
-; Migrations OTRS 9
-;
-
-[+TidyAll::Plugin::OTRS::Migrations::OTRS9::DropVariableCheck]
-select = **/*.{pl,pm,psgi,t}
-ignore = Kernel/Config/Files/ZZZ*.pm
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-
-[+TidyAll::Plugin::OTRS::Migrations::OTRS9::ImproveLogMessages]
-select = **/*.{pl,pm,psgi,t}
-ignore = Kernel/Config/Files/ZZZ*.pm
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
-
-[+TidyAll::Plugin::OTRS::Migrations::OTRS9::UnimportMoose]
-select = **/*.pm
-ignore = Kernel/Config/Files/ZZZ*.pm
-ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
+[+TidyAll::Plugin::Znuny::Legal::UpdateZnunyCopyright]
+select = **/*.{pl,pm,psgi,t,tt,spec,js,css,scss,dist,tmpl}
+select = .*.dist .bash_completion
+select = var/cron/*
+select = var/git/hooks/*-receive
+ignore = Kernel/Config.pm Kernel/Config/**/ZZZ*.pm
+ignore = **/*.yml.dist
+ignore = var/httpd/htdocs/common/**/*.css
+ignore = scripts/auto_build/spec/templates/**/*
+; Don't run this in the CI to avoid updates on year changes. It is enough to update the code when it is changed.
+only_modes = cli editor commit

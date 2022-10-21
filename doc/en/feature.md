@@ -2,46 +2,46 @@
 
 ## Required CPAN modules
 
-* Perl::Critic
-* Perl::Critic::Moose
-* Perl::Tidy
-* XML::Parser
 * Algorithm::Diff
 * Code::TidyAll
+* Perl::Critic
+* Perl::Tidy
+* Pod::POM
+* XML::Parser
 
 ## Installation
 
 ```bash
-    sudo cpanm -i Perl::Critic Perl::Tidy XML::Parser Algorithm::Diff Code::TidyAll Perl::Critic::Moose
+    sudo cpanm -i Algorithm::Diff Code::TidyAll Perl::Critic Perl::Tidy Pod::POM XML::Parser
 ```
 
 ## Usage
 
 Tidy all files in your current directory:
 ```bash
-perl $WORKSPACE/ZnunyCodePolicy/bin/otrs.CodePolicy.pl --all
+perl $WORKSPACE/ZnunyCodePolicy/bin/znuny.CodePolicy.pl --all-files
 ```
 
 Tidy a single file in your directory:
 ```bash
-perl $WORKSPACE/ZnunyCodePolicy/bin/otrs.CodePolicy.pl --file Test.pm
+perl $WORKSPACE/ZnunyCodePolicy/bin/znuny.CodePolicy.pl --file-path Test.pm
 ```
 
 ### Git Alias
 You also can add git aliases to create shortcuts to tidy your file, for example:
 ```bash
 [alias]
-cc = !perl $WORKSPACE/ZnunyCodePolicy/bin/otrs.CodePolicy.pl --all
-ccf = !perl $WORKSPACE/ZnunyCodePolicy/bin/otrs.CodePolicy.pl --file $@
+cc = !perl $WORKSPACE/ZnunyCodePolicy/bin/znuny.CodePolicy.pl --all-files
+ccf = !perl $WORKSPACE/ZnunyCodePolicy/bin/znuny.CodePolicy.pl --file-path $@
 ```
 
 ```bash
 $WORKSPACE/ZnunyCodePolicy$ git cc
-$WORKSPACE/ZnunyCodePolicy$ git ccf Kernel/TidyAll/OTRS.pm
+$WORKSPACE/ZnunyCodePolicy$ git ccf Kernel/System/Main.pm
 ```
 
 ### Hooks
-If you want to setup a local commit filter to your git directory you can run the following command:
+If you want to set up a local commit filter to your git directory you can run the following command:
 ```bash
 perl $WORKSPACE/ZnunyCodePolicy/scripts/install-git-hooks.pl
 ```

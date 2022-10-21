@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2012-2016 Znuny GmbH, http://znuny.com/
+# Copyright (C) Znuny GmbH, http://znuny.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -13,9 +13,9 @@ use warnings;
 
 use base qw(TidyAll::Plugin::Znuny::Base);
 
-sub validate_file {    ## no critic
-    my ( $Self, $File ) = @_;
-    my $Code = $Self->_GetFileContents($File);
+sub validate_source {    ## no critic
+    my ( $Self, $Code ) = @_;
+
     return if $Self->IsPluginDisabled( Code => $Code );
 
     my $LineCounter  = 0;
@@ -27,7 +27,7 @@ sub validate_file {    ## no critic
 
         # Only test for $CacheObject and Kernel::System::Cache
         next LINE if $Line !~ m{(\$CacheObject|\('Kernel::System::Cache'\))->CleanUp\(\s*\)};
-        $ErrorMessage .= "\n\tLine $LineCounter: $Line";
+        $ErrorMessage .= "Line $LineCounter: $Line\n";
     }
 
     return if !$ErrorMessage;
@@ -37,11 +37,7 @@ Kernel::System::Cache::CleanUp() must be called with arguments.
 $ErrorMessage
 EOF
 
-    $Self->Print(
-        Package  => __PACKAGE__,
-        Priority => 'notice',
-        Message  => $Message,
-    );
+    $Self->AddErrorMessage($Message);
 
     return;
 }
