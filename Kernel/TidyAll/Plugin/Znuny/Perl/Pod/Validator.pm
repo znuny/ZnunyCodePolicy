@@ -41,7 +41,10 @@ sub validate_file {
         && defined $Output
         && length $Output
     ) {
-        $Self->AddErrorMessage($Output);
+        $Self->AddMessage(
+            Message  => $Output,
+            Priority => 'warning',
+        );
     }
 
     $Checker = Pod::POM->new( warn => 1 );
@@ -56,7 +59,10 @@ sub validate_file {
         && defined $Output
         && length $Output
     ) {
-        $Self->AddErrorMessage($Output . "\n");
+        $Self->AddMessage(
+            Message  => $Output . "\n",
+            Priority => 'warning',
+        );
     }
 }
 
