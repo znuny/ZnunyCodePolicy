@@ -58,7 +58,7 @@ Usage: bin/znuny.CodePolicy.pl
     Performs Znuny code policy checks.
     Run this script from the **top-level directory** of your package or Znuny installation.
     By default it will process all changed files (staged and unstaged) that are already known to Git.
-    Other file selection options are --all-files, --staged-files, --file and --directory.
+    Other file selection options are --all-files, --staged-files, --file-path and --directory.
 
 Options:
     -h, --help                 Show this usage message
