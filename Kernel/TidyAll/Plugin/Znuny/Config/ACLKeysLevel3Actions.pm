@@ -11,7 +11,7 @@ package TidyAll::Plugin::Znuny::Config::ACLKeysLevel3Actions;
 use strict;
 use warnings;
 
-use base qw(TidyAll::Plugin::Znuny::Base);
+use parent qw(TidyAll::Plugin::Znuny::Base);
 
 =head1 SYNOPSIS
 

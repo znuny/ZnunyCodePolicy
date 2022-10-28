@@ -93,7 +93,11 @@ sub transform_source {
         $Code =~ s{nofilter\($OldKey\)}{nofilter\($NewKey\)}xmsg;
     }
 
-    $Code =~ s{(.+nofilter\(TidyAll::Plugin::OTRS.*\))}{}x;
+    # Rename Znuny4OTRS nofilters
+    $Code =~ s{(.+nofilter\(TidyAll::Plugin::)OTRS::Znuny4OTRS(::.*\))}{$1Znuny$2}g;
+
+    # Remove remaining OTRS nofilters.
+    $Code =~ s{(.+nofilter\(TidyAll::Plugin::OTRS.*\))}{}g;
 
     return $Code;
 }
