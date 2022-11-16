@@ -9,7 +9,6 @@
             <xs:sequence>
                 <xs:element ref="Name" />
                 <xs:element ref="Version"/>
-                <xs:element ref="ChangeLog" minOccurs="0" maxOccurs="unbounded" />
                 <xs:element ref="Framework" maxOccurs="unbounded"/>
                 <xs:choice minOccurs="0" maxOccurs="unbounded">
                     <xs:element ref="PackageRequired"/>
@@ -27,6 +26,7 @@
                 <xs:element ref="PackageAllowDirectUpdate" minOccurs="0" />
 
                 <xs:element ref="OS" minOccurs="0" maxOccurs="unbounded" />
+                <xs:element ref="ChangeLog" minOccurs="0" maxOccurs="unbounded" />
                 <xs:element ref="Filelist"/>
                 <xs:choice minOccurs="0" maxOccurs="unbounded">
                     <xs:element ref="IntroInstall"/>
