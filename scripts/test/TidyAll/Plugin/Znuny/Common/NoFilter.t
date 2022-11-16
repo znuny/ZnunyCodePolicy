@@ -7,6 +7,8 @@
 # --
 
 ## no critic (Modules::RequireExplicitPackage)
+## nofilter(TidyAll::Plugin::Znuny::Common::NoFilter)
+
 use strict;
 use warnings;
 
@@ -23,7 +25,7 @@ my @Tests = (
         Source   => <<'EOF',
 # nofilter(TidyAll::Plugin::Znuny::Perl::PerlCritic)
 EOF
-        ExpectedSource=> <<'EOF',
+        ExpectedSource => <<'EOF',
 ## nofilter(TidyAll::Plugin::Znuny::Perl::PerlCritic)
 EOF
         ExpectedMessageSubstring => undef,
@@ -35,7 +37,7 @@ EOF
         Source   => <<'EOF',
 / nofilter(TidyAll::Plugin::Znuny::Legal::LicenseValidator)
 EOF
-        ExpectedSource=> <<'EOF',
+        ExpectedSource => <<'EOF',
 // nofilter(TidyAll::Plugin::Znuny::Legal::LicenseValidator)
 EOF
         ExpectedMessageSubstring => undef,
@@ -47,7 +49,7 @@ EOF
         Source   => <<'EOF',
 /* no filter (TidyAll::Plugin::Znuny::Legal::LicenseValidator) */
 EOF
-        ExpectedSource=> <<'EOF',
+        ExpectedSource => <<'EOF',
 /* nofilter(TidyAll::Plugin::Znuny::Legal::LicenseValidator) */
 EOF
         ExpectedMessageSubstring => undef,
@@ -59,7 +61,7 @@ EOF
         Source   => <<'EOF',
 <!--  nofilter(TidyAll::Plugin::Znuny::Legal::LicenseValidator) -->
 EOF
-        ExpectedSource=> <<'EOF',
+        ExpectedSource => <<'EOF',
 <!-- nofilter(TidyAll::Plugin::Znuny::Legal::LicenseValidator) -->
 EOF
         ExpectedMessageSubstring => undef,
@@ -71,7 +73,7 @@ EOF
         Source   => <<'EOF',
 ## nofilter(TidyAll::Plugin::OTRS::Perl::PerlCritic)
 EOF
-        ExpectedSource=> <<'EOF',
+        ExpectedSource => <<'EOF',
 ## nofilter(TidyAll::Plugin::Znuny::Perl::PerlCritic)
 EOF
         ExpectedMessageSubstring => undef,
@@ -83,7 +85,7 @@ EOF
         Source   => <<'EOF',
 ## nofilter(TidyAll::Plugin::OTRS::Invalid)
 EOF
-        ExpectedSource=> <<'EOF',
+        ExpectedSource => <<'EOF',
 
 EOF
         ExpectedMessageSubstring => undef,

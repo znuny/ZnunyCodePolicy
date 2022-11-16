@@ -14,7 +14,7 @@ use warnings;
 use vars (qw($Self));
 use utf8;
 
-## nofilter(TidyAll::Plugin::OTRS::Perl::Tests::Helper)
+## nofilter(TidyAll::Plugin::Znuny::Perl::Tests::Helper)
 use scripts::test::TidyAll::Plugin::Znuny;
 
 my @Tests = (

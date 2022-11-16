@@ -179,6 +179,7 @@
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/CodeStyle/LabelCheck.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/CodeStyle/STDERRCheck.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/CodeStyle/TODOCheck.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Common/NoFilter.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Config/ACLKeysLevel3Actions.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Encoding.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/ExampleTest.t"/>

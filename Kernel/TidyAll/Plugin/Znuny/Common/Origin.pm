@@ -36,11 +36,14 @@ sub transform_source {
         for my $Line ( split /\n/, $Code ) {
             $LineCounter++;
 
-            last ORIGINLINE if $LineCounter > 5;
+            # Ignore exact position of origin tag because there could be more than two copyright lines in the header.
+#             last ORIGINLINE if $LineCounter > 5;
 
             next ORIGINLINE if $Line !~ m{ ^ [ ]* (?: \# | \/\/ ) [ ]+ \$origin: [ ]+ [^\n]+ $ }xms;
 
             $FoundOrigin = 1;
+
+            last ORIGINLINE;
         }
 
         if ( !$FoundOrigin ) {
@@ -92,7 +95,10 @@ sub validate_source {
         LINE:
         for my $Line ( split /\n/, $Code ) {
             $Counter++;
-            last LINE if $Counter > 5;
+
+            # Ignore exact position of origin tag because there could be more than two copyright lines in the header.
+#             last LINE if $Counter > 5;
+
             next LINE if $Line !~ m{ ^ [ ]* (?: \# | \/\/ ) [ ]+ \$origin: [ ]+ [^\n]+ $ }xms;
 
             $FoundOrigin = 1;

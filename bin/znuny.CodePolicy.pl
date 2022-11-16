@@ -123,7 +123,7 @@ if (
     print
         "Framework and/or OPM information could not be retrieved or OPM framework version is incompatible. Note that only the framework versions of the executed code policy are supported.\n";
 
-    # Use exit code 0 (not 1) because the CI environment's git hook should not lead to reject the push if the framework version is not supported.
+# Use exit code 0 (not 1) because the CI environment's git hook should not lead to reject the push if the framework version is not supported.
     exit 0;
 }
 
