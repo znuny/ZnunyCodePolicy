@@ -70,6 +70,7 @@ select = Kernel/Config.pm.dist
 [+TidyAll::Plugin::Znuny::CodeStyle::TODOCheck]
 select = **/*
 ignore = **/*.eml
+ignore = **/*.po
 
 ;
 ; Common
