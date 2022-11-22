@@ -1003,6 +1003,7 @@ sub PrintResults {
     my %ResultsBySOPMFilePath = %{ $TidyAllResults // {} };
 
     my $ExitCode = 0;
+    my %Summary;
 
     SOPMFILEPATH:
     for my $SOPMFilePath ( sort keys %ResultsBySOPMFilePath ) {
@@ -1018,6 +1019,7 @@ sub PrintResults {
 
         my $TidyAllState = $TidyAllResultObject->state();
         next SOPMFILEPATH if !$ValidTidyAllStates{$TidyAllState};
+        $Summary{FileCounter} += 1;
 
         # Since 'die' is not used anymore for signalling code policy errors in plugins,
         # manually check for real errors.
@@ -1025,6 +1027,9 @@ sub PrintResults {
 
         if ( $TidyAllState eq 'tidied' ) {
             print $Self->ReplaceColorTags("    <green>[File was tidied]</green>\n");
+
+            $Summary{Tidied}->{$SOPMFilePath} += 1;
+            $ExitCode = 1;
         }
 
         # TidyAll plugin runtime errors
@@ -1040,6 +1045,7 @@ sub PrintResults {
             print $Self->ReplaceColorTags("    <red>[Error]</red> ");
             print $ErrorMessage;
 
+            $Summary{Error}->{$SOPMFilePath} += 1;
             $ExitCode = 1;
         }
 
@@ -1047,8 +1053,33 @@ sub PrintResults {
         for my $Message ( @{ $Result->{Messages} // [] } ) {
             print $Self->ReplaceColorTags("    <yellow>[Warning]</yellow> ");
             print $Message;
+
+            $Summary{Warning}->{$SOPMFilePath} += 1;
         }
     }
+
+    my %TypeColors = (
+        Error   => 'red',
+        Warning => 'yellow',
+        Tidied  => 'green',
+    );
+
+    print "================================================================================\n";
+    SUMMARYTYPE:
+    for my $Type ( qw(Error Warning Tidied) ) {
+        next SUMMARYTYPE if !$Summary{$Type};
+
+        my $Count = scalar keys %{ $Summary{$Type} };
+        print $Self->ReplaceColorTags("<$TypeColors{$Type}>$Type</$TypeColors{$Type}>");
+
+        print "\t(" . $Count . ")\n";
+
+        for my $Key ( keys %{ $Summary{$Type} } ) {
+            print "\t" . $Key . "\n";
+        }
+    }
+    print $Self->ReplaceColorTags("<bright_green>Total</bright_green>") . "\t$Summary{FileCounter}\n";
+    print "================================================================================\n";
 
     return $ExitCode;
 }
