@@ -101,8 +101,6 @@ sub CodeUninstall {
     return $Result;
 }
 
-=begin Internal:
-
 =head2 _InstallDependencies()
 
 Installs dependencies, if needed:
@@ -149,5 +147,3 @@ sub _DeleteDependencies {
 }
 
 1;
-
-=end Internal:

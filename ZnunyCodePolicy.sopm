@@ -73,6 +73,7 @@
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Common/Origin.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Common/ValidateFilename.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Config/ACLKeysLevel3Actions.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/JavaScript/AlertFunction.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/JavaScript/DebugCode.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/JavaScript/ESLint.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/JavaScript/ESLint/legacy.eslintrc.js"/>
@@ -183,6 +184,7 @@
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Config/ACLKeysLevel3Actions.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Encoding.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/ExampleTest.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/JavaScript/AlertFunction.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/JavaScript/DebugCode.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/JavaScript/ESLint.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Legal/LicenseValidator.t"/>

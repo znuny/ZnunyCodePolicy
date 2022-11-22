@@ -26,7 +26,7 @@ use Kernel::System::Encode;
 use Kernel::System::Log;
 use Kernel::System::Main;
 
-=head2 ()
+=head1 Run()
 
 runs Znuny code policy unit tests.
 

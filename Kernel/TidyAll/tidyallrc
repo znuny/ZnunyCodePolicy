@@ -112,6 +112,9 @@ select = Kernel/Config/**/*.xml
 ; JavaScript
 ;
 
+[+TidyAll::Plugin::Znuny::JavaScript::AlertFunction]
+select = **/*.js
+
 [+TidyAll::Plugin::Znuny::JavaScript::DebugCode]
 select = **/*.js
 
