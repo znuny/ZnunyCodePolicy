@@ -19,7 +19,7 @@ my @Tests = (
         Filename => 'Test.js',
         Plugins  => [qw(TidyAll::Plugin::Znuny::JavaScript::AlertFunction)],
         Source   => <<'EOF',
-# no content
+// no content
 EOF
     },
     {
@@ -29,8 +29,47 @@ EOF
         Source   => <<'EOF',
 alert('Debug');
 EOF
-        ExpectedMessageSubstring => "Found alert() in line 1: alert(\'Debug\');
-        Use Core.UI.Dialog.ShowAlert(\'TITLE\', \'Debug\') instead of alert().",
+        ExpectedMessageSubstring => "Found alert() in line 1: alert('Debug');
+        Use Core.UI.Dialog.ShowAlert('<Insert your alert title here>', 'Debug') instead of alert().",
+    },
+    {
+        Name     => 'alert() is given',
+        Filename => 'Test.js',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::JavaScript::AlertFunction)],
+        Source   => <<'EOF',
+console.log('Hi'); alert('Debug'); console.log('Hi');
+EOF
+        ExpectedMessageSubstring => "Found alert() in line 1: console.log('Hi'); alert('Debug'); console.log('Hi');
+        Use Core.UI.Dialog.ShowAlert('<Insert your alert title here>', 'Debug') instead of alert().",
+    },
+    {
+        Name     => 'alert() is not given',
+        Filename => 'Test.js',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::JavaScript::AlertFunction)],
+        Source   => <<'EOF',
+// no content
+thisisnoalert('Test');
+EOF
+    },
+    {
+        Name     => 'alert() is not given',
+        Filename => 'Test.js',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::JavaScript::AlertFunction)],
+        Source   => <<'EOF',
+// no content
+// alert('Test');
+EOF
+    },
+    {
+        Name     => 'alert() is not given',
+        Filename => 'Test.js',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::JavaScript::AlertFunction)],
+        Source   => <<'EOF',
+// no content
+/* alert('Test');
+...
+*/
+EOF
     },
 );
 

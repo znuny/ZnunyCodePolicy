@@ -21,18 +21,25 @@ sub validate_source {
     my $ErrorMessage;
     my $Counter;
 
+    LINE:
     for my $Line ( split( /\n/, $Code ) ) {
         $Counter++;
 
-        if ( $Line =~ m{ alert\((.*)\); }xms ) {
+        # Ignore comments (this still doesn't catch code in comment blocks /* */).
+        next LINE if $Line =~ m{\A(//|/\*)};
+
+        if ( $Line =~ m{\balert\((.*?)\)} ) {
             $ErrorMessage
                 .= "Found alert() in line $Counter: $Line\n";
-            $ErrorMessage .= "Use Core.UI.Dialog.ShowAlert('TITLE', $1) instead of alert().\n";
+            $ErrorMessage .= "Use Core.UI.Dialog.ShowAlert('<Insert your alert title here>', $1) instead of alert().\n";
         }
     }
 
     if ($ErrorMessage) {
-        $Self->AddErrorMessage($ErrorMessage);
+        $Self->AddMessage(
+            Message  => $ErrorMessage,
+            Priority => 'warning'
+        );
     }
 }
 

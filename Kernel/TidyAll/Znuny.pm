@@ -1019,7 +1019,6 @@ sub PrintResults {
 
         my $TidyAllState = $TidyAllResultObject->state();
         next SOPMFILEPATH if !$ValidTidyAllStates{$TidyAllState};
-        $Summary{FileCounter} += 1;
 
         # Since 'die' is not used anymore for signalling code policy errors in plugins,
         # manually check for real errors.
@@ -1058,28 +1057,47 @@ sub PrintResults {
         }
     }
 
-    my %TypeColors = (
-        Error   => 'red',
-        Warning => 'yellow',
-        Tidied  => 'green',
-    );
+    my %TouchedFiles;
 
-    print "================================================================================\n";
-    SUMMARYTYPE:
-    for my $Type ( qw(Error Warning Tidied) ) {
-        next SUMMARYTYPE if !$Summary{$Type};
+    if (%Summary) {
+        my %TypeColors = (
+            Error   => 'red',
+            Warning => 'yellow',
+            Tidied  => 'green',
+        );
 
-        my $Count = scalar keys %{ $Summary{$Type} };
-        print $Self->ReplaceColorTags("<$TypeColors{$Type}>$Type</$TypeColors{$Type}>");
+        print "\n================================================================================\n";
+        print "Summary\n";
+        print "================================================================================\n";
 
-        print "\t(" . $Count . ")\n";
 
-        for my $Key ( keys %{ $Summary{$Type} } ) {
-            print "\t" . $Key . "\n";
+        TYPE:
+        for my $Type ( qw(Error Warning Tidied) ) {
+            next TYPE if !$Summary{$Type};
+
+            my $Entries = keys %{ $Summary{$Type} };
+            print $Self->ReplaceColorTags("<$TypeColors{$Type}>[$Type] ($Entries)</$TypeColors{$Type}>\n");
+
+            for my $SOPMFilePath ( sort keys %{ $Summary{$Type} } ) {
+                $TouchedFiles{$SOPMFilePath} = 1;
+
+                print "\t";
+
+                # "Tidied" needs no output of counter, it happens only once per file.
+                if ( $Type ne 'Tidied' ) {
+                    print "($Summary{$Type}->{$SOPMFilePath}) ";
+                }
+
+                print "$SOPMFilePath\n";
+            }
         }
     }
-    print $Self->ReplaceColorTags("<bright_green>Total</bright_green>") . "\t$Summary{FileCounter}\n";
+
+    my $TotalNummberOfFiles  = keys %ResultsBySOPMFilePath;
+    my $NumberOfTouchedFiles = keys %TouchedFiles;
+
     print "================================================================================\n";
+    print "$NumberOfTouchedFiles of $TotalNummberOfFiles files were tidied or have warnings/errors.\n";
 
     return $ExitCode;
 }
