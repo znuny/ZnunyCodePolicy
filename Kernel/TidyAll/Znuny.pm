@@ -1059,37 +1059,36 @@ sub PrintResults {
 
     my %TouchedFiles;
 
-    if (%Summary) {
-        my %TypeColors = (
-            Error   => 'red',
-            Warning => 'yellow',
-            Tidied  => 'green',
-        );
+    return $ExitCode if !%Summary;
 
-        print "\n================================================================================\n";
-        print "Summary\n";
-        print "================================================================================\n";
+    my %TypeColors = (
+        Error   => 'red',
+        Warning => 'yellow',
+        Tidied  => 'green',
+    );
 
+    print "\n================================================================================\n";
+    print "Summary\n";
+    print "================================================================================\n";
 
-        TYPE:
-        for my $Type ( qw(Error Warning Tidied) ) {
-            next TYPE if !$Summary{$Type};
+    TYPE:
+    for my $Type ( qw(Error Warning Tidied) ) {
+        next TYPE if !$Summary{$Type};
 
-            my $Entries = keys %{ $Summary{$Type} };
-            print $Self->ReplaceColorTags("<$TypeColors{$Type}>[$Type] ($Entries)</$TypeColors{$Type}>\n");
+        my $Entries = keys %{ $Summary{$Type} };
+        print $Self->ReplaceColorTags("<$TypeColors{$Type}>[$Type] ($Entries)</$TypeColors{$Type}>\n");
 
-            for my $SOPMFilePath ( sort keys %{ $Summary{$Type} } ) {
-                $TouchedFiles{$SOPMFilePath} = 1;
+        for my $SOPMFilePath ( sort keys %{ $Summary{$Type} } ) {
+            $TouchedFiles{$SOPMFilePath} = 1;
 
-                print "\t";
+            print "\t";
 
-                # "Tidied" needs no output of counter, it happens only once per file.
-                if ( $Type ne 'Tidied' ) {
-                    print "($Summary{$Type}->{$SOPMFilePath}) ";
-                }
-
-                print "$SOPMFilePath\n";
+            # "Tidied" needs no output of counter, it happens only once per file.
+            if ( $Type ne 'Tidied' ) {
+                print "($Summary{$Type}->{$SOPMFilePath}) ";
             }
+
+            print "$SOPMFilePath\n";
         }
     }
 
