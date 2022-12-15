@@ -6,7 +6,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package TidyAll::Plugin::Znuny::CodeStyle::ConsolePrintCheck;
+package TidyAll::Plugin::Znuny::Deprecated::CreateTimeUnix;
 
 use strict;
 use warnings;
@@ -15,7 +15,7 @@ use parent qw(TidyAll::Plugin::Znuny::Base);
 
 =head1 SYNOPSIS
 
-Checks for deprecated print statements in console commands.
+Checks for deprecated ticket field 'CreateTimeUnix'.
 
 =cut
 
@@ -24,26 +24,24 @@ sub validate_source {    ## no critic
 
     return if $Self->IsPluginDisabled( Code => $Code );
 
-    my $LineCounter  = 0;
-    my $ErrorMessage = '';
-
+    my $ErrorMessage;
+    my $LineCounter = 0;
     LINE:
-    for my $Line ( split "\n", $Code ) {
+    for my $Line ( split /\n/, $Code ) {
         $LineCounter++;
-        next LINE if $Line !~ /\bprint(\z|\s|\()/sm;
+        next LINE if $Line =~ m{\A\s*#};
+        next LINE if $Line !~ m{Ticket.*?\{(["'])?CreateTimeUnix(["'])?\}};
+
         $ErrorMessage .= "\n\tLine $LineCounter: $Line";
     }
 
-    return if !length $ErrorMessage;
+    return if !defined $ErrorMessage;
 
-    my $Message = 'Use $Self->Print("Hello World\n") in console commands instead of "print"' . ".\n"
-        . "If writing to a file, consider using Kernel::System::Main::FileWrite()."
-        . $ErrorMessage;
+    my $Message = "There's code referencing ticket field CreateTimeUnix. This field was removed from tickets in Znuny 6. Use field Created and convert it to a unix timestamp." . $ErrorMessage;
 
-    $Self->AddMessage(
-        Message  => $Message,
-        Priority => 'notice',
-    );
+    $Self->AddErrorMessage($Message);
+
+    return;
 }
 
 1;

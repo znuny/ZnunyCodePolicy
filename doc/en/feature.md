@@ -1,4 +1,4 @@
-# ZnunyCodePolicy
+# Functionality
 
 ## Required CPAN modules
 

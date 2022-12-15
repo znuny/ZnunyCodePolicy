@@ -21,6 +21,7 @@ use warnings;
 
 use Cwd;
 use File::Spec;
+use utf8;
 
 my $Directory = getcwd;
 

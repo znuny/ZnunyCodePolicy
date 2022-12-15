@@ -22,6 +22,7 @@ use warnings;
 use Cwd;
 use File::Spec;
 use FindBin qw($RealBin);
+use utf8;
 
 my $Directory = getcwd;
 

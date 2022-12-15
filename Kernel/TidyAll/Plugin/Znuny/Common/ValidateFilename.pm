@@ -12,8 +12,6 @@ package TidyAll::Plugin::Znuny::Common::ValidateFilename;
 use strict;
 use warnings;
 
-use File::Basename;
-use File::Copy qw(copy);
 use parent qw(TidyAll::Plugin::Znuny::Base);
 
 =head1 SYNOPSIS

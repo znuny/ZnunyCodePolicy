@@ -10,11 +10,11 @@ use strict;
 use warnings;
 
 ## nofilter(TidyAll::Plugin::Znuny::Perl::Tests::Helper)
+## nofilter(TidyAll::Plugin::Znuny::SeleniumTest::RestoreDatabase)
 
 use vars (qw($Self));
 use utf8;
 
-## nofilter(TidyAll::Plugin::Znuny::Perl::Tests::Helper)
 use scripts::test::TidyAll::Plugin::Znuny;
 
 my @Tests = (

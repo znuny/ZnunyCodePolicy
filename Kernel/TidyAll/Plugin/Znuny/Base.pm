@@ -158,7 +158,7 @@ sub IsPluginDisabled {
     Adds an error message with the given priority for the currently checked file.
 
     $TidyAllObject->AddErrorMessage(
-        Message  => 'Your package <Description></Description> ends with at least two dots. Should be only one.',
+        'Your package <Description></Description> ends with at least two dots. Should be only one.',
     );
 
 =cut

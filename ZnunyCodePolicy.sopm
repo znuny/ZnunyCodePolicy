@@ -59,6 +59,8 @@
         <File Permission="770" Location="Kernel/TidyAll/git-hooks/pre-commit.pl"/>
         <File Permission="770" Location="Kernel/TidyAll/git-hooks/pre-receive.pl"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Base.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Autoload/ObjectManagerDisabled.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/CodeStyle/CodeMarkerPackageName.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/CodeStyle/ConsolePrintCheck.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/CodeStyle/CStyleForLoop.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/CodeStyle/DollarUnderscore.pm"/>
@@ -73,6 +75,12 @@
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Common/Origin.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Common/ValidateFilename.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Config/ACLKeysLevel3Actions.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Config/MemoryLeak.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Deprecated/ArticleFunctions.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Deprecated/ArticleType.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Deprecated/CreateTimeUnix.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Documentation/ImagePath.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Documentation/Title.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/JavaScript/AlertFunction.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/JavaScript/DebugCode.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/JavaScript/ESLint.pm"/>
@@ -85,6 +93,8 @@
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Legal/LicenseValidator.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Legal/UpdateOTRSCopyright.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Legal/UpdateZnunyCopyright.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Misc/NotificationEvent.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Misc/TicketSearch.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/CacheCleanup.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/Critic/Policy/Znuny/ProhibitGoto.pm"/>
@@ -131,10 +141,12 @@
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/UnitTestConfigChanges.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/UseParent.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/UseWarnings.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/UTF8.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/VariableCheck.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/PO/DocbookLint.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/PO/HTMLTags.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/PO/msgfmt.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/SeleniumTest/RestoreDatabase.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/SOPM/CodeTags.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/SOPM/FileList.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/SOPM/FileRights.pm"/>
@@ -143,9 +155,12 @@
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/SOPM/RequiredElements.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/SOPM/XSDValidator.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/SQL/ReservedWords.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Translation/Empty.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Translation/JavaScriptStrings.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/TT/Breadcrumb.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/TT/ScriptUsage.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/TT/TranslationFilter.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/UnitTest/Path.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Whitespace/FourSpaces.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Whitespace/Tabs.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Whitespace/TrailingWhitespace.pm"/>
@@ -173,6 +188,8 @@
         <File Permission="660" Location="Kernel/TidyAll/Znuny/Git/PreReceive.pm"/>
         <File Permission="770" Location="scripts/install-git-hooks.pl"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny.pm"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Autoload/ObjectManagerDisabled.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/CodeStyle/CodeMarkerPackageName.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/CodeStyle/ConsolePrintCheck.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/CodeStyle/CStyleForLoop.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/CodeStyle/DollarUnderscore.t"/>
@@ -182,6 +199,12 @@
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/CodeStyle/TODOCheck.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Common/NoFilter.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Config/ACLKeysLevel3Actions.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Config/MemoryLeak.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Deprecated/ArticleFunctions.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Deprecated/ArticleType.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Deprecated/CreateTimeUnix.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Documentation/ImagePath.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Documentation/Title.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Encoding.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/ExampleTest.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/JavaScript/AlertFunction.t"/>
@@ -190,6 +213,8 @@
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Legal/LicenseValidator.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Legal/UpdateOTRSCopyright.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Legal/UpdateZnunyCopyright.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Misc/NotificationEvent.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Misc/TicketSearch.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/CacheCleanup.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/HashObjectFunctionCall.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/IsIntegerVariableCheck.t"/>
@@ -203,13 +228,18 @@
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/Pod/NamePod.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/SortKeys.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/Tests/Helper.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/UTF8.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/VariableCheck.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/PO/DocbookLint.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/PO/HTMLTags.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/SeleniumTest/RestoreDatabase.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/SOPM/CodeTags.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/SOPM/License.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/SOPM/XSDValidator.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Translation/Empty.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Translation/JavaScriptStrings.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/TT/TranslationFilter.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/UnitTest/Path.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/XML/Configuration/Navigation.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/XML/Configuration/XSDValidator.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/XML/Database/KeyLength.t"/>
