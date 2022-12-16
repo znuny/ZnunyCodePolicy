@@ -88,16 +88,6 @@ EOF
         ExpectedMessageSubstring => 'Found deprecated article function call',
     },
     {
-        Name     => 'ArticleCount - Found deprecated article function call(s)',
-        Filename => 'Kernel/Modules/Coffee.pm',
-        Plugins  => [qw(TidyAll::Plugin::Znuny::Deprecated::ArticleFunctions)],
-        Source   => <<'EOF',
-my $ArticleObject->ArticleCount();
-EOF
-        ExpectedSource           => undef,
-        ExpectedMessageSubstring => 'Found deprecated article function call',
-    },
-    {
         Name     => 'ArticlePage - Found deprecated article function call(s)',
         Filename => 'Kernel/Modules/Coffee.pm',
         Plugins  => [qw(TidyAll::Plugin::Znuny::Deprecated::ArticleFunctions)],

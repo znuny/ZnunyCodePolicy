@@ -32,7 +32,6 @@ sub validate_source {    ## no critic
         'ArticleLastCustomerArticle',
         'ArticleFirstArticle',
         'ArticleContentIndex',
-        'ArticleCount',
         'ArticlePage',
     );
 
