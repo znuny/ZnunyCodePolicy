@@ -324,13 +324,6 @@ sub GetZnunyCopyrightString {
     my $CopyrightYear      = $IsFrameworkContext ? 2021 : 2012;
     my $URL                = $IsFrameworkContext ? 'https://znuny.org/' : 'https://znuny.com/';
 
-    my ( $Sec, $Min, $Hour, $Day, $Month, $Year ) = localtime( time() );
-    $Year += 1900;
-
-    if ( $Year > $CopyrightYear ) {
-        $CopyrightYear .= "-$Year";
-    }
-
     my $CopyrightString = "Copyright (C) $CopyrightYear Znuny GmbH, $URL";
 
     return $CopyrightString;

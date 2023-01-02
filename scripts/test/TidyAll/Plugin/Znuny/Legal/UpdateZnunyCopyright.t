@@ -20,10 +20,7 @@ use scripts::test::TidyAll::Plugin::Znuny;
 
 use TidyAll::Znuny;
 
-my ( $Sec, $Min, $Hour, $Day, $Month, $Year ) = localtime( time() );
-$Year += 1900;
-
-my $ZnunyCopyrightString = "Copyright (C) 2021-$Year Znuny GmbH, https://znuny.org/";
+my $ZnunyCopyrightString = "Copyright (C) 2021 Znuny GmbH, https://znuny.org/";
 
 my @Tests = (
     {
