@@ -18,9 +18,12 @@ sub transform_source {
     my ( $Self, $Code ) = @_;
 
     return $Code if $Self->IsPluginDisabled( Code => $Code );
-    return $Code if $Self->GetSetting('Vendor') ne 'Znuny GmbH';
 
-    my $CopyrightString = $Self->GetZnunyCopyrightString();
+    my $Context = $Self->GetZnunyVendorContext();
+    return $Code if !$Context;
+
+    my $CopyrightString = $Self->GetZnunyCopyrightString($Context);
+    return $Code if !$CopyrightString;
 
     # Check if a Znuny copyright is already present and replace it with the updated one.
     if ( $Code =~ m{^.*?Copyright.*?Znuny}m ) {
@@ -41,11 +44,14 @@ sub validate_source {
     my ( $Self, $Code ) = @_;
 
     return if $Self->IsPluginDisabled( Code => $Code );
-    return if $Self->GetSetting('Vendor') ne 'Znuny GmbH';
 
     return if $Code =~ m{^.*?Copyright.*?Znuny}m;
 
-    my $CopyrightString = $Self->GetZnunyCopyrightString();
+    my $Context = $Self->GetZnunyVendorContext();
+    return if !$Context;
+
+    my $CopyrightString = $Self->GetZnunyCopyrightString($Context);
+    return if !$CopyrightString;
 
     my $Message = "File is missing copyright in header section. Add the following string:\n\n"
         . "$CopyrightString\n";

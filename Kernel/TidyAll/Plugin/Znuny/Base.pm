@@ -308,21 +308,46 @@ sub IsOriginalZnunyCode {
     return;
 }
 
+=head2 GetZnunyVendorContext()
+
+    Returns the vendor context for Znuny packages or framework.
+
+    my $Context = $TidyAllObject->GetZnunyVendorContext();
+
+=cut
+
+sub GetZnunyVendorContext {
+    my ($Self) = @_;
+
+    my $IsFrameworkContext = $Self->GetSetting('Context::Framework');
+    return 'org' if $IsFrameworkContext;
+
+    my $Vendor = $Self->GetSetting('Vendor');
+    return if $Vendor !~ m{\bZnuny\b}i;
+
+    my $VendorURL = $Self->GetSetting('VendorURL');
+    return 'com' if $VendorURL =~ m{\bznuny\.com\b}i;
+    return 'org' if $VendorURL =~ m{\bznuny\.org\b}i;
+
+    return;
+}
+
 =head2 GetZnunyCopyrightString()
 
     Returns the current copyright string for Znuny (framework)
     or package files.
 
-    my $CopyrightString = $TidyAllObject->GetZnunyCopyrightString();
+    my $CopyrightString = $TidyAllObject->GetZnunyCopyrightString($VendorContext);
 
 =cut
 
 sub GetZnunyCopyrightString {
-    my ( $Self ) = @_;
+    my ( $Self, $VendorContext ) = @_;
 
-    my $IsFrameworkContext = $Self->GetSetting('Context::Framework');
-    my $CopyrightYear      = $IsFrameworkContext ? 2021 : 2012;
-    my $URL                = $IsFrameworkContext ? 'https://znuny.org/' : 'https://znuny.com/';
+    return if !$VendorContext;
+
+    my $CopyrightYear = $VendorContext eq 'org' ? 2021 : 2012;
+    my $URL           = $VendorContext eq 'org' ? 'https://znuny.org/' : 'https://znuny.com/';
 
     my $CopyrightString = "Copyright (C) $CopyrightYear Znuny GmbH, $URL";
 

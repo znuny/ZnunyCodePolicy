@@ -429,6 +429,11 @@ sub _GetInformationFromSOPMFile {
         $Information{Vendor} = $1;
     }
 
+    # VendorURL
+    if ( $Content =~ m{<URL>(.*?)</URL>}m ) {
+        $Information{VendorURL} = $1;
+    }
+
     # Files
     my @FilePaths = sort ( $Content =~ m{<File .*?Location="(.*?)"}mg );
     $Information{'FilePaths::SOPM'} = \@FilePaths;

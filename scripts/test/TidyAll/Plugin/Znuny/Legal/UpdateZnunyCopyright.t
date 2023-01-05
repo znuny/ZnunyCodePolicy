@@ -124,6 +124,105 @@ package Kernel::System::Coffee;
 EOF
         ExpectedMessageSubstring => undef,
     },
+    {
+        Name     => "External copyright",
+        Filename => 'Kernel/System/Coffee.pm',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::Legal::UpdateZnunyCopyright)],
+        Settings => {
+            'Vendor'             => 'Google',
+            'VendorURL'          => 'https://google.com',
+            'Context::Framework' => 0,
+            'Context::OPM'       => 1,
+        },
+        Source => <<'EOF',
+# --
+# Copyright (C) 1998 Google Inc, https://znuny.org/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+package Kernel::System::Coffee;
+EOF
+        ExpectedSource => <<"EOF",
+# --
+# Copyright (C) 1998 Google Inc, https://znuny.org/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+package Kernel::System::Coffee;
+EOF
+    },
+    {
+        Name     => "Change Znuny commercial copyright year to 2012",
+        Filename => 'Kernel/System/Coffee.pm',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::Legal::UpdateZnunyCopyright)],
+        Settings => {
+            'Vendor'             => 'Znuny GmbH',
+            'VendorURL'          => 'http://znuny.com',
+            'Context::Framework' => 0,
+            'Context::OPM'       => 1,
+        },
+        Source => <<'EOF',
+# --
+# Copyright (C) 1998 Znuny Inc, https://znuny.rocks/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+package Kernel::System::Coffee;
+EOF
+        ExpectedSource => <<"EOF",
+# --
+# Copyright (C) 2012 Znuny GmbH, https://znuny.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+package Kernel::System::Coffee;
+EOF
+    },
+    {
+        Name     => "Change Znuny org copyright to 2021",
+        Filename => 'Kernel/System/Coffee.pm',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::Legal::UpdateZnunyCopyright)],
+        Settings => {
+            'Vendor'             => 'Znuny GmbH',
+            'VendorURL'          => 'http://znuny.org',
+            'Context::Framework' => 0,
+            'Context::OPM'       => 1,
+        },
+        Source => <<'EOF',
+# --
+# Copyright (C) 1998 Znuny Inc, https://znuny.rocks/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+package Kernel::System::Coffee;
+EOF
+        ExpectedSource => <<"EOF",
+# --
+# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+package Kernel::System::Coffee;
+EOF
+    },
 );
 
 $Self->scripts::test::TidyAll::Plugin::Znuny::Run( Tests => \@Tests );
