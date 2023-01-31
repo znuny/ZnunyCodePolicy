@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # --
 # Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
-# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
+# Copyright (C) 2012 Znuny GmbH, https://znuny.com/
 # --
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ use warnings;
 use Cwd;
 use File::Spec;
 use FindBin qw($RealBin);
+use utf8;
 
 my $Directory = getcwd;
 
@@ -30,13 +31,6 @@ unlink File::Spec->catfile( $Directory, '.git', 'hooks', 'pre-commit' );
 symlink(
     File::Spec->catfile( $RealBin, '..', 'Kernel', 'TidyAll', 'git-hooks', 'pre-commit.pl' ),
     File::Spec->catfile( $Directory, '.git', 'hooks', 'pre-commit' )
-);
-unlink File::Spec->catfile( $Directory, '.git', 'hooks', 'prepare-commit-msg' );
-symlink(
-    File::Spec->catfile(
-        $RealBin, '..', 'Kernel', 'TidyAll', 'git-hooks', 'prepare-commit-msg.pl'
-    ),
-    File::Spec->catfile( $Directory, '.git', 'hooks', 'prepare-commit-msg' )
 );
 
 print "Installed git commit hooks in $Directory.\n\n";

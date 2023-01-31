@@ -11,20 +11,11 @@ package TidyAll::Plugin::Znuny::Perl::IsIntegerVariableCheck;
 use strict;
 use warnings;
 
-use File::Basename;
-
 use base qw(TidyAll::Plugin::Znuny::Base);
 
-=head1 SYNOPSIS
+sub validate_source {    ## no critic
+    my ( $Self, $Code ) = @_;
 
-This plugin checks warns developers to avoid using IsInteger and IsPositiveInteger (expensive)
-
-=cut
-
-sub validate_file {    ## no critic
-    my ( $Self, $File ) = @_;
-
-    my $Code = $Self->_GetFileContents($File);
     return if $Self->IsPluginDisabled( Code => $Code );
 
     my $ErrorMessage = '';
@@ -36,24 +27,18 @@ sub validate_file {    ## no critic
 
         next LINE if $Line !~ m{looks_like_number}smx;
 
-        $ErrorMessage .= "\nLine $Counter: $Line";
+        $ErrorMessage .= "Line $Counter: $Line\n";
     }
 
     return if !length $ErrorMessage;
 
-    my $FilePath = $Self->FilePath($Code);
     my $Message  = <<EOF;
-NOTICE: Avoid looks_like_number since the result is not consistent on different systems.
-Use IsInteger() and IsPositiveInteger().
+Avoid looks_like_number since the result is inconsistent across different systems.
+Use IsInteger() and IsPositiveInteger() instead.
 $ErrorMessage
 EOF
 
-    $Self->Print(
-        Package  => __PACKAGE__,
-        Priority => 'notice',
-        Message  => $Message,
-        FilePath => $FilePath,
-    );
+    $Self->AddErrorMessage($Message);
 
     return;
 }

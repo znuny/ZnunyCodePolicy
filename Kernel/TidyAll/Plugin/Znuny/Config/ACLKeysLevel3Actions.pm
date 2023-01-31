@@ -11,9 +11,7 @@ package TidyAll::Plugin::Znuny::Config::ACLKeysLevel3Actions;
 use strict;
 use warnings;
 
-use base qw(TidyAll::Plugin::Znuny::Base);
-
-use XML::Parser;
+use parent qw(TidyAll::Plugin::Znuny::Base);
 
 =head1 SYNOPSIS
 
@@ -27,10 +25,8 @@ sub validate_source {    ## no critic
     return if $Self->IsPluginDisabled( Code => $Code );
 
     my %Check = (
-        Name             => 'ACLKeysLevel3Actions',
-        NewFrontendRegEx => "\<ConfigItem Name\=\"Frontend::Module\#\#\#(.*)",
-        AdditionalRegEx  => "\<ConfigItem Name\=\"ACLKeysLevel3::Actions\#\#\#.*",
-        Registration     => "ACLKeysLevel3::Actions",
+        NewFrontendRegEx => "\<Setting Name\=\"Frontend::Module\#\#\#(.*)",
+        AdditionalRegEx  => "\<Setting Name\=\"ACLKeysLevel3::Actions\#\#\#.*",
         Findings         => [],
         Registered       => 0,
     );
@@ -51,27 +47,22 @@ sub validate_source {    ## no critic
         }
     }
 
+
     my $ErrorMessage = '';
 
     return if $Check{Registered};
     return if !@{ $Check{Findings} };
 
     $ErrorMessage
-        .= "NOTICE: $Check{Name} - Found frontend module registration but no $Check{Registration} registration for the following.\nMaybe you wanna do this with yeahman.";
+        .= "Found frontend module registration but no ACLKeysLevel3::Actions registration for the following:";
 
     for my $Lines ( @{ $Check{Findings} } ) {
-
         $ErrorMessage .= "\n\t$Lines";
     }
 
-    return if !length $ErrorMessage;
-    my $FilePath = $Self->FilePath($Code);
-
-    $Self->Print(
-        Package  => __PACKAGE__,
-        Priority => 'notice',
+    $Self->AddMessage(
         Message  => $ErrorMessage,
-        FilePath => $FilePath,
+        Priority => 'notice',
     );
 }
 

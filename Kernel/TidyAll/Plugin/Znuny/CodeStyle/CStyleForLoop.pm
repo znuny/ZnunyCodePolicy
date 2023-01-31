@@ -13,10 +13,9 @@ use warnings;
 
 use parent qw(TidyAll::Plugin::Znuny::Base);
 
-sub validate_file {    ## no critic
-    my ( $Self, $File ) = @_;
+sub validate_source {    ## no critic
+    my ( $Self, $Code ) = @_;
 
-    my $Code = $Self->_GetFileContents($File);
     return if $Self->IsPluginDisabled( Code => $Code );
 
     return if $Code =~ m{^ \# \s+ \$origin}xms;
@@ -35,14 +34,11 @@ sub validate_file {    ## no critic
 
     return if !length $ErrorMessage;
 
-    my $FilePath = $Self->FilePath($Code);
-    my $Message  = "NOTICE: Avoid C-style for-loops if possible.\n$ErrorMessage";
+    my $Message  = "Avoid C-style for loops if possible.\n$ErrorMessage";
 
-    $Self->Print(
-        Package  => __PACKAGE__,
-        Priority => 'notice',
+    $Self->AddMessage(
         Message  => $Message,
-        FilePath => $FilePath,
+        Priority => 'notice',
     );
 
     return;

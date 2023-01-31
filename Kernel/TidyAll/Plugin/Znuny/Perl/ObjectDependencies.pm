@@ -1,6 +1,6 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
-# Copyright (C) 2012-2016 Znuny GmbH, http://znuny.com/
+# Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
+# Copyright (C) 2012-2022 Znuny GmbH, https://znuny.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -24,7 +24,6 @@ sub validate_source {    ## no critic
     my ( $Self, $Code ) = @_;
 
     return if $Self->IsPluginDisabled( Code => $Code );
-    return if $Self->IsFrameworkVersionLessThan( 4, 0 );
 
     $Code = $Self->StripPod( Code => $Code );
     $Code = $Self->StripComments( Code => $Code );
@@ -111,30 +110,30 @@ sub validate_source {    ## no critic
 
     if (@UndeclaredObjectDependencies) {
         $ErrorMessage
-            .= "The following objects are used in the code, but not declared as dependencies:\n\n";
+            .= "The following objects are used in the code, but not declared as dependencies:\n";
         $ErrorMessage
-            .= join( ",\n", map {"    '$_'"} sort { $a cmp $b } @UndeclaredObjectDependencies )
-            . ",\n";
+            .= join( ",\n", map {$_} sort { $a cmp $b } @UndeclaredObjectDependencies );
+        $ErrorMessage .= "\n";
     }
 
-    my @ObsoletDeclaredObjectDependencies;
+    my @ObsoleteDeclaredObjectDependencies;
     DECLAREDOBJECT:
     for my $DeclaredObject (@DeclaredObjectDependencies) {
         next DECLAREDOBJECT if grep { $_ eq $DeclaredObject } @UsedObjects;
-        push @ObsoletDeclaredObjectDependencies, $DeclaredObject;
+        push @ObsoleteDeclaredObjectDependencies, $DeclaredObject;
     }
 
-    if (@ObsoletDeclaredObjectDependencies) {
+    if (@ObsoleteDeclaredObjectDependencies) {
         $ErrorMessage
-            .= "The following objects are not longer used in the code, but declared as dependencies:\n\n";
+            .= "The following objects are not longer used in the code, but declared as dependencies:\n";
         $ErrorMessage
-            .= join( ",\n", map {"    '$_'"} sort { $a cmp $b } @ObsoletDeclaredObjectDependencies )
-            . ",\n";
+            .= join( ",\n", map {$_} sort { $a cmp $b } @ObsoleteDeclaredObjectDependencies );
+        $ErrorMessage .= "\n";
     }
 
     return if !length $ErrorMessage;
 
-    $Self->Print(
+    $Self->AddMessage(
         Package  => __PACKAGE__,
         Priority => 'notice',
         Message  => $ErrorMessage,
@@ -143,7 +142,7 @@ sub validate_source {    ## no critic
     return;
 }
 
-# Small helper function to cleanup object lists in Perl code for OM.
+# Cleans up object lists in Perl code for OM.
 sub _CleanupObjectList {
     my ( $Self, %Param ) = @_;
 

@@ -1,6 +1,6 @@
 # --
 # Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
-# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
+# Copyright (C) 2012-2022 Znuny GmbH, https://znuny.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -11,49 +11,53 @@ package TidyAll::Plugin::Znuny::Common::Contributors;
 
 use strict;
 use warnings;
-use IO::File;
+
 use utf8;
 
+use Encode;
+
 use parent qw(TidyAll::Plugin::Znuny::Base);
+
+=head1 SYNOPSIS
+
+Updates AUTHORS.md with authors of Git repository.
+
+=cut
 
 sub transform_source {
     my ( $Self, $Code ) = @_;
 
-    my $RootDir = $Self->GetOTRSRootDir();
-    return $Code if !$RootDir;
-
+    my $RootDir = $Self->GetSetting('TidyAll::RootDir');
     chdir $RootDir;
 
-    my @Lines = qx{git log --format="%aN <%aE>"};
-    my %Seen;
-    map { $Seen{$_}++ } @Lines;
+    my @Authors = qx{git log --format="%aN <%aE>"};
+    my %Authors = map { $_ => 1 } @Authors;
 
-    my $FileHandle = IO::File->new( 'AUTHORS.md', 'w' );
-    $FileHandle->print("The following persons contributed to OTRS:\n\n");
+    my $AuthorContent = "The following persons contributed to Znuny:\n\n";
+
+    my %ProblematicAuthors;
 
     AUTHOR:
-    for my $Author ( sort keys %Seen ) {
-
+    for my $Author ( sort keys %Authors ) {
         chomp $Author;
-        if ( $Author =~ m/^[^<>]+ \s <>\s?$/smx ) {
-            $Self->Print("<yellow>Author $Author of commit could not be reliably determined.</yellow>\n");
+
+        if ( $Author =~ m{^[^<>]+ \s <>\s?$}smx ) {
+            $ProblematicAuthors{$Author} = 1;
             next AUTHOR;
         }
-        $FileHandle->print("* $Author\n");
+
+        $AuthorContent .= "* $Author\n";
     }
 
-    $FileHandle->close();
+    return $AuthorContent if !%ProblematicAuthors;
 
-    my $FilePath = 'AUTHORS.md';
-    my $Message  = "Updated 'AUTHORS.md'";
+    my $ProblematicAuthors = join "\n", sort keys %ProblematicAuthors;
 
-    $Self->Print(
-        Package  => __PACKAGE__,
-        Priority => 'success',
-        Message  => $Message,
-        FilePath => $FilePath,
+    $Self->AddErrorMessage(
+        "The following authors could not reliably be determined:\n$ProblematicAuthors",
     );
 
+    # Return unchanged code.
     return $Code;
 }
 

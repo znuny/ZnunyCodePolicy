@@ -1,12 +1,11 @@
 # --
 # Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
-# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
+# Copyright (C) 2012-2022 Znuny GmbH, https://znuny.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
-## nofilter(TidyAll::Plugin::OTRS::Common::Origin)
 
 package TidyAll::Znuny::Git::PreCommit;
 
@@ -15,43 +14,36 @@ use warnings;
 
 =head1 SYNOPSIS
 
-This commit hook loads the OTRS version of Code::TidyAll
+This commit hook loads the Znuny version of Code::TidyAll
 with the custom plugins, executes it for any modified files
 and returns a corresponding status code.
 
 =cut
 
-use Cwd;
 use File::Spec;
 use File::Basename;
-
-use Code::TidyAll;
-use IPC::System::Simple qw(capturex run);
+use IPC::System::Simple qw(capturex);
 use Try::Tiny;
-use TidyAll::OTRS;
-use Moo;
-
-# ---
-# ZnunyCodePolicy
-# ---
 use TidyAll::Znuny;
 
-# ---
+sub new {
+    my ( $Type, %Param ) = @_;
+
+    my $Self = {};
+    bless( $Self, $Type );
+
+    return $Self;
+}
 
 sub Run {
     my $Self = @_;
 
-# ---
-    # ZnunyCodePolicy
-# ---
-    #     print "OTRSCodePolicy commit hook starting...\n";
-    print "ZnunyCodePolicy commit hook starting...\n";
-
-# ---
+    print "Znuny code policy pre-commit hook starting...\n";
 
     my $ErrorMessage;
 
     try {
+
         # Find conf file at git root
         my $RootDir = capturex( 'git', "rev-parse", "--show-toplevel" );
         chomp($RootDir);
@@ -71,7 +63,7 @@ sub Run {
             }
         }
 
-        # Find OTRSCodePolicy configuration
+        # Find code policy configuration
         my $ScriptDirectory;
         if ( -l $0 ) {
             $ScriptDirectory = dirname( readlink($0) );
@@ -81,44 +73,60 @@ sub Run {
         }
         my $ConfigFile = $ScriptDirectory . '/../tidyallrc';
 
-# ---
-        # ZnunyCodePolicy
-# ---
-        #
-        #         my $TidyAll = TidyAll::OTRS->new_from_conf_file(
-        #             $ConfigFile,
-        #             check_only => 1,
-        #             mode       => 'commit',
-        #             root_dir   => $RootDir,
-        #             data_dir   => File::Spec->tmpdir(),
-        #         );
         my $TidyAll = TidyAll::Znuny->new_from_conf_file(
             $ConfigFile,
             check_only => 1,
-            mode       => 'commit',
+            mode       => 'cli',
             root_dir   => $RootDir,
             data_dir   => File::Spec->tmpdir(),
         );
 
-# ---
-        $TidyAll->DetermineFrameworkVersionFromDirectory();
-        $TidyAll->GetFileListFromDirectory();
+        if ( !$TidyAll ) {
+            print "Error creating TidyAll object.\n";
+            exit 1;
+        }
 
-        my @CheckResults = $TidyAll->ProcessPathsParallel(
-            FilePaths => [ map {"$RootDir/$_"} @ChangedFiles ],
+        my $TidyAllSettings = $TidyAll->GetSettings();
+
+        if (
+            !$TidyAll->HasValidContext()
+            || !$TidyAllSettings->{'SOPM::HasSupportedFrameworkVersion'}
+        ) {
+            print "Framework and/or OPM information could not be retrieved or OPM framework version is incompatible. Note that only the framework versions of the executed code policy are supported.\n";
+
+            # Use exit code 0 (not 1) because the CI environment's git hook should not lead to reject the push if the framework version is not supported.
+            exit 0;
+        }
+
+        print "\n================================================================================\n";
+        print "Code policy context:         " . ( $TidyAllSettings->{'Context::Framework'} ? 'Framework' : 'OPM' )  . "\n";
+        print "Vendor:                      $TidyAllSettings->{Vendor}\n";
+        print "Product name:                $TidyAllSettings->{ProductName}\n";
+        print "================================================================================\n";
+
+        my$TidyAllResults = $TidyAll->ProcessFilePathsParallel(
+            FilePathsToCheck => [ map {"$RootDir/$_"} @ChangedFiles ],
         );
 
-        $TidyAll->HandleResults(
-            Results => \@CheckResults,
-        );
+        my $ExitCode = $TidyAll->PrintResults($TidyAllResults);
+        if ($ExitCode) {
+            print "Error: Some file(s) did not pass validation.\n";
+            exit 1;
+        }
+
+        exit 0;
     }
     catch {
         my $Exception = $_;
-        die "Error during pre-commit hook (use --no-verify to skip hook):\n$Exception";
+        print "Error during pre-commit hook:\n$Exception\n";
     };
+
     if ($ErrorMessage) {
-        die "$ErrorMessage\nYou can use --no-verify to skip the hook\n";
+        print "$ErrorMessage\n";
+        exit 1;
     }
+
+    exit 0;
 }
 
 1;

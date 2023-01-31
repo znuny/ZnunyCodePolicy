@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2012-2019 Znuny GmbH, http://znuny.com/
+# Copyright (C) 2012-2022 Znuny GmbH, https://znuny.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -13,10 +13,16 @@ use warnings;
 
 use parent qw(TidyAll::Plugin::Znuny::Base);
 
-sub validate_file {    ## no critic
-    my ( $Self, $File ) = @_;
+=head1 SYNOPSIS
 
-    my $Code = $Self->_GetFileContents($File);
+Checks if Kernel::System::UnitTest::Helper option RestoreDatabase is used in Selenium context.
+
+=cut
+
+
+sub validate_source {    ## no critic
+    my ( $Self, $Code ) = @_;
+
     return if $Self->IsPluginDisabled( Code => $Code );
 
     return if $Code =~ m{^ \# \s+ \$origin}xms;
@@ -36,14 +42,11 @@ sub validate_file {    ## no critic
 
     return if !length $ErrorMessage;
 
-    my $Message
-        = "Using Kernel::System::UnitTest::Helper with option RestoreDatabase within Selenium tests is most likely a mistake because data will get lost between requests."
-        . $ErrorMessage;
+    my $Message = "Using Kernel::System::UnitTest::Helper with option RestoreDatabase within Selenium tests is most likely a mistake because data will get lost between requests." . $ErrorMessage;
 
-    $Self->Print(
-        Package  => __PACKAGE__,
-        Priority => 'notice',
+    $Self->AddMessage(
         Message  => $Message,
+        Priority => 'warning', # or: success, transform, warning, notice
     );
 
     return;

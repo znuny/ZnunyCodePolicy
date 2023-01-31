@@ -11,8 +11,6 @@ package TidyAll::Plugin::Znuny::CodeStyle::TODOCheck;
 use strict;
 use warnings;
 
-use File::Basename;
-
 use base qw(TidyAll::Plugin::Znuny::Base);
 
 =head1 SYNOPSIS
@@ -21,12 +19,10 @@ This plugin checks for "todo"s in comments.
 
 =cut
 
-sub validate_file {    ## no critic
-    my ( $Self, $File ) = @_;
+sub validate_source {    ## no critic
+    my ( $Self, $Code ) = @_;
 
-    my $Code = $Self->_GetFileContents($File);
     return if $Self->IsPluginDisabled( Code => $Code );
-    return if $TidyAll::Znuny::SkipTodos;
 
     my $LineCounter = 0;
     my $TODOLine    = '';
@@ -36,25 +32,22 @@ sub validate_file {    ## no critic
         $LineCounter++;
 
         my $LowerCaseLine = lc($Line);
-        next LINE if $LowerCaseLine !~ m{todo}smx;
+        next LINE if $LowerCaseLine !~ m{\btodos?\b}smx;
 
-        $TODOLine .= "\tLine $LineCounter: $Line\n";
+        $TODOLine .= "Line $LineCounter: $Line\n";
     }
 
     my $ErrorMessage = '';
     if ( length $TODOLine ) {
-        $ErrorMessage .= "NOTICE: Please pay attention to maybe not completed tasks:\n\n" . $TODOLine;
+        $ErrorMessage .= "Pay attention to tasks that may not have been completed:\n" . $TODOLine;
     }
 
     return if !length $ErrorMessage;
 
-    my $FilePath = $Self->FilePath($File);
-
-    $Self->Print(
-        Package  => __PACKAGE__,
-        Priority => 'notice',
+    $Self->AddMessage(
         Message  => $ErrorMessage,
-        FilePath => $FilePath,
+        Priority => 'notice',
     );
 }
+
 1;

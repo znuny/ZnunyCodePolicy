@@ -1,6 +1,6 @@
 # --
 # Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
-# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
+# Copyright (C) 2012 Znuny GmbH, https://znuny.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -11,6 +11,7 @@ package var::packagesetup::ZnunyCodePolicy;
 
 use strict;
 use warnings;
+use utf8;
 
 our @ObjectDependencies = (
     'Kernel::Config',
@@ -101,8 +102,6 @@ sub CodeUninstall {
     return $Result;
 }
 
-=begin Internal:
-
 =head2 _InstallDependencies()
 
 Installs dependencies, if needed:
@@ -120,11 +119,8 @@ sub _InstallDependencies {
 
     my ($VersionMajor) = $Version =~ m{^(\d+)\.}xms;
 
-    # Don't install ESLint on systems < 5.0.x.
-    return 1 if $VersionMajor < 5;
-
     my $Home   = $ConfigObject->Get('Home');
-    my $Result = system("perl $Home/bin/otrs.CodePolicy.pl --install");
+    my $Result = system("perl $Home/bin/znuny.CodePolicy.pl --install-eslint");
 
     return !$Result;
 }
@@ -140,8 +136,10 @@ Deletes the dependency folder, if it exists:
 sub _DeleteDependencies {
     my $Self = shift;
 
-    my $Home                = $Kernel::OM->Get('Kernel::Config')->Get('Home');
-    my $DependencyDirectory = $Home . '/Kernel/TidyAll/Plugin/OTRS/JavaScript/ESLint/node_modules';
+    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+
+    my $Home                = $ConfigObject->Get('Home');
+    my $DependencyDirectory = $Home . '/Kernel/TidyAll/Plugin/Znuny/JavaScript/ESLint/node_modules';
     return 1 if !-d $DependencyDirectory;
 
     my $Result = system("rm -rf $DependencyDirectory");
@@ -150,5 +148,3 @@ sub _DeleteDependencies {
 }
 
 1;
-
-=end Internal:

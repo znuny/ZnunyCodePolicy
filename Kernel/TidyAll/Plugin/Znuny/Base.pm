@@ -1,331 +1,192 @@
 # --
 # Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
-# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
+# Copyright (C) 2012-2022 Znuny GmbH, https://znuny.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
-# ---
-# ZnunyCodePolicy
-# ---
-## nofilter(TidyAll::Plugin::OTRS::Common::Origin)
-## nofilter(TidyAll::Plugin::OTRS::Perl::Time)
-# ---
 package TidyAll::Plugin::Znuny::Base;
 
 use strict;
 use warnings;
 
-use Encode();
-use TidyAll::Znuny;
-
-# ---
-# ZnunyCodePolicy
-# ---
-use Term::ANSIColor();
-use Path::Tiny;
-
-# ---
+use utf8;
 
 use parent qw(Code::TidyAll::Plugin);
 
-sub IsPluginDisabled {
-    my ( $Self, %Param ) = @_;
+use Term::ANSIColor();
+use Path::Tiny;
 
-    my $PluginPackage = ref $Self;
+=head2 process_source_or_file()
 
-    if ( !defined $Param{Code} && !defined $Param{Filename} ) {
-
-# ---
-        # ZnunyCodePolicy
-# ---
-        #         print STDERR "Need Code or Filename!\n";
-        print STDERR "Need code or filename in plugin package $PluginPackage!\n";
-
-# ---
-        die;
-    }
-
-    my $Code = defined $Param{Code} ? $Param{Code} : $Self->_GetFileContents( $Param{Filename} );
-
-    if ( $Code =~ m{nofilter\([^()]*\Q$PluginPackage\E[^()]*\)}ismx ) {
-        return 1;
-    }
-
-    return;
-}
-
-sub IsFrameworkVersionLessThan {
-    my ( $Self, $FrameworkVersionMajor, $FrameworkVersionMinor ) = @_;
-
-    if ($TidyAll::Znuny::FrameworkVersionMajor) {
-        return 1 if $TidyAll::Znuny::FrameworkVersionMajor < $FrameworkVersionMajor;
-        return 0 if $TidyAll::Znuny::FrameworkVersionMajor > $FrameworkVersionMajor;
-        return 1 if $TidyAll::Znuny::FrameworkVersionMinor < $FrameworkVersionMinor;
-        return 0;
-    }
-
-    # Default: if framework is unknown, return false (strict checks).
-    return 0;
-}
-
-# ---
-# ZnunyCodePolicy
-# ---
-sub IsFrameworkVersionGreaterThan {
-    my ( $Self, $FrameworkVersionMajor, $FrameworkVersionMinor ) = @_;
-
-    if ($TidyAll::OTRS::FrameworkVersionMajor) {
-        return 1 if $TidyAll::OTRS::FrameworkVersionMajor > $FrameworkVersionMajor;
-        return 0 if $TidyAll::OTRS::FrameworkVersionMajor < $FrameworkVersionMajor;
-        return 1 if $TidyAll::OTRS::FrameworkVersionMinor > $FrameworkVersionMinor;
-        return 0;
-    }
-
-    # Default: if framework is unknown, return false (strict checks).
-    return 0;
-}
-
-# ---
-
-sub IsThirdpartyModule {
-    my ($Self) = @_;
-
-    return $TidyAll::Znuny::ThirdpartyModule ? 1 : 0;
-}
-
-sub DieWithError {
-    my ( $Self, $Error ) = @_;
-
-    chomp $Error;
-
-# ---
-# ZnunyCodePolicy
-# ---
-    #     die _Color( 'yellow', ref($Self) ) . "\n" . _Color( 'red', $Error ) . "\n";
-    die $Self->_Color( 'yellow', ref($Self) ) . "\n" . $Self->_Color( 'red', $Error ) . "\n";
-
-# ---
-}
-
-=head2 _Color()
-
-This will color the given text (see Term::ANSIColor::color()) if ANSI output is available and active, otherwise the text
-stays unchanged.
-
-    my $PossiblyColoredText = $Object->_Color('green', $Text);
+    Ensures that the code and path of the currently checked file is accessible from all
+    places. Is an overwritten function of Code::TidyAll::Plugin and will automatically be called.
 
 =cut
 
-sub _Color {
+sub process_source_or_file { ## no critic
+    my ( $Self, $OrigSource, $RelPath, $CheckOnly ) = @_;
 
-# ---
-# ZnunyCodePolicy
-# ---
-    #     my ( $Color, $Text ) = @_;
-    my ( $Self, $Color, $Text ) = @_;
+    $Self->{CurrentlyCheckedCode}         = $OrigSource;
+    $Self->{CurrentlyCheckedSOPMFilePath} = $RelPath;
 
-# ---
-
-    return $Text if $ENV{OTRSCODEPOLICY_NOCOLOR};
-
-    return Term::ANSIColor::color($Color) . $Text . Term::ANSIColor::color('reset');
+    return $Self->SUPER::process_source_or_file( $OrigSource, $RelPath, $CheckOnly );
 }
 
-sub _GetFileContents {
-    my ( $Self, $Filename ) = @_;
+=head2 GetCurrentlyCheckedCode()
 
-    my $FileHandle;
-    if ( !open $FileHandle, '<', $Filename ) {    ## no critic
-        print STDERR "Can't open $Filename\n";
-        die;
-    }
+    Returns the path to the currently checked file as given in the SOPM file list.
 
-    my $Content = do { local $/ = undef; <$FileHandle> };
-    close $FileHandle;
+    my $FilePath = $TidyAllObject->GetCurrentlyCheckedCode();
 
-    return $Content;
-}
+    Returns e.g.: 'Kernel/System/CSV.pm'
 
-# ---
-# ZnunyCodePolicy
-# ---
+=cut
 
-sub GetOTRSRootDir {
-    my ($Self) = @_;
-    return $TidyAll::Znuny::OTRSRootDir;
-}
-
-sub GetScope {
-    my ($Self) = @_;
-    return $TidyAll::Znuny::Scope || '';
-}
-
-sub GetPackageName {
-    my ($Self) = @_;
-    return $TidyAll::Znuny::PackageName // '';
-}
-
-sub GetCondensedPackageName {
-    my ($Self) = @_;
-
-    my $PackageName          = $Self->GetPackageName();
-    my $CondensedPackageName = $PackageName // '';
-    return $CondensedPackageName if !$CondensedPackageName;
-
-    $CondensedPackageName =~ s{-}{}g;
-    return $CondensedPackageName;
-}
-
-sub IsFileInCustomDirectory {
-    my ( $Self, $Filename ) = @_;
-
-    my $IsFileInCustomDirectory = ( index( $Filename, 'Custom/' ) == -1 ? 0 : 1 );
-    return $IsFileInCustomDirectory;
-}
-
-sub IsCustomizedOTRSCode {
-    my ( $Self, $Code ) = @_;
-
-    if (
-        $Code =~ m{Copyright \(C\) 2001-20\d{2} OTRS AG}sm
-        && $Code =~ m{\$origin:}sm
-        )
-    {
-        return 1;
-    }
-
-    return;
-}
-
-sub IsOriginalOTRSCode {
-    my ( $Self, $Code ) = @_;
-
-    return 1 if $Code =~ m{Copyright \(C\) 2001-20\d{2} OTRS AG}sm;
-
-    return;
-}
-
-sub IsOriginalZnunyCode {
-    my ( $Self, $Code ) = @_;
-
-    return if $Self->IsOriginalOTRSCode($Code);
-    return if $Self->IsThirdpartyModule();
-
-    return 1 if $Code =~ m{Copyright \(C\) 2021(-20\d{2})? Znuny GmbH}sm;
-
-    return;
-}
-
-sub GetZnunyCopyrightString {
-    my $CopyrightYear = '2021';    # start year of Znuny fork
-
-    my ( $Sec, $Min, $Hour, $Day, $Month, $Year ) = localtime( time() );
-    $Year += 1900;
-    if ( $Year > 2021 ) {
-        $CopyrightYear .= "-$Year";
-    }
-
-    my $Copyright = "Copyright (C) $CopyrightYear Znuny GmbH, https://znuny.org/";
-
-    return $Copyright;
-}
-
-sub GetChangedFiles {
-    my %ChangedFiles = map { $_ => 1 } @{ $TidyAll::Znuny::ChangedFiles // [] };
-    return \%ChangedFiles;
-}
-
-sub IsFileChanged {
+sub GetCurrentlyCheckedCode {
     my ( $Self, $FilePath ) = @_;
 
-    return if !defined $FilePath;
-
-    my $ChangedFiles = $Self->GetChangedFiles();
-    return $ChangedFiles->{$FilePath} ? 1 : 0;
+    return $Self->{CurrentlyCheckedCode};
 }
 
-=head2 ()
+=head2 GetCurrentlyCheckedSOPMFilePath()
 
-returns path of file or code.
+    Returns the path to the currently checked file as given in the SOPM file list.
 
-    my $FilePath = $Object->FilePath($File);
+    my $FilePath = $TidyAllObject->GetCurrentlyCheckedSOPMFilePath();
 
-    $File = \bless( [
-       '/var/folders/47/mj945dss3gsd9sf1f4b8pbhh0000gn/T/Code-TidyAll-lbxB/scripts/test/Coffee.t',
-       '/var/folders/47/mj945dss3gsd9sf1f4b8pbhh0000gn/T/Code-TidyAll-lbxB/scripts/test/Coffee.t',
-       '',
-       '/var/folders/47/mj945dss3gsd9sf1f4b8pbhh0000gn/T/Code-TidyAll-lbxB/scripts/test/',
-       'Coffee.t'
-     ], 'Path::Tiny' );
-
-    # OR
-
-    my $FilePath = $Object->FilePath($Code);
-
-Returns:
-
-    my $FilePath = '/scripts/test/Coffee.t';
+    Returns e.g.: 'Kernel/System/CSV.pm'
 
 =cut
 
-sub FilePath {
-    my ( $Self, $Content ) = @_;
+sub GetCurrentlyCheckedSOPMFilePath {
+    my ( $Self, $FilePath ) = @_;
 
-    # File
-    if ( ref $Content eq 'Path::Tiny' ) {
-        $Content =~ s{.*\/Code-TidyAll-[^\/]+\/}{}x;
-        return $Content;
-    }
-
-    # Code
-
-    # package Kernel::System::Coffee;
-    ( my $FilePath ) = $Content =~ m{^package \s ([^;]+);}xms;
-    if ($FilePath) {
-        $FilePath =~ s{::}{/}g;
-        $FilePath .= '.pm';
-    }
-
-    # sopm
-    if ( $Content =~ m{^\<\?xml\s[^\<]+<otrs_package}xms ) {
-        my $GetPackageName = $Self->GetPackageName();
-        $FilePath = $GetPackageName . '.sopm';
-    }
-
-    # xml
-    if ( $Content =~ m{^\<\?xml\s[^\<]+<otrs_config}xms ) {
-        my $GetCondensedPackageName = $Self->GetCondensedPackageName();
-        $FilePath = $GetCondensedPackageName . '.xml';
-    }
-
-    return $FilePath;
+    return $Self->{CurrentlyCheckedSOPMFilePath};
 }
 
-=head2 Print()
+=head2 GetTidyAllZnunyObject()
 
-    $Object->Print(
-        Priority => 'error',
-        Message  => 'Your package <Description></Description> ends with at least two dots. Should be only one.',
+    Returns the TidyAll::Znuny object to access its functions.
+
+    my $TidyAllZnunyObject = $TidyAllObject->GetTidyAllZnunyObject();
+
+    Returns the TidyAll::Znuny object.
+
+=cut
+
+sub GetTidyAllZnunyObject {
+    my ( $Self, %Param ) = @_;
+
+    return $TidyAll::Znuny::Object;
+}
+
+=head2 GetSettings()
+
+    Retrieves all settings stored in $TidyAll::Znuny::Settings.
+
+    my $Settings = $TidyAllObject->GetSettings();
+
+    Returns the stored values (can be empty hash).
+
+=cut
+
+sub GetSettings {
+    my ( $Self, $Key ) = @_;
+
+    my $TidyAllZnunyObject = $Self->GetTidyAllZnunyObject();
+    return if !$TidyAllZnunyObject;
+
+    return $TidyAllZnunyObject->GetSettings();
+}
+
+=head2 GetSetting()
+
+    Retrieves the value of a single setting with the given key.
+
+    my $Value = $TidyAllObject->GetSetting('Framework::Version');
+
+    Returns the stored value or undef if the key does not exist.
+
+=cut
+
+sub GetSetting {
+    my ( $Self, $Key ) = @_;
+
+    my $TidyAllZnunyObject = $Self->GetTidyAllZnunyObject();
+    return if !$TidyAllZnunyObject;
+
+    return $TidyAllZnunyObject->GetSetting($Key);
+}
+
+=head2 IsPluginDisabled()
+
+    Checks if the currently executed plugin is disabled for the file/code to be checked
+    by checking for a 'nofilter' line.
+
+    my $PluginIsDisabled = $TidyAllObject->IsPluginDisabled(
+        Code => '...',
+
+        # OR
+
+        FilePath => 'Kernel/System/CSV.pm',
     );
 
 =cut
 
-sub Print {
+sub IsPluginDisabled {
     my ( $Self, %Param ) = @_;
 
-    $Param{Priority} //= 'warning';
-    $Param{Message}  //= '';
-    $Param{Package}  //= '';
+    my $PackageName = ref $Self;
 
-    my $Package = '';
-    my $Message = '';
-
-    my $PreOutput = "[$Param{Priority}] for the next file:\n";
-    if ( $Param{FilePath} ) {
-        $PreOutput = "[$Param{Priority}] $Param{FilePath}\n";
+    if ( !defined $Param{Code} && !defined $Param{FilePath} ) {
+        $Self->AddErrorMessage(
+            "Either parameter Code or FilePath is needed in call to IsPluginDisabled() in plugin $PackageName.\n"
+        );
     }
+
+    my $Code = defined $Param{Code} ? $Param{Code} : $Self->GetFileContent( $Param{FilePath} );
+
+    return 1 if $Code =~ m{nofilter\([^()]*?\Q$PackageName\E}ism;
+
+    return;
+}
+
+=head2 AddErrorMessage()
+
+    Adds an error message with the given priority for the currently checked file.
+
+    $TidyAllObject->AddErrorMessage(
+        'Your package <Description></Description> ends with at least two dots. Should be only one.',
+    );
+
+=cut
+
+sub AddErrorMessage {
+    my ( $Self, $ErrorMessage ) = @_;
+
+    return $Self->AddMessage(
+        Message  => $ErrorMessage,
+        Priority => 'error',
+    );
+}
+
+=head2 AddMessage()
+
+    Adds a message with the given priority for the currently checked file.
+
+    $TidyAllObject->AddMessage(
+        Message  => 'Your package <Description></Description> ends with at least two dots. Should be only one.',
+        Priority => 'error', # or: success, transform, warning, notice
+    );
+
+=cut
+
+sub AddMessage {
+    my ( $Self, %Param ) = @_;
+
+    my $TidyAllZnunyObject = $Self->GetTidyAllZnunyObject();
 
     my %PriorityColorMap = (
         'success'   => 'green',
@@ -335,26 +196,162 @@ sub Print {
         'error'     => 'red',
     );
 
-    $Message = $Self->_Color( $PriorityColorMap{ $Param{Priority} }, $Param{Message} );
-    $Package = $Self->_Color( $PriorityColorMap{ $Param{Priority} }, $Param{Package} );
+    # Indent every line of message.
+    my $Message = $Param{Message} // '';
+    chomp $Message;
 
-    my $OutputMessage = <<"OUT";
-$Package
+    my @MessageLines = split "\n", $Message;
+    $Message = join "\n", map { "        $_" } @MessageLines;
 
-$Message
-OUT
+    my $Priority = $Param{Priority} // 'warning';
+    my $Color    = $PriorityColorMap{$Priority} // 'yellow';
+    $Message     = $Self->ColorString( $Message // '', $Color );
 
-    if ( $Param{Priority} eq 'error' ) {
-        die $OutputMessage;
+    # Add plugin name to message.
+    $Message = $Self->ColorString( ref $Self, 'cyan' ) . "\n$Message\n";
+
+    my %MessageParam;
+    if ( $Priority eq 'error' ) {
+        $MessageParam{ErrorMessage} = $Message;
     }
     else {
-        print $PreOutput;
-        print $OutputMessage . "\n";
+        $MessageParam{Message} = $Message;
     }
+
+    $TidyAllZnunyObject->AddFileCheckResult(
+        FilePath => $Self->GetCurrentlyCheckedSOPMFilePath(),
+        %MessageParam,
+    );
 
     return;
 }
 
-# ---
+=head2 ColorString()
+
+    Colors the given string (see Term::ANSIColor::color()) if ANSI output is available and active
+    and environment variable ZNUNY_CODE_POLICY_NO_COLOR_OUTPUT is not set.
+
+    Otherwise the text stays unchanged.
+
+    my $ColoredText = $TidyAllObject->ColorString( $String, 'green' );
+
+=cut
+
+sub ColorString {
+    my ( $Self, $String, $Color ) = @_;
+
+    return $String if $ENV{ZNUNY_CODE_POLICY_NO_COLOR_OUTPUT};
+
+    return Term::ANSIColor::color($Color) . $String . Term::ANSIColor::color('reset');
+}
+
+=head2 GetFileContent()
+
+    Returns content of the given file.
+
+    my $Content = $TidyAllObject->GetFileContent(
+        'Kernel/System/CSV.pm',
+    );
+
+=cut
+
+sub GetFileContent {
+    my ( $Self, $FilePath ) = @_;
+
+    my $FileHandle;
+    if ( !open $FileHandle, '<', $FilePath ) {    ## no critic
+        $Self->AddErrorMessage("Can't open $FilePath");
+    }
+
+    my $Content = do { local $/ = undef; <$FileHandle> };
+    close $FileHandle;
+
+    return $Content;
+}
+
+=head2 IsOriginalOTRSCode()
+
+    Checks if the given code has an OTRS AG copyright.
+
+    my $IsOriginalOTRSCode = $TidyAllObject->IsOriginalOTRSCode($Code);
+
+    Returns true value if given code is original OTRS code.
+
+=cut
+
+sub IsOriginalOTRSCode {
+    my ( $Self, $Code ) = @_;
+
+    return 1 if $Code =~ m{Copyright \(C\) 2001-20\d{2} OTRS AG}sm;
+
+    return;
+}
+
+=head2 IsOriginalZnunyCode()
+
+    Checks if the given code originally comes from Znuny.
+
+    my $IsOriginalZnunyCode = $TidyAllObject->IsOriginalZnunyCode($Code);
+
+    Returns true value if given code is original Znuny code.
+
+=cut
+
+sub IsOriginalZnunyCode {
+    my ( $Self, $Code ) = @_;
+
+    return if $Self->IsOriginalOTRSCode($Code);
+    return if $Self->GetSetting('IsThirdPartyProduct');
+
+    return 1 if $Code =~ m{Copyright .*? Znuny GmbH}sm;
+
+    return;
+}
+
+=head2 GetZnunyVendorContext()
+
+    Returns the vendor context for Znuny packages or framework.
+
+    my $Context = $TidyAllObject->GetZnunyVendorContext();
+
+=cut
+
+sub GetZnunyVendorContext {
+    my ($Self) = @_;
+
+    my $IsFrameworkContext = $Self->GetSetting('Context::Framework');
+    return 'org' if $IsFrameworkContext;
+
+    my $Vendor = $Self->GetSetting('Vendor');
+    return if $Vendor !~ m{\bZnuny\b}i;
+
+    my $VendorURL = $Self->GetSetting('VendorURL');
+    return 'com' if $VendorURL =~ m{\bznuny\.com\b}i;
+    return 'org' if $VendorURL =~ m{\bznuny\.org\b}i;
+
+    return;
+}
+
+=head2 GetZnunyCopyrightString()
+
+    Returns the current copyright string for Znuny (framework)
+    or package files.
+
+    my $CopyrightString = $TidyAllObject->GetZnunyCopyrightString($VendorContext);
+
+=cut
+
+sub GetZnunyCopyrightString {
+    my ( $Self, $VendorContext ) = @_;
+
+    return if !$VendorContext;
+
+    my $CopyrightYear = $VendorContext eq 'org' ? 2021 : 2012;
+    my $URL           = $VendorContext eq 'org' ? 'https://znuny.org/' : 'https://znuny.com/';
+
+    my $CopyrightString = "Copyright (C) $CopyrightYear Znuny GmbH, $URL";
+
+    return $CopyrightString;
+}
 
 1;

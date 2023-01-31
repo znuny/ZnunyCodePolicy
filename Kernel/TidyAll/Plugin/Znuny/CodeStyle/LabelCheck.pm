@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2021 Znuny GmbH, https://znuny.org/
+# Copyright (C) 2012-2022 Znuny GmbH, https://znuny.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -11,21 +11,18 @@ package TidyAll::Plugin::Znuny::CodeStyle::LabelCheck;
 use strict;
 use warnings;
 
-use File::Basename;
-
 use parent qw(TidyAll::Plugin::Znuny::Base);
 
 =head1 SYNOPSIS
 
-This plugin checks for next and last statements that refer to non-existing labels.
+Checks for next and last statements that refer to non-existing labels.
 Additionally, labels will be checked for LOOP suffix (not allowed).
 
 =cut
 
-sub validate_file {    ## no critic
-    my ( $Self, $File ) = @_;
+sub validate_source {    ## no critic
+    my ( $Self, $Code ) = @_;
 
-    my $Code = $Self->_GetFileContents($File);
     return if $Self->IsPluginDisabled( Code => $Code );
 
     my %Labels;
@@ -64,12 +61,7 @@ sub validate_file {    ## no critic
 
     return if !length $ErrorMessage;
 
-    $Self->Print(
-        Package  => __PACKAGE__,
-        Priority => 'error',
-        Message  => $ErrorMessage,
-    );
-
+    $Self->AddErrorMessage($ErrorMessage);
 }
 
 1;
