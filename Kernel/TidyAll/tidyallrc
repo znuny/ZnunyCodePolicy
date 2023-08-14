@@ -330,6 +330,11 @@ select = **/*.pm
 select = Kernel/Config.pm.dist
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 
+[+TidyAll::Plugin::Znuny::Perl::ObjectFunctionCall]
+select = **/*.{pl,pm}
+select = Kernel/Config.pm.dist
+ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
+
 [+TidyAll::Plugin::Znuny::Perl::ObjectManagerCreation]
 select = **/*.pm
 select = Kernel/Config.pm.dist

@@ -121,6 +121,7 @@
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/NoExitInConsoleCommands.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/NoShebangLine.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/ObjectDependencies.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/ObjectFunctionCall.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/ObjectManagerCreation.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/ObjectManagerDirectCall.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/ObjectNameSpace.pm"/>
@@ -222,6 +223,7 @@
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/IsIntegerVariableCheck.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/NoExitInConsoleCommands.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/ObjectDependencies.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/ObjectFunctionCall.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/ObjectManagerDirectCall.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/PerlCritic/ProhibitOpen.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/PerlCritic/RequireCamelCase.t"/>
