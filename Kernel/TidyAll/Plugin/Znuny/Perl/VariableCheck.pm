@@ -44,13 +44,26 @@ sub validate_source {    ## no critic
 
     my $VariableCheckUse = qr{ use \s Kernel\:\:System\:\:VariableCheck }xmsi;
 
-    return if $Code !~ $VariableCheckFunction;
-    return if $Code =~ $VariableCheckUse;
+    return if $Code !~ $VariableCheckFunction && $Code !~ $VariableCheckUse;
+    return if $Code =~ $VariableCheckFunction && $Code =~ $VariableCheckUse;
 
-    my $Message = "'use' statement for Kernel::System::VariableCheck is missing:\n"
-    ."use Kernel::System::VariableCheck qw(:all);";
+    my $Message;
+    if ($Code =~ $VariableCheckFunction && $Code !~ $VariableCheckUse){
+        $Message = "'use' statement for Kernel::System::VariableCheck is missing:\n"
+        . "use Kernel::System::VariableCheck qw(:all);";
 
-    $Self->AddErrorMessage($Message);
+        $Self->AddErrorMessage($Message);
+    }
+
+    if ($Code !~ $VariableCheckFunction && $Code =~ $VariableCheckUse){
+        $Message = "'use' statement for Kernel::System::VariableCheck is used, but no VariableCheck function was ever used.";
+
+        $Self->AddMessage(
+            Message  => $Message,
+            Priority => 'warning',
+        );
+    }
+
 
     return;
 }

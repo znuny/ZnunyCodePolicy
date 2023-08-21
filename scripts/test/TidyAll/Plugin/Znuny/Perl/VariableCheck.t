@@ -138,6 +138,17 @@ DataIsDifferent($Test)
 EOF
         ExpectedMessageSubstring => undef,
     },
+    {
+        Name =>
+            "use Kernel::System::VariableCheck - but never used a VariableCheck function",
+        Filename => 'Kernel/System/Znuny.pm',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::Perl::VariableCheck)],
+        Source   => <<'EOF',
+use Kernel::System::VariableCheck qw(:all);
+EOF
+        ExpectedMessageSubstring =>
+            "'use' statement for Kernel::System::VariableCheck is used, but no VariableCheck function was ever used.",
+    },
 );
 
 $Self->scripts::test::TidyAll::Plugin::Znuny::Run( Tests => \@Tests );
