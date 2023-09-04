@@ -1,7 +1,7 @@
 ![Znuny logo](https://www.znuny.com/assets/images/logo_small.png)
 
 
-![Build status](https://badge.proxy.znuny.com/ZnunyCodePolicy/master)
+![Build status](https://badge.proxy.znuny.com/ZnunyCodePolicy/dev)
 
 ZnunyCodePolicy
 =================
@@ -11,7 +11,7 @@ You can use it to check your code against the Znuny code style guide.
 
 **Installation / Usage**
 
-All important information can be found here [feature.md](https://github.com/znuny/ZnunyCodePolicy/blob/master/doc/en/feature.md).
+All important information can be found here [feature.md](https://github.com/znuny/ZnunyCodePolicy/blob/dev/doc/en/feature.md).
 
 Enjoy!
 
