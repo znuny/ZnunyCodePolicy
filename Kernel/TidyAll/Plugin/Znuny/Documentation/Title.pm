@@ -69,6 +69,13 @@ sub _CheckTitle {
 
     return 1 if !$ExpectedTitle;
 
+    if ( !@Line ) {
+        $Self->AddErrorMessage(
+            "The documentation file '$Param{Language}/$Param{Filename}' is empty."
+        );
+        return;
+    }
+
     # Check the title of current documentation
     if (
         $Line[0] !~ m{^$ExpectedTitle$}ms
