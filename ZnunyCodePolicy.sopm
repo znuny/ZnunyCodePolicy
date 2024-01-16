@@ -9,6 +9,7 @@
     <Framework>6.4.x</Framework>
     <Framework>6.5.x</Framework>
     <Framework>7.0.x</Framework>
+    <Framework>7.1.x</Framework>
     <ModuleRequired Version="0.17">Code::TidyAll</ModuleRequired>
     <ModuleRequired>Perl::Critic</ModuleRequired>
     <Vendor>Znuny GmbH</Vendor>
