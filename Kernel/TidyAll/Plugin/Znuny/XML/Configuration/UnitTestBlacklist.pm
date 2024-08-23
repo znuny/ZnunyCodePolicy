@@ -40,7 +40,7 @@ sub validate_source {
             $TestNames[-1] = $PackageName . $TestNames[-1];
 
             my $PackageUnitTest = 'scripts/test/' . join( '/', @TestNames );
-            if ( !grep { $_ eq $PackageUnitTest } @TidyAll::OTRS::FileList ) {
+            if ( !grep { $_ eq $PackageUnitTest } @{ $Self->GetSetting('FilePaths::SOPM') // [] } ) {
                 $ErrorMessage .= $PackageUnitTest . "\n";
             }
         }
