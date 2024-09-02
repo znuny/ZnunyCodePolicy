@@ -323,9 +323,11 @@ sub GetZnunyVendorContext {
     return 'org' if $IsFrameworkContext;
 
     my $Vendor = $Self->GetSetting('Vendor');
+    return if ! defined $Vendor;
     return if $Vendor !~ m{\bZnuny\b}i;
 
     my $VendorURL = $Self->GetSetting('VendorURL');
+    return if ! defined $VendorURL;
     return 'com' if $VendorURL =~ m{\bznuny\.com\b}i;
     return 'org' if $VendorURL =~ m{\bznuny\.org\b}i;
 
