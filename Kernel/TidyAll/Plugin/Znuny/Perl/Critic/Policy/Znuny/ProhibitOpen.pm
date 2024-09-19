@@ -49,9 +49,7 @@ sub violates {
         # Loop until we found the Token after the first comma
         my $Counter;
         COUNTER:
-        while ( $Counter++ < 10 ) {
-            $NextSibling = $NextSibling->snext_sibling();
-
+        while ( $Counter++ < 10 && ($NextSibling = $NextSibling->snext_sibling()) ) {
             if (
                 $NextSibling->isa('PPI::Token::Operator')
                 && $NextSibling->content() eq ','
@@ -64,6 +62,8 @@ sub violates {
             }
         }
     }
+
+    return if !defined $OpenMode;
 
     if ( $OpenMode eq '>' || $OpenMode eq '<' ) {
         return $Self->violation( $Description, $Explanation, $Element );
