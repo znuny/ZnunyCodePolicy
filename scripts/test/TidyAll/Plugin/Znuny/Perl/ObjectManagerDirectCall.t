@@ -19,7 +19,7 @@ use scripts::test::TidyAll::Plugin::Znuny;
 
 my @Tests = (
     {
-        Name     => "Direct ObjectManager call found",
+        Name     => "OPM: Direct ObjectManager call found",
         Filename => 'Kernel/System/Znuny.pm',
         Plugins  => [qw(TidyAll::Plugin::Znuny::Perl::ObjectManagerDirectCall)],
         Source   => <<'EOF',
@@ -27,8 +27,24 @@ $Kernel::OM->Get('Kernel::System::Coffee')->Get();
 EOF
         ExpectedMessageSubstring =>
             "Don't use direct object manager calls. Fetch the object in a separate variable first",
+        Settings => {
+            'Context::OPM'       => 1,
+            'Context::Framework' => 0,
+            'ProductName'        => 'Znuny-SomeTestPackage',
+        },
     },
-
+    {
+        Name     => "Framework: Ignore direct ObjectManager call found.",
+        Filename => 'Kernel/System/Znuny.pm',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::Perl::ObjectManagerDirectCall)],
+        Source   => <<'EOF',
+$Kernel::OM->Get('Kernel::System::Coffee')->Get();
+EOF
+        Settings => {
+            'Context::OPM'       => 0,
+            'Context::Framework' => 1,
+        },
+    },
 );
 
 $Self->scripts::test::TidyAll::Plugin::Znuny::Run( Tests => \@Tests );

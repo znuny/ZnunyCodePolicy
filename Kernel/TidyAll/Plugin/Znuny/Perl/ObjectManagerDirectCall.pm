@@ -17,6 +17,10 @@ sub validate_source {
     my ( $Self, $Code ) = @_;
 
     return if $Self->IsPluginDisabled( Code => $Code );
+
+    my $IsFrameworkContext = $Self->GetSetting('Context::Framework');
+    return if $IsFrameworkContext;
+
     return if $Code =~ m{no \s warnings \s 'redefine';}xms;
     return if $Code =~ m{^ \# \s+ \$origin}xms;
 
