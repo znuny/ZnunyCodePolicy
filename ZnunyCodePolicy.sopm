@@ -79,6 +79,7 @@
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Common/ValidateFilename.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Config/ACLKeysLevel3Actions.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Config/MemoryLeak.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Deprecated/AjaxAttachment.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Deprecated/ArticleFunctions.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Deprecated/ArticleType.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Deprecated/CreateTimeUnix.pm"/>
@@ -205,6 +206,7 @@
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Common/NoFilter.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Config/ACLKeysLevel3Actions.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Config/MemoryLeak.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Deprecated/AjaxAttachment.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Deprecated/ArticleFunctions.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Deprecated/ArticleType.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Deprecated/CreateTimeUnix.t"/>

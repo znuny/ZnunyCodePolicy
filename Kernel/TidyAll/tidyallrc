@@ -127,6 +127,11 @@ select = Kernel/Config/**/*.pm
 ; Deprecated
 ;
 
+[+TidyAll::Plugin::Znuny::Deprecated::AjaxAttachment]
+select = **/*.{pl,pm,t,js}
+ignore = Kernel/cpan-lib/**/* Custom/Kernel/cpan-lib/**/*
+ignore = scripts/test/sample/**/*
+
 [+TidyAll::Plugin::Znuny::Deprecated::ArticleFunctions]
 select = **/*.{pl,pm,t}
 ignore = Custom/Kernel/**/*
