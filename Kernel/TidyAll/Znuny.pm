@@ -415,8 +415,17 @@ sub _GetInformationFromSOPMFile {
         my $FrameworkVersionSupported = $Self->IsFrameworkVersionSupported($FrameworkVersion);
         next FRAMEWORKVERSION if !$FrameworkVersionSupported;
 
+        # Set Framework::Version if not already set.
+        if (!$Information{'Framework::Version'} && $FrameworkVersion){
+            $Information{'Framework::Version'} = $FrameworkVersion;
+        }
+
+        # Only store the highest supported framework version.
+        if ( $FrameworkVersion && $Information{'Framework::Version'} && $FrameworkVersion gt $Information{'Framework::Version'} ) {
+            $Information{'Framework::Version'} = $FrameworkVersion;
+        }
+
         $Information{'SOPM::HasSupportedFrameworkVersion'} = 1;
-        last FRAMEWORKVERSION;
     }
 
     # Product name
@@ -1159,14 +1168,51 @@ sub IsFrameworkVersionSupported {
     my ( $Self, $Version ) = @_;
 
     return if !defined $Version;
-    return if $Version !~ m{\A(\d+)\.(\d+)(?:\.(?:x|\d+))?\z};
 
-    my $VersionMajor = $1;
-    my $VersionMinor = $2;
+    my %Version = $Self->GetSemanticVersion($Version);
+
+    return if !%Version;
+    return if !defined $Version{Major};
+    return if !defined $Version{Minor};
 
     my $SupportedFrameworkVersions = $Self->GetSupportedFrameworkVersions();
-    return $SupportedFrameworkVersions->{"$VersionMajor.$VersionMinor"};
+    return $SupportedFrameworkVersions->{"$Version{Major}.$Version{Minor}"};
 }
+
+=head2 GetSemanticVersion
+
+    This method takes a version string as input and returns a hash containing
+    the major, minor, and patch components of the version.
+
+    Returns:
+
+    my %Version = $TidyAllObject->GetSemanticVersion('7.1.2');
+
+    my %Version = (
+        Major => 7,
+        Minor => 1,
+        Patch => 2,
+    );
+
+    If the version string is not defined or does not match the expected format, the method returns undef.
+
+=cut
+
+sub GetSemanticVersion {
+    my ( $Self, $Version ) = @_;
+
+    return if !defined $Version;
+    return if $Version !~ m{\A(\d+)\.(\d+)(?:\.(?:x|\d+))?\z};
+
+    my %Version = (
+        Major => $1,
+        Minor => $2,
+        Patch => $3,
+    );
+
+    return %Version;
+}
+
 
 =head2 GetSupportedFrameworkVersions()
 

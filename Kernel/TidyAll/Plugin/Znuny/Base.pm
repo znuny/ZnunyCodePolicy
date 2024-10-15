@@ -153,6 +153,66 @@ sub IsPluginDisabled {
     return;
 }
 
+=head2 IsFrameworkVersionLessThan()
+
+    Checks if the currently checked framework version is less than the given version.
+
+    Returns true value if the currently checked framework version is less than the given version.
+
+    my $IsFrameworkVersionLessThan = $TidyAllObject->IsFrameworkVersionLessThan('7.1');
+
+=cut
+
+sub IsFrameworkVersionLessThan {
+    my ( $Self, $Version ) = @_;
+
+    my $TidyAllZnunyObject = $Self->GetTidyAllZnunyObject();
+    my $FrameworkVersion = $Self->GetSetting('Framework::Version');
+
+    my %Version          = $TidyAllZnunyObject->GetSemanticVersion($Version);
+    my %FrameworkVersion = $TidyAllZnunyObject->GetSemanticVersion($FrameworkVersion);
+
+    if ($FrameworkVersion{Major}) {
+        return 1 if $FrameworkVersion{Major} < $Version{Major};
+        return 0 if $FrameworkVersion{Major} > $Version{Major};
+        return 1 if $FrameworkVersion{Minor} < $Version{Minor};
+        return 0;
+    }
+
+    # Default: if framework is unknown, return false (strict checks).
+    return 0;
+}
+
+=head2 IsFrameworkVersionGreaterThan
+
+    Checks if the currently checked framework version is greater than the given version.
+
+    Returns true value if the currently checked framework version is greater than the given version.
+
+    my $IsFrameworkVersionGreaterThan = $TidyAllObject->IsFrameworkVersionGreaterThan('7.1');
+
+=cut
+
+sub IsFrameworkVersionGreaterThan {
+    my ( $Self, $Version ) = @_;
+
+    my $TidyAllZnunyObject = $Self->GetTidyAllZnunyObject();
+    my $FrameworkVersion = $Self->GetSetting('Framework::Version');
+
+    my %Version          = $TidyAllZnunyObject->GetSemanticVersion($Version);
+    my %FrameworkVersion = $TidyAllZnunyObject->GetSemanticVersion($FrameworkVersion);
+
+    if ($FrameworkVersion{Major}) {
+        return 1 if $FrameworkVersion{Major} > $Version{Major};
+        return 0 if $FrameworkVersion{Major} < $Version{Major};
+        return 1 if $FrameworkVersion{Minor} > $Version{Minor};
+        return 0;
+    }
+
+    # Default: if framework is unknown, return false (strict checks).
+    return 0;
+}
+
 =head2 AddErrorMessage()
 
     Adds an error message with the given priority for the currently checked file.
