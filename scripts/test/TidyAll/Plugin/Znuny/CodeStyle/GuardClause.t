@@ -19,7 +19,7 @@ use scripts::test::TidyAll::Plugin::Znuny;
 
 my @Tests = (
     {
-        Name     => "Possible guard clause before end of loop",
+        Name     => "Context::Framework - Possible guard clause before end of loop",
         Filename => 'Znuny.pm',
         Plugins  => [qw(TidyAll::Plugin::Znuny::CodeStyle::GuardClause)],
         Source   => <<'EOF',
@@ -29,6 +29,30 @@ my @Tests = (
         }
     }
 EOF
+        Settings => {
+            'Context::OPM'       => 0,
+            'Context::Framework' => 1,
+            'ProductName'        => 'Znuny',
+        },
+        ExpectedSource           => undef,
+        ExpectedMessageSubstring => undef,
+    },
+    {
+        Name     => "Context::OPM - Possible guard clause before end of loop",
+        Filename => 'Znuny.pm',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::CodeStyle::GuardClause)],
+        Source   => <<'EOF',
+    for my $Needed ( qw(1 2 3) ) {
+        if ( $Param{$Needed} ) {
+            # todo
+        }
+    }
+EOF
+        Settings => {
+            'Context::OPM'       => 1,
+            'Context::Framework' => 0,
+            'ProductName'        => 'Znuny-SomeTestPackage',
+        },
         ExpectedSource           => undef,
         ExpectedMessageSubstring => 'Possible guard clause before end of loop.',
     },

@@ -18,6 +18,9 @@ sub validate_source {    ## no critic
 
     return if $Self->IsPluginDisabled( Code => $Code );
 
+    # Do not execute if Context is Framework.
+    return if $Self->GetSetting('Context::Framework');
+
     return if $Code =~ m{\# \s \$origin}xmsi;
     return if $Code =~ m{no \s warnings \s 'redefine'}xmsi;
 
