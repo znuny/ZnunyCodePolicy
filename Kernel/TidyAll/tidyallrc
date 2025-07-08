@@ -486,6 +486,9 @@ select = *.sopm
 ; SQL
 ;
 
+[+TidyAll::Plugin::Znuny::SQL::PermissionGroups]
+select = **/*.{xml,sopm}
+
 [+TidyAll::Plugin::Znuny::SQL::ReservedWords]
 select = **/*.{xml,sopm}
 
