@@ -10,6 +10,7 @@
 ## nofilter(TidyAll::Plugin::Znuny::Legal::UpdateZnunyCopyright)
 ## nofilter(TidyAll::Plugin::Znuny::Common::TidyAll::Plugin::Znuny::Common::CustomizationMarkers)
 
+## no critic (RequireExplicitPackage)
 use strict;
 use warnings;
 

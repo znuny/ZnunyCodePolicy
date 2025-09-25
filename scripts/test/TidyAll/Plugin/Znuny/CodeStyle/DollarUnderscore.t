@@ -9,7 +9,7 @@
 ## nofilter(TidyAll::Plugin::Znuny::Perl::ForMy)
 ## nofilter(TidyAll::Plugin::Znuny::CodeStyle::TODOCheck)
 
-## no critic (Modules::RequireExplicitPackage)
+## no critic (RequireExplicitPackage)
 use strict;
 use warnings;
 

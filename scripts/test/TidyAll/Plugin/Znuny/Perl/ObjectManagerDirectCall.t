@@ -8,7 +8,7 @@
 # --
 
 ## nofilter(TidyAll::Plugin::Znuny::Perl::ObjectManagerDirectCall)
-## no critic (Modules::RequireExplicitPackage)
+## no critic (RequireExplicitPackage)
 use strict;
 use warnings;
 

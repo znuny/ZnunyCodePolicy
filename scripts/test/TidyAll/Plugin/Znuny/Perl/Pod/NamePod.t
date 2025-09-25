@@ -7,6 +7,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
+## no critic (RequireExplicitPackage)
 use strict;
 use warnings;
 
@@ -23,6 +24,7 @@ my @Tests = (
         Source    => <<'EOF',
 package scripts::test::Pod::Test;    ## no critic
 
+## no critic (RequireExplicitPackage)
 use strict;
 use warnings;
 
@@ -51,6 +53,7 @@ EOF
         Source    => <<'EOF',
 package scripts::test::Pod::Test;
 
+## no critic (RequireExplicitPackage)
 use strict;
 use warnings;
 
@@ -79,6 +82,7 @@ EOF
         Source    => <<'EOF',
 package scripts::test::Pod::Test;    ## no critic
 
+## no critic (RequireExplicitPackage)
 use strict;
 use warnings;
 
@@ -102,6 +106,7 @@ EOF
         ExpectedSource => <<'EOF',
 package scripts::test::Pod::Test;    ## no critic
 
+## no critic (RequireExplicitPackage)
 use strict;
 use warnings;
 
@@ -130,6 +135,7 @@ EOF
         Source    => <<'EOF',
 package scripts::test::Pod::Test;    ## no critic
 
+## no critic (RequireExplicitPackage)
 use strict;
 use warnings;
 
@@ -153,6 +159,7 @@ EOF
         ExpectedSource => <<'EOF',
 package scripts::test::Pod::Test;    ## no critic
 
+## no critic (RequireExplicitPackage)
 use strict;
 use warnings;
 
@@ -182,6 +189,7 @@ EOF
 # $origin: otrs - d152f0ba9f7b326b4bd3b8624cc2c99944e2a956 - scripts/test/Pod/Test.pm
 package scripts::test::Pod::Test;    ## no critic
 
+## no critic (RequireExplicitPackage)
 use strict;
 use warnings;
 
@@ -206,6 +214,7 @@ EOF
 # $origin: otrs - d152f0ba9f7b326b4bd3b8624cc2c99944e2a956 - scripts/test/Pod/Test.pm
 package scripts::test::Pod::Test;    ## no critic
 
+## no critic (RequireExplicitPackage)
 use strict;
 use warnings;
 
@@ -234,6 +243,7 @@ EOF
         Source    => <<'EOF',
 package scripts::test::Pod::Test;    ## no critic
 
+## no critic (RequireExplicitPackage)
 use strict;
 use warnings;
 
@@ -257,6 +267,7 @@ EOF
         ExpectedSource => <<'EOF',
 package scripts::test::Pod::Test;    ## no critic
 
+## no critic (RequireExplicitPackage)
 use strict;
 use warnings;
 
@@ -286,6 +297,7 @@ EOF
         Source    => <<'EOF',
 package scripts::test::Pod::Test;    ## no critic
 
+## no critic (RequireExplicitPackage)
 use strict;
 use warnings;
 
@@ -317,6 +329,7 @@ EOF
         ExpectedSource => <<'EOF',
 package scripts::test::Pod::Test;    ## no critic
 
+## no critic (RequireExplicitPackage)
 use strict;
 use warnings;
 

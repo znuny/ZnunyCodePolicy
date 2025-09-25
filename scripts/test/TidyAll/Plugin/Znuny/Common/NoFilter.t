@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-## no critic (Modules::RequireExplicitPackage)
+## no critic (RequireExplicitPackage)
 ## nofilter(TidyAll::Plugin::Znuny::Common::NoFilter)
 
 use strict;

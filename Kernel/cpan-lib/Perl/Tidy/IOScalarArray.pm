@@ -14,11 +14,43 @@ package Perl::Tidy::IOScalarArray;
 use strict;
 use warnings;
 use Carp;
-our $VERSION = '20191203';
+our $VERSION = '20250214';
+
+use constant DEVEL_MODE => 0;
+
+sub AUTOLOAD {
+
+    # Catch any undefined sub calls so that we are sure to get
+    # some diagnostic information.  This sub should never be called
+    # except for a programming error.
+    our $AUTOLOAD;
+    return if ( $AUTOLOAD =~ /\bDESTROY$/ );
+
+    # Originally there was a dummy sub close. All calls to it should have been
+    # eliminated, but for safety we will check for them here.
+    return 1 if ( $AUTOLOAD =~ /\bclose$/ && !DEVEL_MODE );
+    my ( $pkg, $fname, $lno ) = caller();
+    my $my_package = __PACKAGE__;
+    print {*STDERR} <<EOM;
+======================================================================
+Error detected in package '$my_package', version $VERSION
+Received unexpected AUTOLOAD call for sub '$AUTOLOAD'
+Called from package: '$pkg'
+Called from File '$fname'  at line '$lno'
+This error is probably due to a recent programming change
+======================================================================
+EOM
+    exit 1;
+} ## end sub AUTOLOAD
+
+sub DESTROY {
+
+    # required to avoid call to AUTOLOAD in some versions of perl
+}
 
 sub new {
     my ( $package, $rarray, $mode ) = @_;
-    my $ref = ref $rarray;
+    my $ref = ref($rarray);
     if ( $ref ne 'ARRAY' ) {
         confess <<EOM;
 ------------------------------------------------------------------------
@@ -42,7 +74,7 @@ expecting mode = 'r' or 'w' but got mode ($mode); trace follows:
 ------------------------------------------------------------------------
 EOM
     }
-}
+} ## end sub new
 
 sub getline {
     my $self = shift;
@@ -56,7 +88,7 @@ EOM
     }
     my $i = $self->[2]++;
     return $self->[0]->[$i];
-}
+} ## end sub getline
 
 sub print {
     my ( $self, $msg ) = @_;
@@ -70,7 +102,5 @@ EOM
     }
     push @{ $self->[0] }, $msg;
     return;
-}
-sub close { return }
+} ## end sub print
 1;
-

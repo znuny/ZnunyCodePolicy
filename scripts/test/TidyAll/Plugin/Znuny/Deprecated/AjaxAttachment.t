@@ -6,7 +6,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 ## nofilter(TidyAll::Plugin::Znuny::Deprecated::AjaxAttachment)
-## no critic (Modules::RequireExplicitPackage)
+## no critic (RequireExplicitPackage)
 
 use strict;
 use warnings;

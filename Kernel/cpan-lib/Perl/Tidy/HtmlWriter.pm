@@ -7,52 +7,108 @@
 package Perl::Tidy::HtmlWriter;
 use strict;
 use warnings;
-our $VERSION = '20191203';
+our $VERSION = '20250214';
 
+use Carp;
+use English qw( -no_match_vars );
 use File::Basename;
+use File::Temp qw();
+
+use constant EMPTY_STRING => q{};
+use constant SPACE        => q{ };
+
+{ #<<< A non-indenting brace to contain all lexical variables
 
 # class variables
-use vars qw{
-  %html_color
-  %html_bold
-  %html_italic
-  %token_short_names
-  %short_to_long_names
-  $rOpts
-  $css_filename
-  $css_linkname
-  $missing_html_entities
-  $missing_pod_html
-};
+my (
+
+    # INITIALIZER: BEGIN block
+    $missing_html_entities,
+    $missing_pod_html,
+
+    # INITIALIZER: BEGIN block
+    %short_to_long_names,
+    %token_short_names,
+
+    # INITIALIZER: sub check_options
+    $rOpts,
+    $rOpts_html_entities,
+    $css_linkname,
+    %html_bold,
+    %html_color,
+    %html_italic,
+
+);
 
 # replace unsafe characters with HTML entity representation if HTML::Entities
 # is available
 #{ eval "use HTML::Entities"; $missing_html_entities = $@; }
 
 BEGIN {
+
+    $missing_html_entities = EMPTY_STRING;
     if ( !eval { require HTML::Entities; 1 } ) {
-        $missing_html_entities = $@ ? $@ : 1;
+        $missing_html_entities = $EVAL_ERROR ? $EVAL_ERROR : 1;
     }
+
+    $missing_pod_html = EMPTY_STRING;
     if ( !eval { require Pod::Html; 1 } ) {
-        $missing_pod_html = $@ ? $@ : 1;
+        $missing_pod_html = $EVAL_ERROR ? $EVAL_ERROR : 1;
     }
+} ## end BEGIN
+
+sub AUTOLOAD {
+
+    # Catch any undefined sub calls so that we are sure to get
+    # some diagnostic information.  This sub should never be called
+    # except for a programming error.
+    our $AUTOLOAD;
+    return if ( $AUTOLOAD =~ /\bDESTROY$/ );
+    my ( $pkg, $fname, $lno ) = caller();
+    my $my_package = __PACKAGE__;
+    print {*STDERR} <<EOM;
+======================================================================
+Error detected in package '$my_package', version $VERSION
+Received unexpected AUTOLOAD call for sub '$AUTOLOAD'
+Called from package: '$pkg'
+Called from File '$fname'  at line '$lno'
+This error is probably due to a recent programming change
+======================================================================
+EOM
+    exit 1;
+} ## end sub AUTOLOAD
+
+sub DESTROY {
+
+    # required to avoid call to AUTOLOAD in some versions of perl
 }
 
 sub new {
 
-    my ( $class, $input_file, $html_file, $extension, $html_toc_extension,
-        $html_src_extension )
-      = @_;
+    my ( $class, @arglist ) = @_;
+    if ( @arglist % 2 ) { croak "Odd number of items in arg hash list\n" }
 
-    my $html_file_opened = 0;
-    my $html_fh;
-    ( $html_fh, my $html_filename ) =
-      Perl::Tidy::streamhandle( $html_file, 'w' );
-    unless ($html_fh) {
-        Perl::Tidy::Warn("can't open $html_file: $!\n");
+    my %defaults = (
+        input_file         => undef,
+        html_file          => undef,
+        extension          => undef,
+        html_toc_extension => undef,
+        html_src_extension => undef,
+    );
+    my %args = ( %defaults, @arglist );
+
+    my $input_file         = $args{input_file};
+    my $html_file          = $args{html_file};
+    my $extension          = $args{extension};
+    my $html_toc_extension = $args{html_toc_extension};
+    my $html_src_extension = $args{html_src_extension};
+
+    my $html_fh = Perl::Tidy::streamhandle( $html_file, 'w' );
+    if ( !$html_fh ) {
+        Perl::Tidy::Warn("can't open html file '$html_file'\n");
         return;
     }
-    $html_file_opened = 1;
+    my $html_file_opened = 1;
 
     if ( !$input_file || $input_file eq '-' || ref($input_file) ) {
         $input_file = "NONAME";
@@ -68,7 +124,7 @@ sub new {
 
         # pre section goes directly to the output stream
         $html_pre_fh = $html_fh;
-        $html_pre_fh->print( <<"PRE_END");
+        $html_pre_fh->print(<<"PRE_END");
 <pre>
 PRE_END
     }
@@ -88,8 +144,6 @@ PRE_END
             undef $rOpts->{'pod2html'};
         }
         else {
-            ##eval "use Pod::Html";
-            #if ($@) {
             if ($missing_pod_html) {
                 Perl::Tidy::Warn(
 "unable to find Pod::Html; cannot use pod2html\n-npod disables this message\n"
@@ -105,7 +159,7 @@ PRE_END
     my $toc_filename;
     my $src_filename;
     if ( $rOpts->{'frames'} ) {
-        unless ($extension) {
+        if ( !$extension ) {
             Perl::Tidy::Warn(
 "cannot use frames without a specified output extension; ignoring -frm\n"
             );
@@ -125,11 +179,11 @@ PRE_END
     # ----------------------------------------------------------
 
     my $title = $rOpts->{'title'};
-    unless ($title) {
-        ( $title, my $path ) = fileparse($input_file);
+    if ( !$title ) {
+        ( $title, my $path_uu ) = fileparse($input_file);
     }
     my $toc_item_count = 0;
-    my $in_toc_package = "";
+    my $in_toc_package = EMPTY_STRING;
     my $last_level     = 0;
     return bless {
         _input_file        => $input_file,          # name of input file
@@ -153,15 +207,7 @@ PRE_END
                                                     # name changes
         _rlast_level       => \$last_level,         # brace indentation level
     }, $class;
-}
-
-sub close_object {
-    my ($object) = @_;
-
-    # returns true if close works, false if not
-    # failure probably means there is no close method
-    return eval { $object->close(); 1 };
-}
+} ## end sub new
 
 sub add_toc_item {
 
@@ -185,9 +231,10 @@ sub add_toc_item {
     my $end_package_list = sub {
         if ( ${$rin_toc_package} ) {
             $html_toc_fh->print("</ul>\n</li>\n");
-            ${$rin_toc_package} = "";
+            ${$rin_toc_package} = EMPTY_STRING;
         }
-    };
+        return;
+    }; ## end $end_package_list = sub
 
     my $start_package_list = sub {
         my ( $unique_name, $package ) = @_;
@@ -197,15 +244,16 @@ sub add_toc_item {
 <ul>
 EOM
         ${$rin_toc_package} = $package;
-    };
+        return;
+    }; ## end $start_package_list = sub
 
     # start the table of contents on the first item
-    unless ( ${$rtoc_item_count} ) {
+    if ( !${$rtoc_item_count} ) {
 
         # but just quit if we hit EOF without any other entries
         # in this case, there will be no toc
         return if ( $type eq 'EOF' );
-        $html_toc_fh->print( <<"TOC_END");
+        $html_toc_fh->print(<<"TOC_END");
 <!-- BEGIN CODE INDEX --><a name="code-index"></a>
 <ul>
 TOC_END
@@ -231,7 +279,7 @@ TOC_END
     # start/stop lists of subs
     if ( $type eq 'sub' ) {
         my $package = $rpackage_stack->[ ${$rlast_level} ];
-        unless ($package) { $package = 'main' }
+        if ( !$package ) { $package = 'main' }
 
         # if we're already in a package/sub list, be sure its the right
         # package or else close it
@@ -240,7 +288,7 @@ TOC_END
         }
 
         # start a package/sub list if necessary
-        unless ( ${$rin_toc_package} ) {
+        if ( !${$rin_toc_package} ) {
             $start_package_list->( $unique_name, $package );
         }
     }
@@ -262,13 +310,13 @@ TOC_END
 
     # end the table of contents, if any, on the end of file
     if ( $type eq 'EOF' ) {
-        $html_toc_fh->print( <<"TOC_END");
+        $html_toc_fh->print(<<"TOC_END");
 </ul>
 <!-- END CODE INDEX -->
 TOC_END
     }
     return;
-}
+} ## end sub add_toc_item
 
 BEGIN {
 
@@ -314,6 +362,7 @@ BEGIN {
 
     # When adding NEW_TOKENS: update this hash table
     # $type => $short_name
+    # c250: changed 'M' to 'S'
     %token_short_names = (
         '#'  => 'c',
         'n'  => 'n',
@@ -334,14 +383,15 @@ BEGIN {
         'f'  => 'sc',
         '('  => 'p',
         ')'  => 'p',
-        'M'  => 'm',
-        'P'  => 'pd',
+        'S'  => 'm',
+        'pd' => 'pd',
         'A'  => 'co',
     );
 
     # These token types will all be called identifiers for now
-    # FIXME: could separate user defined modules as separate type
-    my @identifier = qw< i t U C Y Z G :: CORE::>;
+    # Fix for c250: added new type 'P', formerly 'i'
+    # ( but package statements will eventually be split into 'k' and 'i')
+    my @identifier = qw< i t U C Y Z G P :: CORE::>;
     @token_short_names{@identifier} = ('i') x scalar(@identifier);
 
     # These token types will be called 'structure'
@@ -375,14 +425,15 @@ BEGIN {
     #    my @list = qw" .. -> <> ... \ ? ";
     #    @token_long_names{@list} = ('misc-operators') x scalar(@list);
 
-}
+} ## end BEGIN
 
 sub make_getopt_long_names {
     my ( $class, $rgetopt_names ) = @_;
-    while ( my ( $short_name, $name ) = each %short_to_long_names ) {
-        push @{$rgetopt_names}, "html-color-$name=s";
-        push @{$rgetopt_names}, "html-italic-$name!";
-        push @{$rgetopt_names}, "html-bold-$name!";
+    foreach my $short_name ( keys %short_to_long_names ) {
+        my $long_name = $short_to_long_names{$short_name};
+        push @{$rgetopt_names}, "html-color-$long_name=s";
+        push @{$rgetopt_names}, "html-italic-$long_name!";
+        push @{$rgetopt_names}, "html-bold-$long_name!";
     }
     push @{$rgetopt_names}, "html-color-background=s";
     push @{$rgetopt_names}, "html-linked-style-sheet=s";
@@ -415,7 +466,7 @@ sub make_getopt_long_names {
     push @{$rgetopt_names}, "podheader!";
     push @{$rgetopt_names}, "podindex!";
     return;
-}
+} ## end sub make_getopt_long_names
 
 sub make_abbreviated_names {
 
@@ -426,7 +477,8 @@ sub make_abbreviated_names {
     my ( $class, $rexpansion ) = @_;
 
     # abbreviations for color/bold/italic properties
-    while ( my ( $short_name, $long_name ) = each %short_to_long_names ) {
+    foreach my $short_name ( keys %short_to_long_names ) {
+        my $long_name = $short_to_long_names{$short_name};
         ${$rexpansion}{"hc$short_name"}  = ["html-color-$long_name"];
         ${$rexpansion}{"hb$short_name"}  = ["html-bold-$long_name"];
         ${$rexpansion}{"hi$short_name"}  = ["html-italic-$long_name"];
@@ -452,7 +504,7 @@ sub make_abbreviated_names {
     ${$rexpansion}{"text"}  = ["html-toc-extension"];
     ${$rexpansion}{"sext"}  = ["html-src-extension"];
     return;
-}
+} ## end sub make_abbreviated_names
 
 sub check_options {
 
@@ -463,8 +515,8 @@ sub check_options {
     # X11 color names for default settings that seemed to look ok
     # (these color names are only used for programming clarity; the hex
     # numbers are actually written)
+##  use constant SaddleBrown   => "#8B4513";
     use constant ForestGreen   => "#228B22";
-    use constant SaddleBrown   => "#8B4513";
     use constant magenta4      => "#8B008B";
     use constant IndianRed3    => "#CD5555";
     use constant DeepSkyBlue4  => "#00688B";
@@ -498,7 +550,8 @@ sub check_options {
     # setup property lookup tables for tokens based on their short names
     # every token type has a short name, and will use these tables
     # to do the html markup
-    while ( my ( $short_name, $long_name ) = each %short_to_long_names ) {
+    foreach my $short_name ( keys %short_to_long_names ) {
+        my $long_name = $short_to_long_names{$short_name};
         $html_color{$short_name}  = $rOpts->{"html-color-$long_name"};
         $html_bold{$short_name}   = $rOpts->{"html-bold-$long_name"};
         $html_italic{$short_name} = $rOpts->{"html-italic-$long_name"};
@@ -511,6 +564,7 @@ sub check_options {
     }
 
     # make sure user gives a file name after -css
+    $css_linkname = EMPTY_STRING;
     if ( defined( $rOpts->{'html-linked-style-sheet'} ) ) {
         $css_linkname = $rOpts->{'html-linked-style-sheet'};
         if ( $css_linkname =~ /^-/ ) {
@@ -521,7 +575,8 @@ sub check_options {
     # check for conflict
     if ( $css_linkname && $rOpts->{'nohtml-style-sheets'} ) {
         $rOpts->{'nohtml-style-sheets'} = 0;
-        warning("You can't specify both -css and -nss; -nss ignored\n");
+        Perl::Tidy::Warn(
+            "You can't specify both -css and -nss; -nss ignored\n");
     }
 
     # write a style sheet file if necessary
@@ -533,26 +588,29 @@ sub check_options {
         # forgets to specify the style sheet, like this:
         #    perltidy -html -css myfile1.pl myfile2.pl
         # This would cause myfile1.pl to parsed as the style sheet by GetOpts
-        my $css_filename = $css_linkname;
-        unless ( -e $css_filename ) {
-            write_style_sheet_file($css_filename);
+        if ( !-e $css_linkname ) {
+            write_style_sheet_file($css_linkname);
         }
     }
-    $missing_html_entities = 1 unless $rOpts->{'html-entities'};
+    $rOpts_html_entities = $rOpts->{'html-entities'};
     return;
-}
+} ## end sub check_options
 
 sub write_style_sheet_file {
 
-    my $css_filename = shift;
-    my $fh;
-    unless ( $fh = IO::File->new("> $css_filename") ) {
-        Perl::Tidy::Die("can't open $css_filename: $!\n");
+    my $filename = shift;
+    my $fh       = IO::File->new("> $filename");
+    if ( !$fh ) {
+        Perl::Tidy::Die("can't open $filename: $OS_ERROR\n");
     }
     write_style_sheet_data($fh);
-    close_object($fh);
+    if ( $fh->can('close') && $filename ne '-' && !ref($filename) ) {
+        $fh->close()
+          or
+          Perl::Tidy::Warn("can't close style sheet '$filename' : $OS_ERROR\n");
+    }
     return;
-}
+} ## end sub write_style_sheet_file
 
 sub write_style_sheet_data {
 
@@ -569,10 +627,10 @@ sub write_style_sheet_data {
     $fh->print(<<"EOM");
 /* default style sheet generated by perltidy */
 body {background: $bg_color; color: $text_color}
-pre { color: $text_color; 
+pre { color: $text_color;
       background: $pre_bg_color;
       font-family: courier;
-    } 
+    }
 
 EOM
 
@@ -580,7 +638,7 @@ EOM
         my $long_name = $short_to_long_names{$short_name};
 
         my $abbrev = '.' . $short_name;
-        if ( length($short_name) == 1 ) { $abbrev .= ' ' }    # for alignment
+        if ( length($short_name) == 1 ) { $abbrev .= SPACE }    # for alignment
         my $color = $html_color{$short_name};
         if ( !defined($color) ) { $color = $text_color }
         $fh->print("$abbrev \{ color: $color;");
@@ -595,7 +653,7 @@ EOM
         $fh->print("} /* $long_name */\n");
     }
     return;
-}
+} ## end sub write_style_sheet_data
 
 sub set_default_color {
 
@@ -604,7 +662,7 @@ sub set_default_color {
     if ( $rOpts->{$key} ) { $color = $rOpts->{$key} }
     $rOpts->{$key} = check_RGB($color);
     return;
-}
+} ## end sub set_default_color
 
 sub check_RGB {
 
@@ -613,7 +671,7 @@ sub check_RGB {
     my ($color) = @_;
     if ( $color =~ /^[0-9a-fA-F]{6,6}$/ ) { $color = "#$color" }
     return $color;
-}
+} ## end sub check_RGB
 
 sub set_default_properties {
     my ( $short_name, $color, $bold, $italic ) = @_;
@@ -621,11 +679,11 @@ sub set_default_properties {
     set_default_color( "html-color-$short_to_long_names{$short_name}", $color );
     my $key;
     $key           = "html-bold-$short_to_long_names{$short_name}";
-    $rOpts->{$key} = ( defined $rOpts->{$key} ) ? $rOpts->{$key} : $bold;
+    $rOpts->{$key} = defined( $rOpts->{$key} ) ? $rOpts->{$key} : $bold;
     $key           = "html-italic-$short_to_long_names{$short_name}";
-    $rOpts->{$key} = ( defined $rOpts->{$key} ) ? $rOpts->{$key} : $italic;
+    $rOpts->{$key} = defined( $rOpts->{$key} ) ? $rOpts->{$key} : $italic;
     return;
-}
+} ## end sub set_default_properties
 
 sub pod_to_html {
 
@@ -634,18 +692,17 @@ sub pod_to_html {
     # return 1 if success, 0 otherwise
     my ( $self, $pod_string, $css_string, $toc_string, $rpre_string_stack ) =
       @_;
-    my $input_file   = $self->{_input_file};
     my $title        = $self->{_title};
     my $success_flag = 0;
 
     # don't try to use pod2html if no pod
-    unless ($pod_string) {
+    if ( !$pod_string ) {
         return $success_flag;
     }
 
     # Pod::Html requires a real temporary filename
     my ( $fh_tmp, $tmpfile ) = File::Temp::tempfile();
-    unless ($fh_tmp) {
+    if ( !$fh_tmp ) {
         Perl::Tidy::Warn(
             "unable to open temporary file $tmpfile; cannot use pod2html\n");
         return $success_flag;
@@ -659,7 +716,12 @@ sub pod_to_html {
 
     # write the pod text to the temporary file
     $fh_tmp->print($pod_string);
-    $fh_tmp->close();
+
+    if ( !$fh_tmp->close() ) {
+        Perl::Tidy::Warn(
+            "unable to close temporary file $tmpfile; cannot use pod2html\n");
+        return $success_flag;
+    }
 
     # Hand off the pod to pod2html.
     # Note that we can use the same temporary filename for input and output
@@ -673,19 +735,25 @@ sub pod_to_html {
         # "backlink=s", "cachedir=s", "htmlroot=s", "libpods=s",
         # "podpath=s", "podroot=s"
         # Note: -css=s is handled by perltidy itself
-        foreach my $kw (qw(backlink cachedir htmlroot libpods podpath podroot))
+        foreach
+          my $kw (qw( backlink cachedir htmlroot libpods podpath podroot ))
         {
             if ( $rOpts->{$kw} ) { push @args, "--$kw=$rOpts->{$kw}" }
         }
 
         # Toggle switches; these have extra leading 'pod'
         # "header!", "index!", "recurse!", "quiet!", "verbose!"
-        foreach my $kw (qw(podheader podindex podrecurse podquiet podverbose)) {
+        foreach
+          my $kw (qw( podheader podindex podrecurse podquiet podverbose ))
+        {
             my $kwd = $kw;    # allows us to strip 'pod'
-            if ( $rOpts->{$kw} ) { $kwd =~ s/^pod//; push @args, "--$kwd" }
+            if    ( $rOpts->{$kw} ) { $kwd =~ s/^pod//; push @args, "--$kwd" }
             elsif ( defined( $rOpts->{$kw} ) ) {
                 $kwd =~ s/^pod//;
                 push @args, "--no$kwd";
+            }
+            else {
+                # user did not set this keyword
             }
         }
 
@@ -696,19 +764,19 @@ sub pod_to_html {
         # Must clean up if pod2html dies (it can);
         # Be careful not to overwrite callers __DIE__ routine
         local $SIG{__DIE__} = sub {
-            unlink $tmpfile if -e $tmpfile;
+            unlink($tmpfile) if -e $tmpfile;
             Perl::Tidy::Die( $_[0] );
         };
 
-        pod2html(@args);
+        Pod::Html::pod2html(@args);
     }
     $fh_tmp = IO::File->new( $tmpfile, 'r' );
-    unless ($fh_tmp) {
+    if ( !$fh_tmp ) {
 
         # this error shouldn't happen ... we just used this filename
         Perl::Tidy::Warn(
             "unable to open temporary file $tmpfile; cannot use pod2html\n");
-        goto RETURN;
+        return $success_flag;
     }
 
     my $html_fh = $self->{_html_fh};
@@ -719,26 +787,25 @@ sub pod_to_html {
 
     # This routine will write the html selectively and store the toc
     my $html_print = sub {
-        foreach (@_) {
-            $html_fh->print($_) unless ($no_print);
-            if ($in_toc) { push @toc, $_ }
+        foreach my $line (@_) {
+            $html_fh->print($line) unless ($no_print);
+            if ($in_toc) { push @toc, $line }
         }
-    };
+        return;
+    }; ## end $html_print = sub
 
     # loop over lines of html output from pod2html and merge in
     # the necessary perltidy html sections
     my ( $saw_body, $saw_index, $saw_body_end );
 
-    my $timestamp = "";
+    my $timestamp = EMPTY_STRING;
     if ( $rOpts->{'timestamp'} ) {
         my $date = localtime;
         $timestamp = "on $date";
     }
-    while ( my $line = $fh_tmp->getline() ) {
+    while ( defined( my $line = $fh_tmp->getline() ) ) {
 
         if ( $line =~ /^\s*<html>\s*$/i ) {
-            ##my $date = localtime;
-            ##$html_print->("<!-- Generated by perltidy on $date -->\n");
             $html_print->("<!-- Generated by perltidy $timestamp -->\n");
             $html_print->($line);
         }
@@ -800,11 +867,10 @@ sub pod_to_html {
             if ($toc_string) {
                 $html_print->("<hr />\n") if $rOpts->{'frames'};
                 $html_print->("<h2>Code Index:</h2>\n");
-                ##my @toc = map { $_ .= "\n" } split /\n/, $toc_string;
-                my @toc = map { $_ . "\n" } split /\n/, $toc_string;
-                $html_print->(@toc);
+                my @toc_st = split /^/, $toc_string;
+                $html_print->(@toc_st);
             }
-            $in_toc   = "";
+            $in_toc   = EMPTY_STRING;
             $no_print = 0;
         }
 
@@ -825,11 +891,10 @@ sub pod_to_html {
                 if ($toc_string) {
                     $html_print->("<hr />\n") if $rOpts->{'frames'};
                     $html_print->("<h2>Code Index:</h2>\n");
-                    ##my @toc = map { $_ .= "\n" } split /\n/, $toc_string;
-                    my @toc = map { $_ . "\n" } split /\n/, $toc_string;
-                    $html_print->(@toc);
+                    my @toc_st = split /^/, $toc_string;
+                    $html_print->(@toc_st);
                 }
-                $in_toc   = "";
+                $in_toc   = EMPTY_STRING;
                 $ul_level = 0;
                 $no_print = 0;
             }
@@ -842,7 +907,7 @@ sub pod_to_html {
 
             # Intermingle code and pod sections if we saw multiple =cut's.
             if ( $self->{_pod_cut_count} > 1 ) {
-                my $rpre_string = shift( @{$rpre_string_stack} );
+                my $rpre_string = shift @{$rpre_string_stack};
                 if ( ${$rpre_string} ) {
                     $html_print->('<pre>');
                     $html_print->( ${$rpre_string} );
@@ -873,44 +938,47 @@ sub pod_to_html {
         elsif ( $line =~ /^\s*<\/body>\s*$/i ) {
             $saw_body_end = 1;
             if ( @{$rpre_string_stack} ) {
-                unless ( $self->{_pod_cut_count} > 1 ) {
+                if ( $self->{_pod_cut_count} <= 1 ) {
                     $html_print->('<hr />');
                 }
-                while ( my $rpre_string = shift( @{$rpre_string_stack} ) ) {
+                while ( @{$rpre_string_stack} ) {
+                    my $rpre_string = shift @{$rpre_string_stack};
                     $html_print->('<pre>');
                     $html_print->( ${$rpre_string} );
                     $html_print->('</pre>');
-                }
+                } ## end while ( @{$rpre_string_stack...})
             }
             $html_print->($line);
         }
         else {
             $html_print->($line);
         }
-    }
+    } ## end while ( defined( my $line...))
 
     $success_flag = 1;
-    unless ($saw_body) {
+    if ( !$saw_body ) {
         Perl::Tidy::Warn("Did not see <body> in pod2html output\n");
         $success_flag = 0;
     }
-    unless ($saw_body_end) {
+    if ( !$saw_body_end ) {
         Perl::Tidy::Warn("Did not see </body> in pod2html output\n");
         $success_flag = 0;
     }
-    unless ($saw_index) {
+    if ( !$saw_index ) {
         Perl::Tidy::Warn("Did not find INDEX END in pod2html output\n");
         $success_flag = 0;
     }
 
-  RETURN:
-    close_object($html_fh);
+    if ( $html_fh->can('close') ) {
+        $html_fh->close();
+    }
 
     # note that we have to unlink tmpfile before making frames
     # because the tmpfile may be one of the names used for frames
     if ( -e $tmpfile ) {
-        unless ( unlink($tmpfile) ) {
-            Perl::Tidy::Warn("couldn't unlink temporary file $tmpfile: $!\n");
+        if ( !unlink($tmpfile) ) {
+            Perl::Tidy::Warn(
+                "couldn't unlink temporary file $tmpfile: $OS_ERROR\n");
             $success_flag = 0;
         }
     }
@@ -919,7 +987,7 @@ sub pod_to_html {
         $self->make_frame( \@toc );
     }
     return $success_flag;
-}
+} ## end sub pod_to_html
 
 sub make_frame {
 
@@ -929,7 +997,6 @@ sub make_frame {
     #  $html_filename contains the no-frames html output
     #  $rtoc is a reference to an array with the table of contents
     my ( $self, $rtoc ) = @_;
-    my $input_file    = $self->{_input_file};
     my $html_filename = $self->{_html_file};
     my $toc_filename  = $self->{_toc_filename};
     my $src_filename  = $self->{_src_filename};
@@ -937,7 +1004,7 @@ sub make_frame {
     $title = escape_html($title);
 
     # FUTURE input parameter:
-    my $top_basename = "";
+    my $top_basename = EMPTY_STRING;
 
     # We need to produce 3 html files:
     # 1. - the table of contents
@@ -945,34 +1012,54 @@ sub make_frame {
     # 3. - the frame which contains them
 
     # get basenames for relative links
-    my ( $toc_basename, $toc_path ) = fileparse($toc_filename);
-    my ( $src_basename, $src_path ) = fileparse($src_filename);
+    my ( $toc_basename, $toc_path_uu ) = fileparse($toc_filename);
+    my ( $src_basename, $src_path_uu ) = fileparse($src_filename);
 
     # 1. Make the table of contents panel, with appropriate changes
     # to the anchor names
-    my $src_frame_name = 'SRC';
-    my $first_anchor =
-      write_toc_html( $title, $toc_filename, $src_basename, $rtoc,
-        $src_frame_name );
+    my $src_frame_name  = 'SRC';
+    my $first_anchor_uu = write_toc_html(
+        {
+            title          => $title,
+            toc_filename   => $toc_filename,
+            src_basename   => $src_basename,
+            rtoc           => $rtoc,
+            src_frame_name => $src_frame_name,
+        }
+    );
 
     # 2. The current .html filename is renamed to be the contents panel
     rename( $html_filename, $src_filename )
-      or Perl::Tidy::Die("Cannot rename $html_filename to $src_filename:$!\n");
+      or Perl::Tidy::Die(
+        "Cannot rename $html_filename to $src_filename: $OS_ERROR\n");
 
     # 3. Then use the original html filename for the frame
     write_frame_html(
-        $title,        $html_filename, $top_basename,
-        $toc_basename, $src_basename,  $src_frame_name
+        {
+            title          => $title,
+            frame_filename => $html_filename,
+            top_basename   => $top_basename,
+            toc_basename   => $toc_basename,
+            src_basename   => $src_basename,
+            src_frame_name => $src_frame_name,
+        }
     );
     return;
-}
+} ## end sub make_frame
 
 sub write_toc_html {
 
     # write a separate html table of contents file for frames
-    my ( $title, $toc_filename, $src_basename, $rtoc, $src_frame_name ) = @_;
+    my ($rarg_hash) = @_;
+
+    my $title          = $rarg_hash->{title};
+    my $toc_filename   = $rarg_hash->{toc_filename};
+    my $src_basename   = $rarg_hash->{src_basename};
+    my $rtoc           = $rarg_hash->{rtoc};
+    my $src_frame_name = $rarg_hash->{src_frame_name};
+
     my $fh = IO::File->new( $toc_filename, 'w' )
-      or Perl::Tidy::Die("Cannot open $toc_filename:$!\n");
+      or Perl::Tidy::Die("Cannot open $toc_filename: $OS_ERROR\n");
     $fh->print(<<EOM);
 <html>
 <head>
@@ -982,9 +1069,9 @@ sub write_toc_html {
 <h1><a href=\"$src_basename#-top-" target="$src_frame_name">$title</a></h1>
 EOM
 
-    my $first_anchor =
+    my $first_anchor_uu =
       change_anchor_names( $rtoc, $src_basename, "$src_frame_name" );
-    $fh->print( join "", @{$rtoc} );
+    $fh->print( join EMPTY_STRING, @{$rtoc} );
 
     $fh->print(<<EOM);
 </body>
@@ -992,18 +1079,23 @@ EOM
 EOM
 
     return;
-}
+} ## end sub write_toc_html
 
 sub write_frame_html {
 
     # write an html file to be the table of contents frame
-    my (
-        $title,        $frame_filename, $top_basename,
-        $toc_basename, $src_basename,   $src_frame_name
-    ) = @_;
+
+    my ($rarg_hash) = @_;
+
+    my $title          = $rarg_hash->{title};
+    my $frame_filename = $rarg_hash->{frame_filename};
+    my $top_basename   = $rarg_hash->{top_basename};
+    my $toc_basename   = $rarg_hash->{toc_basename};
+    my $src_basename   = $rarg_hash->{src_basename};
+    my $src_frame_name = $rarg_hash->{src_frame_name};
 
     my $fh = IO::File->new( $frame_filename, 'w' )
-      or Perl::Tidy::Die("Cannot open $toc_basename:$!\n");
+      or Perl::Tidy::Die("Cannot open $toc_basename: $OS_ERROR\n");
 
     $fh->print(<<EOM);
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN"
@@ -1049,7 +1141,7 @@ EOM
 </html>
 EOM
     return;
-}
+} ## end sub write_frame_html
 
 sub change_anchor_names {
 
@@ -1069,11 +1161,11 @@ sub change_anchor_names {
             my $post = $5;
             my $href = "$filename#$name";
             $line = "$pre<a href=\"$href\" target=\"$target\">$post\n";
-            unless ($first_anchor) { $first_anchor = $href }
+            if ( !$first_anchor ) { $first_anchor = $href }
         }
     }
     return $first_anchor;
-}
+} ## end sub change_anchor_names
 
 sub close_html_file {
     my $self = shift;
@@ -1088,10 +1180,11 @@ sub close_html_file {
     # Path 1: finish up if in -pre mode
     # ---------------------------------
     if ( $rOpts->{'html-pre-only'} ) {
-        $html_fh->print( <<"PRE_END");
+        $html_fh->print(<<"PRE_END");
 </pre>
 PRE_END
-        close_object($html_fh);
+        $html_fh->close()
+          if ( $html_fh->can('close') );
         return;
     }
 
@@ -1114,20 +1207,25 @@ PRE_END
     my $css_string;
     my $fh_css = Perl::Tidy::IOScalar->new( \$css_string, 'w' );
 
-    # use css linked to another file
+    # use css linked to another file,
     if ( $rOpts->{'html-linked-style-sheet'} ) {
         $fh_css->print(
             qq(<link rel="stylesheet" href="$css_linkname" type="text/css" />));
     }
 
-    # use css embedded in this file
-    elsif ( !$rOpts->{'nohtml-style-sheets'} ) {
-        $fh_css->print( <<'ENDCSS');
+    # or no css,
+    elsif ( $rOpts->{'nohtml-style-sheets'} ) {
+
+    }
+
+    # or use css embedded in this file
+    else {
+        $fh_css->print(<<'ENDCSS');
 <style type="text/css">
 <!--
 ENDCSS
         write_style_sheet_data($fh_css);
-        $fh_css->print( <<"ENDCSS");
+        $fh_css->print(<<"ENDCSS");
 -->
 </style>
 ENDCSS
@@ -1150,13 +1248,13 @@ ENDCSS
     # --------------------------------------------------
     my $input_file = $self->{_input_file};
     my $title      = escape_html($input_file);
-    my $timestamp  = "";
+    my $timestamp  = EMPTY_STRING;
     if ( $rOpts->{'timestamp'} ) {
         my $date = localtime;
         $timestamp = "on $date";
     }
-    $html_fh->print( <<"HTML_START");
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    $html_fh->print(<<"HTML_START");
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <!-- Generated by perltidy $timestamp -->
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -1167,21 +1265,21 @@ HTML_START
     # output the css, if used
     if ($css_string) {
         $html_fh->print($css_string);
-        $html_fh->print( <<"ENDCSS");
+        $html_fh->print(<<"ENDCSS");
 </head>
 <body>
 ENDCSS
     }
     else {
 
-        $html_fh->print( <<"HTML_START");
+        $html_fh->print(<<"HTML_START");
 </head>
 <body bgcolor=\"$rOpts->{'html-color-background'}\" text=\"$rOpts->{'html-color-punctuation'}\">
 HTML_START
     }
 
     $html_fh->print("<a name=\"-top-\"></a>\n");
-    $html_fh->print( <<"EOM");
+    $html_fh->print(<<"EOM");
 <h1>$title</h1>
 EOM
 
@@ -1196,7 +1294,7 @@ EOM
     # copy the pre section(s)
     my $fname_comment = $input_file;
     $fname_comment =~ s/--+/-/g;    # protect HTML comment tags
-    $html_fh->print( <<"END_PRE");
+    $html_fh->print(<<"END_PRE");
 <hr />
 <!-- contents of filename: $fname_comment -->
 <pre>
@@ -1207,20 +1305,20 @@ END_PRE
     }
 
     # and finish the html page
-    $html_fh->print( <<"HTML_END");
+    $html_fh->print(<<"HTML_END");
 </pre>
 </body>
 </html>
 HTML_END
-    close_object($html_fh);
+    $html_fh->close()
+      if ( $html_fh->can('close') );
 
     if ( $rOpts->{'frames'} ) {
-        ##my @toc = map { $_ .= "\n" } split /\n/, ${$rtoc_string};
-        my @toc = map { $_ . "\n" } split /\n/, ${$rtoc_string};
+        my @toc = split /^/, ${$rtoc_string};
         $self->make_frame( \@toc );
     }
     return;
-}
+} ## end sub close_html_file
 
 sub markup_tokens {
     my ( $self, $rtokens, $rtoken_type, $rlevels ) = @_;
@@ -1228,7 +1326,7 @@ sub markup_tokens {
     my $rlast_level    = $self->{_rlast_level};
     my $rpackage_stack = $self->{_rpackage_stack};
 
-    for ( my $j = 0 ; $j < @{$rtoken_type} ; $j++ ) {
+    foreach my $j ( 0 .. @{$rtoken_type} - 1 ) {
         $type  = $rtoken_type->[$j];
         $token = $rtokens->[$j];
         $level = $rlevels->[$j];
@@ -1240,14 +1338,14 @@ sub markup_tokens {
         # blocks and go out of scope when we leave the block.
         #-------------------------------------------------------
         if ( $level > ${$rlast_level} ) {
-            unless ( $rpackage_stack->[ $level - 1 ] ) {
+            if ( !$rpackage_stack->[ $level - 1 ] ) {
                 $rpackage_stack->[ $level - 1 ] = 'main';
             }
             $rpackage_stack->[$level] = $rpackage_stack->[ $level - 1 ];
         }
         elsif ( $level < ${$rlast_level} ) {
             my $package = $rpackage_stack->[$level];
-            unless ($package) { $package = 'main' }
+            if ( !$package ) { $package = 'main' }
 
             # if we change packages due to a nesting change, we
             # have to make an entry in the toc
@@ -1255,23 +1353,27 @@ sub markup_tokens {
                 $self->add_toc_item( $package, 'package' );
             }
         }
+        else {
+            ## level unchanged
+        }
         ${$rlast_level} = $level;
 
         #-------------------------------------------------------
         # Intercept a sub name here; split it
         # into keyword 'sub' and sub name; and add an
         # entry in the toc
+        # Fix for c250: switch from 'i' to 'S'
         #-------------------------------------------------------
-        if ( $type eq 'i' && $token =~ /^(sub\s+)(\w.*)$/ ) {
+        if ( $type eq 'S' && $token =~ /^(\w+\s+)(\w.*)$/ ) {
             $token = $self->markup_html_element( $1, 'k' );
             push @colored_tokens, $token;
             $token = $2;
-            $type  = 'M';
+            $type  = 'S';
 
             # but don't include sub declarations in the toc;
-            # these wlll have leading token types 'i;'
-            my $signature = join "", @{$rtoken_type};
-            unless ( $signature =~ /^i;/ ) {
+            # these will have leading token types 'i;'
+            my $signature = join EMPTY_STRING, @{$rtoken_type};
+            if ( $signature !~ /^i;/ ) {
                 my $subname = $token;
                 $subname =~ s/[\s\(].*$//; # remove any attributes and prototype
                 $self->add_toc_item( $subname, 'sub' );
@@ -1283,7 +1385,8 @@ sub markup_tokens {
         # into keyword 'package' and name; add to the toc,
         # and update the package stack
         #-------------------------------------------------------
-        if ( $type eq 'i' && $token =~ /^(package\s+)(\w.*)$/ ) {
+        # Fix for c250: switch from 'i' to 'P' and allow 'class' or 'package'
+        if ( $type eq 'P' && $token =~ /^(\w+\s+)(\w.*)$/ ) {
             $token = $self->markup_html_element( $1, 'k' );
             push @colored_tokens, $token;
             $token = $2;
@@ -1296,7 +1399,7 @@ sub markup_tokens {
         push @colored_tokens, $token;
     }
     return ( \@colored_tokens );
-}
+} ## end sub markup_tokens
 
 sub markup_html_element {
     my ( $self, $token, $type ) = @_;
@@ -1329,12 +1432,12 @@ sub markup_html_element {
         if ( $html_bold{$short_name} )   { $token = "<b>$token</b>" }
     }
     return $token;
-}
+} ## end sub markup_html_element
 
 sub escape_html {
 
     my $token = shift;
-    if ($missing_html_entities) {
+    if ( $missing_html_entities || !$rOpts_html_entities ) {
         $token =~ s/\&/&amp;/g;
         $token =~ s/\</&lt;/g;
         $token =~ s/\>/&gt;/g;
@@ -1344,7 +1447,7 @@ sub escape_html {
         HTML::Entities::encode_entities($token);
     }
     return $token;
-}
+} ## end sub escape_html
 
 sub finish_formatting {
 
@@ -1352,7 +1455,7 @@ sub finish_formatting {
     my $self = shift;
     $self->close_html_file();
     return;
-}
+} ## end sub finish_formatting
 
 sub write_line {
 
@@ -1375,11 +1478,11 @@ sub write_line {
             $html_line = $1;
         }
         else {
-            $html_line = "";
+            $html_line = EMPTY_STRING;
         }
         my ($rcolored_tokens) =
           $self->markup_tokens( $rtokens, $rtoken_type, $rlevels );
-        $html_line .= join '', @{$rcolored_tokens};
+        $html_line .= join EMPTY_STRING, @{$rcolored_tokens};
     }
 
     # markup line of non-code..
@@ -1389,6 +1492,8 @@ sub write_line {
         elsif ( $line_type eq 'HERE_END' )   { $line_character = 'h' }
         elsif ( $line_type eq 'FORMAT' )     { $line_character = 'H' }
         elsif ( $line_type eq 'FORMAT_END' ) { $line_character = 'h' }
+        elsif ( $line_type eq 'SKIP' )       { $line_character = 'H' }
+        elsif ( $line_type eq 'SKIP_END' )   { $line_character = 'h' }
         elsif ( $line_type eq 'SYSTEM' )     { $line_character = 'c' }
         elsif ( $line_type eq 'END_START' ) {
             $line_character = 'k';
@@ -1399,7 +1504,10 @@ sub write_line {
             $self->add_toc_item( '__DATA__', '__DATA__' );
         }
         elsif ( $line_type =~ /^POD/ ) {
-            $line_character = 'P';
+
+            # fix for c250: changed 'P' to 'pd' here and in %token_short_names
+            # to allow use of 'P' as new package token type
+            $line_character = 'pd';
             if ( $rOpts->{'pod2html'} ) {
                 my $html_pod_fh = $self->{_html_pod_fh};
                 if ( $line_type eq 'POD_START' ) {
@@ -1432,7 +1540,7 @@ EOM
                     # otherwise, just clear the current string and start
                     # over
                     else {
-                        ${$rpre_string} = "";
+                        ${$rpre_string} = EMPTY_STRING;
                         $html_pod_fh->print("\n");
                     }
                 }
@@ -1451,16 +1559,17 @@ EOM
     # add the line number if requested
     if ( $rOpts->{'html-line-numbers'} ) {
         my $extra_space =
-            ( $line_number < 10 )   ? "   "
-          : ( $line_number < 100 )  ? "  "
-          : ( $line_number < 1000 ) ? " "
-          :                           "";
-        $html_line = $extra_space . $line_number . " " . $html_line;
+            ( $line_number < 10 )   ? SPACE x 3
+          : ( $line_number < 100 )  ? SPACE x 2
+          : ( $line_number < 1000 ) ? SPACE
+          :                           EMPTY_STRING;
+        $html_line = $extra_space . $line_number . SPACE . $html_line;
     }
 
     # write the line
     $html_pre_fh->print("$html_line\n");
     return;
-}
-1;
+} ## end sub write_line
 
+} ## end package Perl::Tidy::HtmlWriter
+1;
