@@ -24,7 +24,7 @@ my @Tests = (
         Source   => <<'EOF',
 print "ConsolePrintCheck \n";
 EOF
-        ExpectedSource => undef,    # no code change expected
+        ExpectedSource           => undef,    # no code change expected
         ExpectedMessageSubstring => "Use \$Self->Print(\"Hello World\\n\") in console commands instead of \"print\".",
     },
 );

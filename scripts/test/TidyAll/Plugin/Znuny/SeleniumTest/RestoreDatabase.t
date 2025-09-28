@@ -31,7 +31,7 @@ $Kernel::OM->ObjectParamAdd(
 my $SeleniumObject = $Kernel::OM->Get('Kernel::System::UnitTest::Selenium');
 
 EOF
-        ExpectedSource => undef,
+        ExpectedSource           => undef,
         ExpectedMessageSubstring =>
             'Using Kernel::System::UnitTest::Helper with option RestoreDatabase within Selenium tests is most likely a mistake',
     },

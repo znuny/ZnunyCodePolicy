@@ -69,7 +69,7 @@ EOF
         ExpectedMessageSubstring => 'Found 1 unfiltered in-template tags',
         ExpectedSource           => '[% Data.foo || html %]',                # still malformed, just differently!
         Filename                 => 'Template.tt',
-        Plugins => ['TidyAll::Plugin::Znuny::TT::ObligatoryFilter'],
+        Plugins                  => ['TidyAll::Plugin::Znuny::TT::ObligatoryFilter'],
     },
     {
         Name     => 'Malformed template: no end tag',

@@ -27,7 +27,7 @@ my @Tests = (
         <Navigation>Frontend::Admin::ModuleRegistration</Navigation>
     </Setting>
 EOF
-        ExpectedSource => undef,
+        ExpectedSource           => undef,
         ExpectedMessageSubstring =>
             'Found frontend module registration but no ACLKeysLevel3::Actions registration for the following',
     },

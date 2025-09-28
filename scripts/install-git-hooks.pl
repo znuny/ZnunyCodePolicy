@@ -29,8 +29,8 @@ my $Directory = getcwd;
 # install hook
 unlink File::Spec->catfile( $Directory, '.git', 'hooks', 'pre-commit' );
 symlink(
-    File::Spec->catfile( $RealBin, '..', 'Kernel', 'TidyAll', 'git-hooks', 'pre-commit.pl' ),
-    File::Spec->catfile( $Directory, '.git', 'hooks', 'pre-commit' )
+    File::Spec->catfile( $RealBin,   '..',   'Kernel', 'TidyAll', 'git-hooks', 'pre-commit.pl' ),
+    File::Spec->catfile( $Directory, '.git', 'hooks',  'pre-commit' )
 );
 
 print "Installed git commit hooks in $Directory.\n\n";
