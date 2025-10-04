@@ -223,6 +223,8 @@ select = var/git/hooks/*-receive
 ignore = Kernel/Config.pm Kernel/Config/**/ZZZ*.pm
 ignore = **/*.yml.dist
 ignore = var/httpd/htdocs/common/**/*.css
+ignore = var/httpd/htdocs/skins/**/**/scss/mixins/*.scss
+ignore = var/httpd/htdocs/skins/**/**/scss/utilities/*.scss
 ignore = scripts/auto_build/spec/templates/**/*
 only_modes = cli ci editor commit
 
