@@ -1235,6 +1235,7 @@ sub GetSupportedFrameworkVersions {
         '7.0' => 1,
         '7.1' => 1,
         '7.2' => 1,
+        '7.3' => 1,
     );
 
     return \%SupportedFrameworkVersions;
