@@ -175,6 +175,7 @@
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Whitespace/TrailingWhitespace.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/XML/ConfigDescription.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/XML/ConfigSyntax.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/XML/Configuration/DaemonModuleCheck.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/XML/Configuration/Navigation.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/XML/Configuration/UnitTestBlacklist.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/XML/Configuration/XSDValidator.pm"/>
@@ -253,6 +254,7 @@
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/TT/ObligatoryFilter.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/TT/TranslationFilter.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/UnitTest/Path.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/XML/Configuration/DaemonModuleCheck.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/XML/Configuration/Navigation.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/XML/Configuration/XSDValidator.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/XML/Database/KeyLength.t"/>

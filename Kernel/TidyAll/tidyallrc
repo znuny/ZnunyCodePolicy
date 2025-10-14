@@ -572,6 +572,9 @@ select = **/*.{xml,xsd}
 [+TidyAll::Plugin::Znuny::XML::LintWithOurParsers]
 select = ;**/*.xml
 
+[+TidyAll::Plugin::Znuny::XML::Configuration::DaemonModuleCheck]
+select = Kernel/Config/**/*.xml
+
 [+TidyAll::Plugin::Znuny::XML::Configuration::Navigation]
 select = Kernel/Config/**/*.xml
 
