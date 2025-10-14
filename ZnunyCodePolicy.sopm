@@ -119,6 +119,7 @@
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/ForeachToFor.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/ForMy.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/HashObjectFunctionCall.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/HTMLUtils.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/ISA.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/IsIntegerVariableCheck.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Perl/LayoutObject.pm"/>
@@ -228,6 +229,7 @@
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Misc/TicketSearch.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/CacheCleanup.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/HashObjectFunctionCall.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/HTMLUtils.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/IsIntegerVariableCheck.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/NoExitInConsoleCommands.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/ObjectDependencies.t"/>

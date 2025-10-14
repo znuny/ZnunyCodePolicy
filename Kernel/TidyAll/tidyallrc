@@ -302,6 +302,10 @@ ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
 select = **/*.{pl,pm,t}
 ignore = Custom/Kernel/**/*
 
+[+TidyAll::Plugin::Znuny::Perl::HTMLUtils]
+select = **/*.{pl,pm,t}
+ignore = Custom/Kernel/**/*
+
 [+TidyAll::Plugin::Znuny::Perl::ISA]
 select = **/*.{pl,pm,psgi,t}
 select = Kernel/Config.pm.dist
