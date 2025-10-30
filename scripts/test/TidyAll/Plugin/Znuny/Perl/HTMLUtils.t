@@ -30,10 +30,11 @@ EOF
         ExpectedMessageSubstring => undef,
     },
     {
-        Name     => 'Direct HTMLUtils DocumentComplete call',
+        Name     => 'HTMLUtilsObject DocumentComplete call',
         Filename => 'Kernel/System/Example.pm',
         Plugins  => [qw(TidyAll::Plugin::Znuny::Perl::HTMLUtils)],
         Source   => <<'EOF',
+    my $HTMLUtilsObject = $Kernel::OM->Get('Kernel::System::HTMLUtils');
     my $CompleteHTML = $HTMLUtilsObject->DocumentComplete(
         String   => $String,  # required
         Charset  => $Charset, # required
@@ -66,6 +67,89 @@ EOF
 EOF
         ExpectedSource           => undef,
         ExpectedMessageSubstring => undef,
+    },
+    {
+        Name     => 'HTMLUtils DocumentComplete with UserType parameter (multiline) - should pass',
+        Filename => 'Kernel/System/Example.pm',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::Perl::HTMLUtils)],
+        Source   => <<'EOF',
+    $PartData{Content} = $HTMLUtilsObject->DocumentComplete(
+        String   => $HTMLContent,
+        Charset  => 'utf-8',
+        UserType => $Param{UserType},
+    );
+EOF
+        ExpectedSource           => undef,
+        ExpectedMessageSubstring => undef,
+    },
+    {
+        Name     => 'HTMLUtils DocumentComplete without UserType parameter (multiline) - should fail',
+        Filename => 'Kernel/System/Example.pm',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::Perl::HTMLUtils)],
+        Source   => <<'EOF',
+    $PartData{Content} = $HTMLUtilsObject->DocumentComplete(
+        String   => $HTMLContent,
+        Charset  => 'utf-8',
+    );
+EOF
+        ExpectedSource           => undef,
+        ExpectedMessageSubstring => 'Found calls to Kernel::System::HTMLUtils::DocumentComplete',
+    },
+    {
+        Name     => 'HTMLUtils DocumentComplete with nofilter comment - should pass',
+        Filename => 'Kernel/System/Example.pm',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::Perl::HTMLUtils)],
+        Source   => <<'EOF',
+    ## nofilter(TidyAll::Plugin::Znuny::Perl::HTMLUtils)
+    my $HTMLUtilsObject = $Kernel::OM->Get('Kernel::System::HTMLUtils');
+
+    $PartData{Content} = $HTMLUtilsObject->DocumentComplete(
+        String   => $HTMLContent,
+        Charset  => 'utf-8',
+    );
+EOF
+        ExpectedSource           => undef,
+        ExpectedMessageSubstring => undef,
+    },
+    {
+        Name     => 'Multiple DocumentComplete calls - should fail - test Line 3',
+        Filename => 'Kernel/System/Example.pm',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::Perl::HTMLUtils)],
+        Source   => <<'EOF',
+    my $HTMLUtilsObject = $Kernel::OM->Get('Kernel::System::HTMLUtils');
+
+    $PartData{Content} = $HTMLUtilsObject->DocumentComplete(
+        String   => $HTMLContent,
+        Charset  => 'utf-8',
+    );
+
+    $PartData{Content} = $HTMLUtilsObject->DocumentComplete(
+        String   => $HTMLContent,
+        Charset  => 'utf-8',
+    );
+EOF
+        ExpectedSource           => undef,
+        ExpectedMessageSubstring => 'Line 3',
+    },
+    {
+        Name     => 'Multiple DocumentComplete calls - should fail - test Line 8',
+        Filename => 'Kernel/System/Example.pm',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::Perl::HTMLUtils)],
+        Source   => <<'EOF',
+    my $HTMLUtilsObject = $Kernel::OM->Get('Kernel::System::HTMLUtils');
+
+    $PartData{Content} = $HTMLUtilsObject->DocumentComplete(
+        String   => $HTMLContent,
+        Charset  => 'utf-8',
+    );
+
+    $PartData{Content} = $HTMLUtilsObject->DocumentComplete(
+        String   => $HTMLContent,
+        Charset  => 'utf-8',
+    );
+EOF
+        ExpectedSource           => undef,
+        ExpectedMessageSubstring => 'Line 8',
     },
 );
 

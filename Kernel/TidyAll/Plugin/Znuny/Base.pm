@@ -153,6 +153,116 @@ sub IsPluginDisabled {
     return;
 }
 
+=head2 IsParameterInFunctionCall()
+
+Checks if a function call contains a specific parameter.
+Works with single-line and multi-line function calls.
+
+    my $HasParameter = $Self->IsParameterInFunctionCall(
+        Code          => $Code,
+        FunctionName  => 'DocumentComplete',
+        ParameterName => 'UserType',
+    );
+
+=cut
+
+sub IsParameterInFunctionCall {
+    my ( $Self, %Param ) = @_;
+
+    return 0 if !defined $Param{Code};
+    return 0 if !defined $Param{FunctionName};
+    return 0 if !defined $Param{ParameterName};
+
+    my $FunctionName  = quotemeta $Param{FunctionName};
+    my $ParameterName = quotemeta $Param{ParameterName};
+
+    # Find all function calls and check if EVERY SINGLE ONE has the parameter
+    my $Counter = 0;
+    my $HasParameter = 0;
+
+    LINE:
+    for my $Line ( split /\n/, $Param{Code} ) {
+        $Counter++;
+
+        # Skip comment lines
+        next LINE if $Line =~ m{^\s*\#}smx;
+
+        # Skip if no function call on this line
+        next LINE if $Line !~ m{\b$FunctionName\s*\(}m;
+
+        $HasParameter = 1;
+
+        # Extract this specific function call
+        my $FunctionBlock = $Self->ExtractFunctionCall(
+            Code         => $Param{Code},
+            StartLine    => $Counter,
+            FunctionName => $Param{FunctionName}
+        );
+
+        # If THIS function call doesn't have the parameter, return 0 immediately
+        my $ParameterName = $Param{ParameterName};
+        if ( $FunctionBlock !~ m{\Q$ParameterName\E\s*=>}m ) {
+            return 0;
+        }
+    }
+
+    # If we found function calls and ALL of them had the parameter, return 1
+    # If we found no function calls at all, return 0
+    return $HasParameter ? 1 : 0;
+}
+
+=head2 ExtractFunctionCall()
+
+Extracts a complete function call including all parameters across multiple lines.
+Returns the function call block as string.
+
+    my $FunctionBlock = $Self->ExtractFunctionCall(
+        Code         => $Code,
+        StartLine    => $LineNumber,
+        FunctionName => 'DocumentComplete',  # optional for validation
+    );
+
+=cut
+
+sub ExtractFunctionCall {
+    my ( $Self, %Param ) = @_;
+
+    return '' if !defined $Param{Code};
+    return '' if !defined $Param{StartLine};
+
+    my @Lines = split /\n/, $Param{Code};
+    my $FunctionBlock = '';
+    my $OpenParens = 0;
+    my $InFunction = 0;
+    my $FunctionName = $Param{FunctionName} ? quotemeta $Param{FunctionName} : '\w+';
+
+    for my $i ( $Param{StartLine} - 1 .. $#Lines ) {
+        my $Line = $Lines[$i];
+
+        # Start counting when we find the function call
+        if ( !$InFunction && $Line =~ m{\b$FunctionName\s*\(} ) {
+            $InFunction = 1;
+        }
+
+        next if !$InFunction;
+        $FunctionBlock .= $Line . "\n";
+
+        # Count opening and closing parentheses (ignore those in strings/comments)
+        my $TempLine = $Line;
+        $TempLine =~ s{#.*$}{};                    # Remove comments
+        $TempLine =~ s{'[^']*'}{QUOTED}g;          # Remove single quotes
+        $TempLine =~ s{"[^"]*"}{QUOTED}g;          # Remove double quotes
+
+        $OpenParens += () = $TempLine =~ /\(/g;
+        $OpenParens -= () = $TempLine =~ /\)/g;
+
+        # Function call is complete when parentheses are balanced
+        last if $OpenParens == 0;
+    }
+
+    return $FunctionBlock;
+}
+
 =head2 IsFrameworkVersionLessThan()
 
     Checks if the currently checked framework version is less than the given version.

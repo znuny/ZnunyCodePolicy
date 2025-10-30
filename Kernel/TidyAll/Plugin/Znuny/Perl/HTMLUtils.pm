@@ -23,29 +23,42 @@ developers that the 'UserType' parameter is required.
 sub validate_source {
     my ( $Self, $Code ) = @_;
 
+
     return $Code if $Self->IsPluginDisabled( Code => $Code );
     return $Code if $Self->IsFrameworkVersionLessThan('7.2');
 
-    $Code = $Self->StripPod( Code => $Code );
-    $Code = $Self->StripComments( Code => $Code );
-
-    my ( $ErrorMessage, $Counter );
-
     # Return if no DocumentComplete exists
-    return if $Code !~ m{^[^#]*?\bDocumentComplete\s*\(}m;
+    return $Code if $Code !~ m{^[^#]*?\bDocumentComplete\s*\(}m;
+
+    # Some DocumentComplete calls are missing UserType - find which ones specifically
+    my $Counter      = 0;
+    my $ErrorMessage = '';
 
     LINE:
     for my $Line ( split /\n/, $Code ) {
         $Counter++;
 
+        next LINE if $Line =~ m{^\s*\#}smx;  # Skip comment lines
+
         # Look for calls to DocumentComplete function
-        next LINE if $Line !~ m{^[^#]*?\bDocumentComplete\s*\(}m;
+        next LINE if $Line !~ m{\bDocumentComplete\s*\(}m;
 
         # Check if it's specifically HTMLUtils::DocumentComplete
         if ( $Line =~ m{^[^#]*?\b(?:HTMLUtils|Kernel::System::HTMLUtils)->DocumentComplete\s*\(}m
-            || $Line =~ m{^[^#]*?\$.*?HTMLUtils.*?->DocumentComplete\s*\(}m ) {
+            || $Line =~ m{^[^#]*?\$.*?HTMLUtils.*?->DocumentComplete\s*\(}m
+            || $Line =~ m{^[^#]*?\$HTMLUtilsObject->DocumentComplete\s*\(}m ) {
 
-            $ErrorMessage .= "Line $Counter: $Line\n";
+            # Extract THIS specific function call block
+            my $FunctionBlock = $Self->ExtractFunctionCall(
+                Code         => $Code,
+                StartLine    => $Counter,
+                FunctionName => 'DocumentComplete'
+            );
+
+            # Check if UserType parameter exists in THIS specific function block
+            if ( $FunctionBlock !~ m{UserType\s*=>}m ) {
+                $ErrorMessage .= "Line $Counter: $Line\n";
+            }
         }
     }
 
