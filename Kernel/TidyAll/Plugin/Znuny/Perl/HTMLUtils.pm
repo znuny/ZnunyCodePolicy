@@ -63,13 +63,15 @@ sub validate_source {
     }
 
     if ($ErrorMessage) {
-        $Self->AddErrorMessage(<<"EOF");
-Found calls to Kernel::System::HTMLUtils::DocumentComplete.
+
+        $Self->AddMessage(
+            Message  => "Found calls to Kernel::System::HTMLUtils::DocumentComplete.
 This function requires the 'UserType' parameter to work correctly.
 Please ensure you pass the UserType parameter in your function call.
 
-$ErrorMessage
-EOF
+$ErrorMessage",
+            Priority => 'warning',
+        );
     }
 
     return;
