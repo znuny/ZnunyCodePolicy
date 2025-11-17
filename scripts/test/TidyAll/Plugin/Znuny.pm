@@ -7,6 +7,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 ## nofilter(TidyAll::Plugin::Znuny::Perl::PerlCritic)
+## nofilter(TidyAll::Plugin::Znuny::Perl::Dumper)
 
 package scripts::test::TidyAll::Plugin::Znuny;    ## no critic
 
@@ -169,8 +170,16 @@ sub Run {
 
                 $Self->True(
                     $MessageFound,
-                    "$Test->{Name}: Messages of file check results must contain expected substring.",
+                    "$Test->{Name}: Messages of file check results must contain expected substring."
                 );
+                if ( !$MessageFound ) {
+                    $Self->False(
+                        $MessageFound,
+                        "$Test->{Name}: Messages of file check results must contain expected substring.
+                        \nExpected: $ExpectedMessageSubstring
+                        \nMessages: " . Dumper( \@Messages ) . "\n",
+                    );
+                }
             }
 
             next TEST;

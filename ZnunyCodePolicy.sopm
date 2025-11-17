@@ -154,6 +154,17 @@
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/PO/DocbookLint.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/PO/HTMLTags.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/PO/msgfmt.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/RichTextEditor/Editable.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/RichTextEditor/Destroy.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/RichTextEditor/UpdateSourceElement.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/RichTextEditor/Events.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/RichTextEditor/ZnunyEditor.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/RichTextEditor/SetData.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/RichTextEditor/Ranges.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/RichTextEditor/GetInstance.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/RichTextEditor/InstanceReady.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/RichTextEditor/ListAllInstances.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/RichTextEditor/Focus.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/SeleniumTest/RestoreDatabase.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/SOPM/CodeTags.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/SOPM/FileList.pm"/>
@@ -246,6 +257,17 @@
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Perl/VariableCheck.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/PO/DocbookLint.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/PO/HTMLTags.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/RichTextEditor/Ranges.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/RichTextEditor/Editable.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/RichTextEditor/Events.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/RichTextEditor/ZnunyEditor.pm.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/RichTextEditor/Destroy.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/RichTextEditor/GetInstance.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/RichTextEditor/SetData.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/RichTextEditor/ListAllInstances.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/RichTextEditor/InstanceReady.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/RichTextEditor/UpdateSourceElement.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/RichTextEditor/Focus.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/SeleniumTest/RestoreDatabase.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/SOPM/CodeTags.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/SOPM/License.t"/>

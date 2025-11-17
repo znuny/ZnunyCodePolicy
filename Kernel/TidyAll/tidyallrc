@@ -466,6 +466,35 @@ select = i18n/**/*.{pot,po}
 select = locale/**/*.{pot,po}
 
 ;
+; RichTextEditor
+;
+
+[+TidyAll::Plugin::Znuny::RichTextEditor::GetInstance]
+select = **/*.{t,js}
+
+[+TidyAll::Plugin::Znuny::RichTextEditor::Events]
+select = **/*.{t,js}
+
+[+TidyAll::Plugin::Znuny::RichTextEditor::InstanceReady]
+select = **/*.{t,js}
+
+[+TidyAll::Plugin::Znuny::RichTextEditor::ListAllInstances]
+select = **/*.{t,js}
+
+[+TidyAll::Plugin::Znuny::RichTextEditor::SetData]
+select = **/*.{t,js}
+
+[+TidyAll::Plugin::Znuny::RichTextEditor::UpdateSourceElement]
+select = **/*.{t,js}
+
+[+TidyAll::Plugin::Znuny::RichTextEditor::Editable]
+select = **/*.{t,js}
+
+; [+TidyAll::Plugin::Znuny::RichTextEditor::ZnunyEditor]
+; select = **/*.{t,js}
+
+
+;
 ; SeleniumTest
 ;
 
