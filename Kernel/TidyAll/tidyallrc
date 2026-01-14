@@ -442,6 +442,13 @@ ignore = scripts/test/sample/**/*
 ignore = COPYING,RELEASE,CREDITS
 ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
 
+[+TidyAll::Plugin::Znuny::Perl::UUID]
+select = **/*.{pl,pm,t}
+ignore = Custom/Kernel/**/*
+ignore = Kernel/cpan-lib/**/* Custom/Kernel/cpan-lib/**/*
+ignore = scripts/test/sample/**/*
+ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
+
 [+TidyAll::Plugin::Znuny::Perl::VariableCheck]
 select = **/*.{pl,pm}
 ignore = Custom/Kernel/**/*
