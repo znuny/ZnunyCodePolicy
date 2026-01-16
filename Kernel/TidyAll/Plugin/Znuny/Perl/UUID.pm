@@ -24,6 +24,7 @@ sub validate_source {
     my ( $Self, $Code ) = @_;
 
     return if $Self->IsPluginDisabled( Code => $Code );
+    return if $Self->IsFrameworkVersionLessThan('7.3');
 
     my $ErrorMessage = '';
     my $Counter = 0;
