@@ -14,6 +14,14 @@ use warnings;
 
 use parent qw(TidyAll::Plugin::Znuny::Base);
 
+my $InvisibleCharsClass = '[\x{00A0}\x{00AD}\x{034F}\x{061C}\x{200B}-\x{200F}\x{202A}-\x{202F}\x{205F}\x{2060}-\x{2065}\x{FEFF}]';
+my $InvisibleOptional   = "(?:$InvisibleCharsClass)*";
+my $CopyrightPattern    = _WordPatternWithInvisibleGaps('Copyright');
+my $ZnunyPattern        = _WordPatternWithInvisibleGaps('Znuny');
+my $OTRSPattern         = _WordPatternWithInvisibleGaps('OTRS');
+my $CommentLeader       = qr{\s*(?:\#|//|/\*)\s*};
+
+
 sub transform_source {
     my ( $Self, $Code ) = @_;
 
@@ -26,14 +34,14 @@ sub transform_source {
     return $Code if !$CopyrightString;
 
     # Check if a Znuny copyright is already present and replace it with the updated one.
-    if ( $Code =~ m{^.*?Copyright.*?Znuny}m ) {
-        $Code =~ s{^(.*?)Copyright.*?Znuny.*$}{$1$CopyrightString}mg;
+    if ( $Code =~ m{^$CommentLeader.*?$CopyrightPattern.*?$ZnunyPattern}m ) {
+        $Code =~ s{^($CommentLeader).*?$CopyrightPattern.*?$ZnunyPattern.*$}{$1$CopyrightString}mg;
         return $Code;
     }
 
     # Add a Znuny copyright under an existing OTRS copyright.
-    if ( $Code =~ m{^.*?Copyright.*?OTRS}m ) {
-        $Code =~ s{(^(.*?)Copyright.*?OTRS.*$)}{$1\n$2$CopyrightString}m;
+    if ( $Code =~ m{^$CommentLeader.*?$CopyrightPattern.*?$OTRSPattern}m ) {
+        $Code =~ s{^($CommentLeader)(.*?$CopyrightPattern.*?$OTRSPattern.*$)}{$1$2\n$1$CopyrightString}mg;
         return $Code;
     }
 
@@ -45,7 +53,7 @@ sub validate_source {
 
     return if $Self->IsPluginDisabled( Code => $Code );
 
-    return if $Code =~ m{^.*?Copyright.*?Znuny}m;
+    return if $Code =~ m{^$CommentLeader.*?$CopyrightPattern.*?$ZnunyPattern}m;
 
     my $Context = $Self->GetZnunyVendorContext();
     return if !$Context;
@@ -59,6 +67,15 @@ sub validate_source {
     $Self->AddErrorMessage($Message);
 
     return;
+}
+
+sub _WordPatternWithInvisibleGaps {
+    my ($Word) = @_;
+
+    my @Chars = map { quotemeta $_ } split //, $Word;
+    my $Pattern = join $InvisibleOptional, @Chars;
+
+    return qr/$Pattern/i;
 }
 
 1;

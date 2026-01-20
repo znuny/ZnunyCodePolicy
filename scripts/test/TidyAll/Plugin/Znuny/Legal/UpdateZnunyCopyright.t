@@ -22,6 +22,7 @@ use scripts::test::TidyAll::Plugin::Znuny;
 use TidyAll::Znuny;
 
 my $ZnunyCopyrightString = "Copyright (C) 2021 Znuny GmbH, https://znuny.org/";
+my $ZeroWidthSpace       = "\N{ZERO WIDTH SPACE}";
 
 my @Tests = (
     {
@@ -114,6 +115,36 @@ package Kernel::System::Coffee;
 EOF
         ExpectedSource => <<"EOF",
 # --
+# $ZnunyCopyrightString
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+package Kernel::System::Coffee;
+EOF
+        ExpectedMessageSubstring => undef,
+    },
+    {
+        Name     => "Handle invsisibe characters",
+        Filename => 'Kernel/System/Coffee.pm',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::Legal::UpdateZnunyCopyright)],
+        Source   => <<"EOF",
+# --
+# Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
+# Copyright (C) 2012-2022 Z${ZeroWidthSpace}nuny GmbH, https://znuny.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+package Kernel::System::Coffee;
+EOF
+        ExpectedSource => <<"EOF",
+# --
+# Copyright (C) 2001-2021 OTRS AG, https://otrs.com/
 # $ZnunyCopyrightString
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
