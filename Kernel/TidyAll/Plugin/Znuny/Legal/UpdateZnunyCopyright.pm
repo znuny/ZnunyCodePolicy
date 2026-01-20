@@ -19,7 +19,7 @@ my $InvisibleOptional   = "(?:$InvisibleCharsClass)*";
 my $CopyrightPattern    = _WordPatternWithInvisibleGaps('Copyright');
 my $ZnunyPattern        = _WordPatternWithInvisibleGaps('Znuny');
 my $OTRSPattern         = _WordPatternWithInvisibleGaps('OTRS');
-my $CommentLeader       = qr{\s*(?:\#|//|/\*)\s*};
+my $CommentLeader       = qr{[ \t]*(?:\#|//|/\*|\*)[ \t]*};
 
 
 sub transform_source {
@@ -34,14 +34,34 @@ sub transform_source {
     return $Code if !$CopyrightString;
 
     # Check if a Znuny copyright is already present and replace it with the updated one.
-    if ( $Code =~ m{^$CommentLeader.*?$CopyrightPattern.*?$ZnunyPattern}m ) {
+    if (
+        $Code =~ m{^$CommentLeader.*?$CopyrightPattern.*?$ZnunyPattern}m
+        || _HasBlockCommentCopyrightLine( $Code, $ZnunyPattern )
+    ) {
         $Code =~ s{^($CommentLeader).*?$CopyrightPattern.*?$ZnunyPattern.*$}{$1$CopyrightString}mg;
         return $Code;
     }
 
     # Add a Znuny copyright under an existing OTRS copyright.
     if ( $Code =~ m{^$CommentLeader.*?$CopyrightPattern.*?$OTRSPattern}m ) {
-        $Code =~ s{^($CommentLeader)(.*?$CopyrightPattern.*?$OTRSPattern.*$)}{$1$2\n$1$CopyrightString}mg;
+        $Code =~ s{^($CommentLeader)(.*?$CopyrightPattern.*?$OTRSPattern.*$)}{
+            my $Leader       = $1;
+            my $Line         = $2;
+            my $InsertLeader = $Leader;
+
+            # Avoid starting new line with '/*'.
+            $InsertLeader =~ s{/\*}{ }g;
+
+            $Leader . $Line . "\n" . $InsertLeader . $CopyrightString;
+        }mge;
+        return $Code;
+    }
+
+    # Add a Znuny copyright inside a block comment (CSS-style).
+    if ( _HasBlockCommentCopyrightLine( $Code, $OTRSPattern ) ) {
+        $Code =~ s{
+            (/\*.*?^([ \t]*\*?[ \t]*)[^\n]*?$CopyrightPattern.*?$OTRSPattern[^\n]*)(\n)
+        }{$1\n$2$CopyrightString$3}msx;
         return $Code;
     }
 
@@ -54,6 +74,7 @@ sub validate_source {
     return if $Self->IsPluginDisabled( Code => $Code );
 
     return if $Code =~ m{^$CommentLeader.*?$CopyrightPattern.*?$ZnunyPattern}m;
+    return if _HasBlockCommentCopyrightLine( $Code, $ZnunyPattern );
 
     my $Context = $Self->GetZnunyVendorContext();
     return if !$Context;
@@ -76,6 +97,16 @@ sub _WordPatternWithInvisibleGaps {
     my $Pattern = join $InvisibleOptional, @Chars;
 
     return qr/$Pattern/i;
+}
+
+sub _HasBlockCommentCopyrightLine {
+    my ( $Code, $WordPattern ) = @_;
+
+    while ( $Code =~ m{/\*.*?\*/}sg ) {
+        return 1 if $& =~ m{$CopyrightPattern.*?$WordPattern}m;
+    }
+
+    return;
 }
 
 1;
