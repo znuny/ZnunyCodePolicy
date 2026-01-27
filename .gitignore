@@ -1,8 +1,0 @@
-.sublimelinterrc
-.project
-.tidyall.d
-perltidy.LOG
-.includepath
-.DS_Store
-.vstags
-Kernel/TidyAll/Plugin/Znuny/JavaScript/ESLint/node_modules

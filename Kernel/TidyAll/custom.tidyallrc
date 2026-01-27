@@ -1,0 +1,37 @@
+;
+; Example Configuration: custom.tidyallrc
+; This file demonstrates how extensions tidyallrc files can be used
+;
+; Copy this file to custom.tidyallrc to activate it
+; It will be automatically loaded by the znuny.CodePolicy.pl script
+;
+
+;
+; Example: New plugin configuration for special checks
+;
+
+; Example plugin for new functionality (if implemented)
+; [+TidyAll::Plugin::Custom::Example]
+; select = Custom/**/*.pm
+; ignore = scripts/test/**/*
+
+;
+; Override existing configurations
+;
+
+; Example: Relax PerlTidy for new developments
+; [+TidyAll::Plugin::Custom::Perl::PerlTidy]
+; select = **/*.{pl,pm,psgi,t}
+; ignore = Kernel/Config.pm Kernel/Config/Defaults.pm Kernel/Config/**/ZZZ*.pm Kernel/Config/Files/User/*.pm
+; ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
+; ignore = development/new_features/**/*
+; argv = -l=120 -i=4 -ci=4 -vt=0 -vtc=0 -cti=0 -pt=1 -bt=1 -sbt=1 -bbt=1 -nsfs -nolq -bbao -nola -ndnl -cab=0
+
+;
+; New ignore rules
+;
+
+; Example: Ignore temporary development files
+; [+TidyAll::Plugin::Custom::Common::Origin]
+; ignore = tmp/development/**/*
+; ignore = sandbox/**/*

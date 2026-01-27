@@ -1,0 +1,28 @@
+# ZnunyCodePolicy Base Patterns
+.sublimelinterrc
+.project
+.tidyall.d
+perltidy.LOG
+.includepath
+.DS_Store
+.vstags
+Kernel/TidyAll/Plugin/Znuny/JavaScript/ESLint/node_modules
+tidyallrc_combined_*
+.gitmodules
+Extensions/
+
+# Temporary files
+*.tmp
+*.log
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.vscode/settings.json
+
+# ------------------------------------------------
+# Symbolic Links from Extensions (auto-generated)
+# ------------------------------------------------
+.gitignore

@@ -16,6 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
+
+## nofilter(TidyAll::Plugin::Znuny::Perl::PerlCritic)
+
 use strict;
 use warnings;
 
@@ -24,7 +27,9 @@ use utf8;
 use Code::TidyAll;
 use Cwd;
 use File::Basename;
-use FindBin qw($RealBin);
+use File::Spec;
+use File::Temp qw(tempfile);
+use FindBin    qw($RealBin);
 use Getopt::Long;
 
 use lib dirname($RealBin) . '/.';
@@ -55,14 +60,22 @@ if ( $Options{Help} ) {
     print <<"EOF";
 Usage: bin/znuny.CodePolicy.pl
 
-    Performs Znuny code policy checks.
+    Performs Znuny code policy checks with automatic configuration file loading.
     Run this script from the **top-level directory** of your package or Znuny installation.
     By default it will process all changed files (staged and unstaged) that are already known to Git.
     Other file selection options are --all-files, --staged-files, --file-path and --directory.
 
+        Extensions Configuration Files:
+    This script automatically loads extensions .tidyallrc configuration files from Kernel/TidyAll/:
+    - custom.tidyallrc
+    - Any other *.tidyallrc files in the directory
+
+    These files are loaded in alphabetical order after the main tidyallrc configuration.
+    This allows for modular plugin configurations and custom rule sets.
+
 Options:
     -h, --help                 Show this usage message
-    -v, --verbose              Activate diagnostics
+    -v, --verbose              Activate diagnostics (shows loaded extensions config files)
     -i, --install-eslint       Install ESLint via npm
     -m, --mode                 Use custom Code::TidyAll mode (default: cli)
     -p, --process-limit        Max. number of processes to use (default: environment variable ZNUNY_CODE_POLICY_PROCESS_LIMIT if set, otherwise 6)
@@ -100,8 +113,102 @@ if ( $Options{InstallESLint} ) {
     exit 0;
 }
 
+# Find extensions files in the Kernel/TidyAll directory
+sub FindExtensionsTidyAllrc {
+    my $TidyAllDir      = $BinDir . '/../Kernel/TidyAll';
+    my @ExtensionsFiles = ();
+
+    # Look for *.tidyallrc files in the TidyAll directory
+    if ( -d $TidyAllDir ) {
+        opendir( my $DH, $TidyAllDir ) || die "Cannot open directory $TidyAllDir: $!";
+        my @TidyAllrcFiles = grep { /\.tidyallrc$/ && -f "$TidyAllDir/$_" } readdir($DH);
+        closedir($DH);
+
+        # Sort files to ensure consistent loading order
+        @TidyAllrcFiles = sort @TidyAllrcFiles;
+
+        FILE:
+        for my $FileName (@TidyAllrcFiles) {
+
+            # Skip the main tidyallrc file
+            next FILE if $FileName eq 'tidyallrc';
+
+            my $FilePath = File::Spec->catfile( $TidyAllDir, $FileName );
+            next FILE if !-f $FilePath || !-r $FilePath;
+
+            push @ExtensionsFiles, $FilePath;
+        }
+    }
+
+    return @ExtensionsFiles;
+}
+
+# Create a combined tidyallrc configuration file
+sub CreateCombinedTidyAllRC {
+    my ( $MainConfig, @ExtensionsConfigs ) = @_;
+
+    return $MainConfig if !@ExtensionsConfigs;
+
+    # Create a temporary file for the combined configuration
+    my ( $FH, $TempConfig ) = tempfile(
+        'tidyallrc_combined_XXXXXX',
+        SUFFIX => '.ini',
+        UNLINK => 1
+    );
+
+    # Read and write main configuration
+    if ( open my $MainFH, '<', $MainConfig ) {
+        while ( my $Line = <$MainFH> ) {
+            print $FH $Line;
+        }
+        close $MainFH;
+    }
+    else {
+        die "Cannot read main tidyallrc file: $MainConfig\n";
+    }
+
+    # Add separator and extensions configurations
+    for my $ExtensionsConfig (@ExtensionsConfigs) {
+        my $ConfigName = basename($ExtensionsConfig);
+        print $FH "\n; ==== Extensions configuration from: $ConfigName ====\n";
+
+        if ( open my $AddFH, '<', $ExtensionsConfig ) {
+            while ( my $Line = <$AddFH> ) {
+                print $FH $Line;
+            }
+            close $AddFH;
+        }
+        else {
+            warn "Cannot read extensions tidyallrc file: $ExtensionsConfig\n";
+        }
+    }
+
+    close $FH;
+
+    print "Created combined configuration with " . scalar(@ExtensionsConfigs) . " extensions file(s).\n"
+        if $Options{Verbose};
+
+    return $TempConfig;
+}
+
+# Find and combine extensions files
+my $MainTidyAllrc            = $BinDir . '/../Kernel/TidyAll/tidyallrc';
+my @ExtensionsTidyAllrcFiles = FindExtensionsTidyAllrc();
+
+# Show found extensions files in verbose mode
+if ( $Options{Verbose} && @ExtensionsTidyAllrcFiles ) {
+    print "================================================================================\n";
+    print "Found extensions tidyallrc files:\n";
+    for my $FilePath (@ExtensionsTidyAllrcFiles) {
+        my $FileName = basename($FilePath);
+        print "  - $FileName\n";
+    }
+}
+
+my $TidyAllrcToUse = CreateCombinedTidyAllRC( $MainTidyAllrc, @ExtensionsTidyAllrcFiles );
+
 my $TidyAllObject = TidyAll::Znuny->new_from_conf_file(
-    $BinDir . '/../Kernel/TidyAll/tidyallrc',
+    $TidyAllrcToUse,
     check_only => 0,
     mode       => $Options{Mode} // 'cli',
     root_dir   => getcwd(),

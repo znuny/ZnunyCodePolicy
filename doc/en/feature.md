@@ -65,3 +65,27 @@ To remove the local commit filter in your git directory you can run the followin
 ```bash
 perl $WORKSPACE/ZnunyCodePolicy/scripts/uninstall-git-hooks.pl
 ```
+
+## Validation Commands
+
+```bash
+# Test with different modes
+perl bin/znuny.CodePolicy.pl --mode fast --file-path test.pl
+perl bin/znuny.CodePolicy.pl --mode ci --file-path test.pl
+
+# Configuration validation
+perl bin/znuny.CodePolicy.pl --verbose --dry-run --all-files
+```
+
+
+## Extensions
+
+ZnunyCodePolicy supports a comprehensive extension system that allows you to extend and customize code policies through additional configurations, custom plugins, and Git submodule integration.
+
+For detailed setup instructions, custom plugin development, configuration examples, and troubleshooting guides, see:
+
+**[Extensions Documentation](extensions.md)**
+
+## Configuration Options
+
+See [Configuration Guide](configuration.md) for detailed configuration examples and options.

@@ -1,4 +1,18 @@
 ;
+; ZnunyCodePolicy Main Configuration
+;
+; Extensions Configuration Files:
+; The znuny.CodePolicy.pl script automatically loads extensions .tidyallrc files
+; from this directory (Kernel/TidyAll/), if they exist:
+;   - custom.tidyallrc
+;   - Any other *.tidyallrc files
+;
+; These files are loaded in alphabetical order after the main tidyallrc
+; and enable modular plugin configurations.
+;
+; Extension plugins can be placed in the Kernel/TidyAll/Plugin directory
+; and configured in the corresponding .tidyallrc files.
+;
 ; Global ignores
 ;
 
@@ -25,6 +39,9 @@ ignore = **/node_modules/**/*
 
 ; TidyAll and plugins
 ignore = Kernel/TidyAll/**/*
+
+; Ignore all extensions.
+ignore = Extensions/**/*
 
 ;
 ; Autoload

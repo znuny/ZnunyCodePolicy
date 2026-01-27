@@ -1,4 +1,7 @@
-![Znuny logo](https://www.znuny.com/assets/images/logo_small.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://www.znuny.com/assets/znuny-logo.svg">
+  <img alt="Znuny" src="https://www.znuny.com/assets/znuny-logo-black.svg">
+</picture>
 
 
 ![Build status](https://badge.proxy.znuny.com/ZnunyCodePolicy/dev)
