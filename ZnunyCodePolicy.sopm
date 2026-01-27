@@ -206,7 +206,7 @@
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/XML/XSD/WADL/xml.xsd"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/XML/XSD/WSDL/Literal.xsd"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/XML/XSD/WSDL/WSDL.xsd"/>
-        <File Permission="660" Location="Kernel/TidyAll/custom.tidyallrc.example"/>
+        <File Permission="660" Location="Kernel/TidyAll/custom.tidyallrc"/>
         <File Permission="660" Location="Kernel/TidyAll/tidyallrc"/>
         <File Permission="660" Location="Kernel/TidyAll/Znuny.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Znuny/Git/PreCommit.pm"/>

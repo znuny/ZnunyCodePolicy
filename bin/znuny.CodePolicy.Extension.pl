@@ -1416,11 +1416,12 @@ sub AddGitignore {
     # Read existing .gitignore content
     my %ExistingPatterns;
     if ( -f $GitignoreFile ) {
-        if ( open my $FH, '<', $GitignoreFile ) {
+        if ( open my $FH, '<', $GitignoreFile ) {    ## no critic
+            LINE:
             while ( my $Line = <$FH> ) {
                 chomp $Line;
-                $Line =~ s/^\s+|\s+$//g;                      # Trim whitespace
-                next if !$Line || $Line =~ /^#/;              # Skip empty lines and comments
+                $Line =~ s/^\s+|\s+$//g;                           # Trim whitespace
+                next LINE if !$Line || $Line =~ /^#/;              # Skip empty lines and comments
                 $ExistingPatterns{$Line} = 1;
             }
             close $FH;
@@ -1429,10 +1430,10 @@ sub AddGitignore {
 
     # Collect new links that are not yet in .gitignore
     my @NewLinks;
+    LINK:
     for my $Link (@SymLinks) {
-        if ( !exists $ExistingPatterns{$Link} ) {
-            push @NewLinks, $Link;
-        }
+        next LINK if exists $ExistingPatterns{$Link};
+        push @NewLinks, $Link;
     }
 
     if ( !@NewLinks ) {
@@ -1441,7 +1442,7 @@ sub AddGitignore {
     }
 
     # Add new links to .gitignore
-    if ( open my $FH, '>>', $GitignoreFile ) {
+    if ( open my $FH, '>>', $GitignoreFile ) {    ## no critic
         for my $Link (@NewLinks) {
             print $FH "$Link\n";
             Print( 'green', "  ✓ Added: " );
