@@ -1,10 +1,11 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://www.znuny.com/assets/znuny-logo.svg">
   <img alt="Znuny" src="https://www.znuny.com/assets/znuny-logo-black.svg">
+
+![Build status](https://badge.proxy.znuny.com/ZnunyCodePolicy/dev)
 </picture>
 
 
-![Build status](https://badge.proxy.znuny.com/ZnunyCodePolicy/dev)
 
 ZnunyCodePolicy
 =================

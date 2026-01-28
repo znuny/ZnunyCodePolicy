@@ -295,8 +295,11 @@ sub AddAllExtensions {
     Print( 'magenta', "Are you sure you want to continue? [Y/n]: " );
 
     my $Response = <ARGV>;
-    chomp $Response;
-    if ( $Response =~ /^[nN]$/ ) {
+    if ( $Response ) {
+        chomp $Response;
+    }
+
+    if ( $Response && $Response =~ /^[nN]$/ ) {
         Print("\n");
         Print( 'success', "✓ Aborted." );
         exit 1;

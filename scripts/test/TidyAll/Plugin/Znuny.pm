@@ -130,8 +130,8 @@ sub Run {
         my $FileCheckResults = $TidyAllObject->GetFileCheckResults();
 
         # for debugging/testing
-        #                 use Data::Dumper;
-        #                 print STDERR Dumper($FileCheckResults) . "\n";
+                        # use Data::Dumper;
+                        # print STDERR Dumper($FileCheckResults) . "\n";
 
         $Self->True(
             ref $FileCheckResults eq 'HASH',
