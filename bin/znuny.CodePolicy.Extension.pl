@@ -295,7 +295,7 @@ sub AddAllExtensions {
     Print( 'magenta', "Are you sure you want to continue? [Y/n]: " );
 
     my $Response = <ARGV>;
-    if ( $Response ) {
+    if ($Response) {
         chomp $Response;
     }
 
