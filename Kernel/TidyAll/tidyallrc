@@ -410,6 +410,7 @@ select = **/*.{pl,psgi}
 select = **/*.{pl,pm,psgi,t}
 select = Kernel/Config.pm.dist
 ignore = Kernel/Language/*.pm Custom/Kernel/Language/*.pm
+ignore = Custom/**/*
 
 [+TidyAll::Plugin::Znuny::Perl::SubDeclaration]
 select = **/*.{pl,pm,psgi,t}
