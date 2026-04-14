@@ -192,6 +192,9 @@ select = doc/**/*.md
 [+TidyAll::Plugin::Znuny::JavaScript::AlertFunction]
 select = **/*.js
 
+[+TidyAll::Plugin::Znuny::JavaScript::UserPreferencesAllowedKeys]
+select = **/*.js
+
 [+TidyAll::Plugin::Znuny::JavaScript::DebugCode]
 select = **/*.js
 
@@ -657,4 +660,3 @@ ignore = development/**/*
 [+TidyAll::Plugin::Znuny::XML::WADL::XSDValidator]
 select = **/*.wadl
 ignore = development/**/*
-
