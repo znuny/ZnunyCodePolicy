@@ -52,7 +52,7 @@ sub new_from_conf_file {
         msg_outputter => sub {
 #             printf @_;
 #             print "\n";
-       },
+        },
     );
 
     $Self->_InitSettings(
@@ -1223,23 +1223,26 @@ sub IsFrameworkVersionSupported {
         Patch => 2,
     );
 
+    For C<7.1> (no patch segment), C<Patch> is C<0>. The patch segment may be a
+    non-negative integer or C<x> (wildcard).
+
     If the version string is not defined or does not match the expected format, the method returns undef.
 
 =cut
 
 sub GetSemanticVersion {
-    my ( $Self, $Version ) = @_;
+    my ( $Self, $VersionString ) = @_;
 
-    return if !defined $Version;
-    return if $Version !~ m{\A(\d+)\.(\d+)(?:\.(?:x|\d+))?\z};
+    return if !defined $VersionString;
+    return if $VersionString !~ m{\A(\d+)\.(\d+)(?:\.(x|\d+))?\z};
 
-    my %Version = (
-        Major => $1,
-        Minor => $2,
-        Patch => $3,
+    my %Parts = (
+        Major => $1 + 0,
+        Minor => $2 + 0,
+        Patch => defined $3 ? ( $3 eq 'x' ? 'x' : $3 + 0 ) : 0,
     );
 
-    return %Version;
+    return %Parts;
 }
 
 

@@ -266,6 +266,7 @@ sub ExtractFunctionCall {
 =head2 IsFrameworkVersionLessThan()
 
     Checks if the currently checked framework version is less than the given version.
+    Only major and minor are compared; patch (third segment) is ignored.
 
     Returns true value if the currently checked framework version is less than the given version.
 
@@ -296,6 +297,7 @@ sub IsFrameworkVersionLessThan {
 =head2 IsFrameworkVersionGreaterThan
 
     Checks if the currently checked framework version is greater than the given version.
+    Only major and minor are compared; patch (third segment) is ignored.
 
     Returns true value if the currently checked framework version is greater than the given version.
 

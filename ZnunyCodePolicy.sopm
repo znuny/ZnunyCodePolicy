@@ -290,6 +290,8 @@
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/XML/Configuration/XSDValidator.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/XML/Database/KeyLength.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/XML/Database/XSDValidator.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Znuny/FrameworkVersion.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Znuny/GetSemanticVersion.t"/>
         <File Permission="770" Location="scripts/uninstall-git-hooks.pl"/>
         <File Permission="660" Location="var/packagesetup/ZnunyCodePolicy.pm"/>
     </Filelist>
