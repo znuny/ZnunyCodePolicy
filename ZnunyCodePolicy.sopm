@@ -86,6 +86,7 @@
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Deprecated/ArticleFunctions.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Deprecated/ArticleType.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Deprecated/CreateTimeUnix.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Deprecated/OTRSInfoGet.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Documentation/ImagePath.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Documentation/Title.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/JavaScript/UserPreferencesAllowedKeys.pm"/>
@@ -231,6 +232,7 @@
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Deprecated/ArticleFunctions.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Deprecated/ArticleType.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Deprecated/CreateTimeUnix.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Deprecated/OTRSInfoGet.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Documentation/ImagePath.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Documentation/Title.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Encoding.t"/>

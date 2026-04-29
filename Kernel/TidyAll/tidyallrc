@@ -173,6 +173,15 @@ ignore = scripts/test/sample/**/*
 ignore = COPYING,RELEASE,CREDITS
 ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
 
+[+TidyAll::Plugin::Znuny::Deprecated::OTRSInfoGet]
+select = **/*.{pl,pm,t}
+ignore = Custom/Kernel/**/*
+ignore = Kernel/cpan-lib/**/* Custom/Kernel/cpan-lib/**/*
+ignore = scripts/test/sample/**/*
+ignore = COPYING,RELEASE,CREDITS
+ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
+ignore = Kernel/System/Environment.pm
+
 ;
 ; Documentation
 ;
