@@ -1018,6 +1018,7 @@ sub PrintResults {
 
     my $ExitCode = 0;
     my %Summary;
+    my @DeferredErrors;    # Keep error output together at the end for better readability.
 
     SOPMFILEPATH:
     for my $SOPMFilePath ( sort keys %ResultsBySOPMFilePath ) {
@@ -1050,6 +1051,10 @@ sub PrintResults {
         if ($TidyAllError) {
             print $Self->ReplaceColorTags("    <red>[Error]</red> ");
             print "$TidyAllError\n";
+            push @DeferredErrors, {
+                FilePath => $SOPMFilePath,
+                Message  => "    <red>[Error]</red> $TidyAllError",
+            };
             $ExitCode = 1;
         }
 
@@ -1057,6 +1062,10 @@ sub PrintResults {
         for my $ErrorMessage ( @{ $Result->{ErrorMessages} // [] } ) {
             print $Self->ReplaceColorTags("    <red>[Error]</red> ");
             print $ErrorMessage;
+            push @DeferredErrors, {
+                FilePath => $SOPMFilePath,
+                Message  => "    <red>[Error]</red> $ErrorMessage",
+            };
 
             $Summary{Error}->{$SOPMFilePath} += 1;
             $ExitCode = 1;
@@ -1072,6 +1081,26 @@ sub PrintResults {
     }
 
     my %TouchedFiles;
+
+    if (@DeferredErrors) {
+        print "\n================================================================================\n";
+        print "Errors\n";
+        print "================================================================================\n";
+
+        my $CurrentFilePath;
+        for my $Error (@DeferredErrors) {
+            if ( !$CurrentFilePath || $CurrentFilePath ne $Error->{FilePath} ) {
+                $CurrentFilePath = $Error->{FilePath};
+                print "$CurrentFilePath\n";
+            }
+
+            my $Message = $Error->{Message} // '';
+            $Message =~ s{\s+\z}{};
+            print $Self->ReplaceColorTags("$Message\n");
+        }
+
+        print "================================================================================\n";
+    }
 
     return $ExitCode if !%Summary;
 
