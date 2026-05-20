@@ -69,8 +69,8 @@ sub validate_source {
                 $ErrorMessage .= "Line $Counter: $Line\n";
             }
         }
-        if ( $FunctionNameInPod && $Line =~ /sub/ ) {
-            if ( $Line =~ /sub (.+) \{/ ) {
+        if ( $FunctionNameInPod && $Line =~ /^sub/ ) {
+            if ( $Line =~ / sub\ (\w+) \s* (?: \( [^)]* \) )? \ \{ /x ) {
                 my $FunctionSub = $1;
                 $FunctionSub =~ s/ //;
                 my $SubLine = $Line;

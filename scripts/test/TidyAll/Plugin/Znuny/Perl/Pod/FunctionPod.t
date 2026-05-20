@@ -38,6 +38,24 @@ sub Get {
 EOF
     },
     {
+        Name     => 'valid documentation for a method using signatures',
+        Filename => 'test.pl',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::Perl::Pod::FunctionPod)],
+        Source   => <<'EOF',
+=head2 Foo()
+
+Does things.
+
+    my $Thing = $BarObject->Foo();
+
+=cut
+
+sub Foo($Self) {
+    ...
+}
+EOF
+    },
+    {
         Name     => 'heading that is not related to a function',
         Filename => 'test.pl',
         Plugins  => [qw(TidyAll::Plugin::Znuny::Perl::Pod::FunctionPod)],
