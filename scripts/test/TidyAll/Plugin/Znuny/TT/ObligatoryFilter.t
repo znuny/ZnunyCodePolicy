@@ -32,24 +32,9 @@ xx [% Foo.x | html %]
 [% Data.bar | html %] yy
 [% Data. %] yy
 EOF
-        ExpectedMessageSubstring => 'Found 3 unfiltered in-template tags',
-        ExpectedSource           => <<'EOF',
-foo [% Data.foo | html %] bar
-[% Data.bar | html %]
-[% Data.bar
-
-| html
-%]
-
-x[% Data.bar
-| html %]x
-[% Quux.x %]
-xx [% Foo.x | html %]
-[% Data.bar | html %] yy
-[% Data. | html %] yy
-EOF
-        Filename => 'Template.tt',
-        Plugins  => ['TidyAll::Plugin::Znuny::TT::ObligatoryFilter'],
+        ExpectedMessageSubstring => 'Found 3 unfiltered data interpolations',
+        Filename                 => 'Template.tt',
+        Plugins                  => ['TidyAll::Plugin::Znuny::TT::ObligatoryFilter'],
     },
     {
         Name     => 'Everything is fine',
@@ -66,8 +51,7 @@ EOF
     {
         Name                     => 'Malformed template: no filter name',
         Source                   => '[% Data.foo |%]',
-        ExpectedMessageSubstring => 'Found 1 unfiltered in-template tags',
-        ExpectedSource           => '[% Data.foo || html %]',                # still malformed, just differently!
+        ExpectedMessageSubstring => 'Found 1 unfiltered data interpolations',
         Filename                 => 'Template.tt',
         Plugins                  => ['TidyAll::Plugin::Znuny::TT::ObligatoryFilter'],
     },

@@ -607,6 +607,10 @@ select = **/*.tt
 [+TidyAll::Plugin::Znuny::TT::TranslationFilter]
 select = **/*.tt
 
+[+TidyAll::Plugin::Znuny::TT::ObligatoryFilter]
+select = Custom/Kernel/Output/HTML/**/*.tt
+select = Kernel/Output/HTML/**/*.tt
+
 ;
 ; UnitTest
 ;

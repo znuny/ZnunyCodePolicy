@@ -14,38 +14,43 @@ use utf8;
 
 use parent qw(TidyAll::Plugin::Znuny::Base);
 
-sub transform_source {
+sub validate_source {
     my ( $Self, $Code ) = @_;
 
     return $Code if $Self->IsPluginDisabled( Code => $Code );
     return $Code if $Self->GetSetting('IsThirdPartyProduct');
 
-    my $NewCode = '';
+    my $Lines = 1;
     my $Found = 0;
+    my $Hits = '';
+
     # Parse out all [% … %] bracketed expressions
     # Using /p we get ${^PREMATCH}, ${^MATCH} and ${^POSTMATCH} defined
-    while( $Code =~ m{\[% ( .*? ) %\]}xspg ) {
-        print STDERR "matched: ${^MATCH}\n";
-        $Code = ${^POSTMATCH};     # next iteration uses only the part after the match
-        $NewCode .= ${^PREMATCH};  # no need to look at the part before
+    while ( $Code =~ m{\[% \s* .*? %\]}xspg ) {
+        my $Match = ${^MATCH};    # ${^MATCH} is read-only and clobbered by the next RE
+        $Code = ${^POSTMATCH};    # Next iteration uses only the part after the match
+        $Lines += ${^PREMATCH} =~ tr{\n}{\n};
 
-        my $Match = ${^MATCH};     # ${^MATCH} is read-only
-        # If there's an access to Data.* and no filter expression ("| foo")
-        if( $Match =~ m{ Data \. . }xs && $Match !~ m{ \| \s* \w+ }xs ) {
-            # Count the mistake and fix it
+        # If there's an interpolation of Data.* and no filter expression ("| foo")
+        if (
+            $Match =~ m{ ^ \[% \s* Data \. . }xs
+            && $Match !~ m{ \| \s* \w+ }xs
+        ) {
             $Found++;
-            $Match =~ s{%\] }{| html %]}xs;
-            print STDERR "transformed ${^MATCH}\n";
+            $Hits .= "Line $Lines: $Match\n";
         }
-        $NewCode .= $Match; # Append either the good code verbatim or the fixed version
+
+        $Lines += $Match =~ tr{\n}{\n};
     }
+
     if( $Found ) {
         $Self->AddMessage(
-            Message => "Found $Found unfiltered in-template tags",
-            Priority => 'transform',
+            Message  => "Found $Found unfiltered data interpolations. Please check if they need some kind of filter like ' | html'.\n$Hits",
+            Priority => 'warning',
         );
     }
-    return $NewCode . $Code;
+
+    return;
 }
 
 1;
