@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<package version="1.0">
     <Name>ZnunyCodePolicy</Name>
     <Version>7.3.0</Version>
     <Framework>6.0.x</Framework>
@@ -311,4 +311,4 @@
     <CodeUninstall Type="pre"><![CDATA[
         $Kernel::OM->Get('var::packagesetup::ZnunyCodePolicy')->CodeUninstall();
     ]]></CodeUninstall>
-</otrs_package>
+</package>

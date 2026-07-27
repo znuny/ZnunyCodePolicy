@@ -77,6 +77,14 @@ perl bin/znuny.CodePolicy.pl --mode ci --file-path test.pl
 perl bin/znuny.CodePolicy.pl --verbose --dry-run --all-files
 ```
 
+## SOPM Root Tag Policy
+
+For SOPM files, `<package version="...">` is the canonical root tag.
+
+During the transition period, ZnunyCodePolicy and `SOPM.xsd` also accept
+legacy `<otrs_package version="...">` roots for backward compatibility.
+New packages should use `<package>`.
+
 
 ## Extensions
 

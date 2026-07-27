@@ -22,6 +22,26 @@ my @Tests = (
         Plugins  => [qw(TidyAll::Plugin::Znuny::SOPM::XSDValidator)],
         Source   => <<'EOF',
 <?xml version="1.0" encoding="utf-8" ?>
+<package version="1.0">
+    <Name>OTRSCodePolicy</Name>
+    <Version>0.0.0</Version>
+    <Framework>4.0.x</Framework>
+    <Vendor>OTRS AG</Vendor>
+    <URL>https://otrs.com/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
+    <Description Lang="en">OTRS code quality checks.</Description>
+    <Filelist>
+        <File Permission="755" Location="bin/otrs.CodePolicy.pl"/>
+    </Filelist>
+</package>
+EOF
+    },
+    {
+        Name     => 'Minimal valid SOPM with legacy root.',
+        Filename => 'Test.pm',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::SOPM::XSDValidator)],
+        Source   => <<'EOF',
+<?xml version="1.0" encoding="utf-8" ?>
 <otrs_package version="1.0">
     <Name>OTRSCodePolicy</Name>
     <Version>0.0.0</Version>
@@ -42,7 +62,7 @@ EOF
         Plugins  => [qw(TidyAll::Plugin::Znuny::SOPM::XSDValidator)],
         Source   => <<'EOF',
 <?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<package version="1.0">
     <Name>OTRSCodePolicy</Name>
     <Version>0.0.0</Version>
     <Framework>4.0.x</Framework>
@@ -54,7 +74,7 @@ EOF
         <File Permission="755" Location="bin/otrs.CodePolicy.pl"/>
     </Filelist>
     <PackageMerge Name="MergeOne" TargetVersion="2.0.0"></PackageMerge>
-</otrs_package>
+</package>
 EOF
     },
     {
@@ -63,7 +83,7 @@ EOF
         Plugins  => [qw(TidyAll::Plugin::Znuny::SOPM::XSDValidator)],
         Source   => <<'EOF',
 <?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<package version="1.0">
     <Name>OTRSCodePolicy</Name>
     <Version>0.0.0</Version>
     <Framework>4.0.x</Framework>
@@ -75,7 +95,7 @@ EOF
         <File Permission="755" Location="bin/otrs.CodePolicy.pl"/>
     </Filelist>
     <PackageMerge Name="MergeOne"></PackageMerge>
-</otrs_package>
+</package>
 EOF
         ExpectedMessageSubstring => "Element 'PackageMerge': The attribute 'TargetVersion' is required but missing",
     },
@@ -85,7 +105,7 @@ EOF
         Plugins  => [qw(TidyAll::Plugin::Znuny::SOPM::XSDValidator)],
         Source   => <<'EOF',
 <?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<package version="1.0">
     <Name>OTRSCodePolicy</Name>
     <Version>0.0.0</Version>
     <Framework>4.0.x</Framework>
@@ -97,7 +117,7 @@ EOF
         <File Permission="755" Location="bin/otrs.CodePolicy.pl"/>
     </Filelist>
     <PackageMerge TargetVersion="2.0.0"></PackageMerge>
-</otrs_package>
+</package>
 EOF
         ExpectedMessageSubstring => "Element 'PackageMerge': The attribute 'Name' is required but missing",
     },
@@ -107,7 +127,7 @@ EOF
         Plugins  => [qw(TidyAll::Plugin::Znuny::SOPM::XSDValidator)],
         Source   => <<'EOF',
 <?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<package version="1.0">
     <Name>OTRSCodePolicy</Name>
     <Version>0.0.0</Version>
     <Framework>4.0.x</Framework>
@@ -132,7 +152,7 @@ EOF
           </TableCreate>
       </DatabaseUpgrade>
     </PackageMerge>
-</otrs_package>
+</package>
 EOF
     },
     {
@@ -141,7 +161,7 @@ EOF
         Plugins  => [qw(TidyAll::Plugin::Znuny::SOPM::XSDValidator)],
         Source   => <<'EOF',
 <?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<package version="1.0">
     <Name>OTRSCodePolicy</Name>
     <Version>0.0.0</Version>
     <Framework>4.0.x</Framework>
@@ -160,9 +180,30 @@ EOF
           </TableCreate>
       </DatabaseInstall>
     </PackageMerge>
-</otrs_package>
+</package>
 EOF
         ExpectedMessageSubstring => "Element 'DatabaseInstall': This element is not expected.",
+    },
+    {
+        Name     => 'Unsupported SOPM root tag',
+        Filename => 'Test.pm',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::SOPM::XSDValidator)],
+        Source   => <<'EOF',
+<?xml version="1.0" encoding="utf-8" ?>
+<not_a_package version="1.0">
+    <Name>OTRSCodePolicy</Name>
+    <Version>0.0.0</Version>
+    <Framework>4.0.x</Framework>
+    <Vendor>OTRS AG</Vendor>
+    <URL>https://otrs.com/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
+    <Description Lang="en">OTRS code quality checks.</Description>
+    <Filelist>
+        <File Permission="755" Location="bin/otrs.CodePolicy.pl"/>
+    </Filelist>
+</not_a_package>
+EOF
+        ExpectedMessageSubstring => "Unsupported SOPM root tag",
     },
 );
 

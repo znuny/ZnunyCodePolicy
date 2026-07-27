@@ -21,6 +21,27 @@ sub validate_file {
 
     return if $Self->IsPluginDisabled( FilePath => $Filename );
 
+    my $Code = $Self->GetFileContent($Filename);
+
+    # Extract the first XML element name, ignoring common prefixes that might appear before
+    # the SOPM root node. Example: "<?xml ...?><!-- ... --><package>" returns "package".
+    my ($RootTag) = $Code =~ m{
+        \A
+        (?: \x{FEFF} )?
+        \s*
+        (?: <\?xml [^>]* \?> \s* )?
+        (?: <!-- .*? --> \s* )*
+        < ([a-zA-Z_][\w\.-]*) \b
+    }xms;
+
+    if ( !$RootTag || ( $RootTag ne 'package' && $RootTag ne 'otrs_package' ) ) {
+        my $RootTagForMessage = defined $RootTag ? $RootTag : '<none>';
+        $Self->AddErrorMessage(
+            "Unsupported SOPM root tag '$RootTagForMessage'. Use '<package>'. Legacy '<otrs_package>' is accepted during transition for backward compatibility.\n"
+        );
+        return;
+    }
+
     my $XSDFile = dirname(__FILE__) . '/../XML/XSD/SOPM.xsd';
     my $CMD = "xmllint --noout --nonet --schema $XSDFile";
 

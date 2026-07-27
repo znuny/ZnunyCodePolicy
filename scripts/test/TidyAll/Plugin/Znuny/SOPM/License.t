@@ -22,7 +22,7 @@ my @Tests = (
         Plugins  => [qw(TidyAll::Plugin::Znuny::SOPM::License)],
         Source   => <<'EOF',
 <?xml version="1.0" encoding="utf-8"?>
-<otrs_package version="1.0">
+<package version="1.0">
     <Name>Znuny-Playground</Name>
     <Version>6.0.5</Version>
     <ChangeLog Version="6.0.5" Date="2020-01-29 16:13:46 +0100">Test release.</ChangeLog>
@@ -42,7 +42,7 @@ my @Tests = (
         <File Permission="660" Location="Kernel/Output/HTML/OutputFilterZnunyPlayground.pm"/>
     </Filelist>
     <PackageMerge Name="Znuny-Playground" TargetVersion="6.0.5"></PackageMerge>
-</otrs_package>
+</package>
 EOF
     },
     {
@@ -51,7 +51,7 @@ EOF
         Plugins  => [qw(TidyAll::Plugin::Znuny::SOPM::License)],
         Source   => <<'EOF',
 <?xml version="1.0" encoding="utf-8"?>
-<otrs_package version="1.0">
+<package version="1.0">
     <Name>Znuny-Playground</Name>
     <Version>6.0.5</Version>
     <ChangeLog Version="6.0.5" Date="2020-01-29 16:13:46 +0100">Test release.</ChangeLog>
@@ -71,11 +71,11 @@ EOF
         <File Permission="660" Location="Kernel/Output/HTML/OutputFilterZnunyPlayground.pm"/>
     </Filelist>
     <PackageMerge Name="Znuny-Playground" TargetVersion="6.0.5"></PackageMerge>
-</otrs_package>
+</package>
 EOF
         ExpectedSource => <<'EOF',
 <?xml version="1.0" encoding="utf-8"?>
-<otrs_package version="1.0">
+<package version="1.0">
     <Name>Znuny-Playground</Name>
     <Version>6.0.5</Version>
     <ChangeLog Version="6.0.5" Date="2020-01-29 16:13:46 +0100">Test release.</ChangeLog>
@@ -95,7 +95,7 @@ EOF
         <File Permission="660" Location="Kernel/Output/HTML/OutputFilterZnunyPlayground.pm"/>
     </Filelist>
     <PackageMerge Name="Znuny-Playground" TargetVersion="6.0.5"></PackageMerge>
-</otrs_package>
+</package>
 EOF
     },
     {
@@ -107,7 +107,7 @@ EOF
         },
         Source => <<'EOF',
 <?xml version="1.0" encoding="utf-8"?>
-<otrs_package version="1.0">
+<package version="1.0">
     <Name>Znuny-Playground</Name>
     <Version>6.0.5</Version>
     <ChangeLog Version="6.0.5" Date="2020-01-29 16:13:46 +0100">Test release.</ChangeLog>
@@ -127,7 +127,7 @@ EOF
         <File Permission="660" Location="Kernel/Output/HTML/OutputFilterZnunyPlayground.pm"/>
     </Filelist>
     <PackageMerge Name="Znuny-Playground" TargetVersion="6.0.5"></PackageMerge>
-</otrs_package>
+</package>
 EOF
     },
 );
