@@ -36,11 +36,12 @@ sub applies_to {
 
 sub prepare_to_scan_document {
     my ( $Self, $Document ) = @_;
+    my $LogicalFilename = $Document->logical_filename() // '';
 
     # Cleanup, one instance can scan multiple files.
     delete $Self->{_IsDerivedModule};
 
-    if ( $Document->logical_filename() !~ m{ (\.pm) \z }xms ) {
+    if ( $LogicalFilename !~ m{ (\.pm) \z }xms ) {
         return 1;
     }
 

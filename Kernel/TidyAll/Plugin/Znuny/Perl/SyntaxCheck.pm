@@ -76,7 +76,7 @@ sub validate_source {
     }
 
     my $TempFile = File::Temp->new();
-    print $TempFile $CleanedSource;
+    print $TempFile( $CleanedSource // '' );
     $TempFile->flush();
 
     # syntax check

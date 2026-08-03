@@ -31,7 +31,9 @@ sub applies_to           { return 'PPI::Document' }
 sub prepare_to_scan_document {
     my ( $Self, $Document ) = @_;
 
-    return $Document->logical_filename() =~ m{ (\.pm|\.t) \z }xms;
+    my $LogicalFilename = $Document->logical_filename() // '';
+
+    return $LogicalFilename =~ m{ (\.pm|\.t) \z }xms;
 }
 
 sub violates {
