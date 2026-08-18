@@ -1,0 +1,13 @@
+.git
+.gitignore
+.DS_Store
+.idea
+.vscode
+blib
+coverage
+dist
+local
+node_modules
+tmp
+var/tmp
+var/log

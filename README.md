@@ -19,6 +19,26 @@ You can use it to check your code against the Znuny code style guide.
 
 All important information can be found here [feature.md](https://github.com/znuny/ZnunyCodePolicy/blob/dev/doc/en/feature.md).
 
+**Docker Usage**
+
+Build and run CodePolicy in a container against your current working directory:
+
+```bash
+./bin/znuny.CodePolicy.Docker.sh
+```
+
+Run against a specific repo and pass arguments through:
+
+```bash
+./bin/znuny.CodePolicy.Docker.sh /path/to/repo --all-files
+```
+
+Rebuild the image when needed (otherwise the existing local image is reused):
+
+```bash
+./bin/znuny.CodePolicy.Docker.sh --rebuild
+```
+
 Enjoy!
 
 Your Znuny Team!

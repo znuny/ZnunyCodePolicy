@@ -21,6 +21,7 @@
     <Filelist>
         <File Permission="770" Location="bin/znuny.CodePolicy.pl"/>
         <File Permission="770" Location="bin/znuny.CodePolicy.Extension.pl"/>
+        <File Permission="770" Location="bin/znuny.CodePolicy.Docker.sh"/>
         <File Permission="660" Location="Kernel/cpan-lib/Locale/PO.pm"/>
         <File Permission="660" Location="Kernel/cpan-lib/Perl/Tidy.pm"/>
         <File Permission="660" Location="Kernel/cpan-lib/Perl/Tidy.pod"/>
