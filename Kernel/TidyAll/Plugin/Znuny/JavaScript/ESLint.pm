@@ -45,7 +45,7 @@ sub transform_file {
         }
 
         # Force the minimum version of eslint.
-        my $ESLintVersion = `$NodePath $ESLintPath -v`;
+        my $ESLintVersion = `$NodePath "$ESLintPath" -v`;
         chomp $ESLintVersion;
         my ( $Major, $Minor, $Patch ) = $ESLintVersion =~ m{v(\d+)[.](\d+)[.](\d+)};
         my $Compare = sprintf( "%03d%03d%03d", $Major, $Minor, $Patch );
@@ -68,8 +68,8 @@ sub transform_file {
     $ESLintRulesPath =~ s{ESLint\.pm}{ESLint/Rules};
 
     my $Command = sprintf(
-        "%s %s --config %s --no-eslintrc --resolve-plugins-relative-to %s --rulesdir %s --fix %s --quiet",
-        $NodePath, $ESLintPath, $ESLintConfigPath, $ESLintPluginsPath, $ESLintRulesPath, $Filename
+        'cd "%s" && "%s" "%s" --config "%s" --no-eslintrc --resolve-plugins-relative-to "%s" --rulesdir Rules --fix "%s" --quiet',
+        $ESLintPluginsPath, $NodePath, $ESLintPath, $ESLintConfigPath, $ESLintPluginsPath, $Filename
     );
 
     my $Output = `$Command`;
