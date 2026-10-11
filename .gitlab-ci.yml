@@ -1,5 +1,6 @@
-image: registry.znuny.com/znuny/internal/docker-znuny-ci:dev
+image: $JOB_IMAGE
 
 include:
-  - project: 'Znuny/Internal/Znuny'
-    file: '/templates/gitlab/CodePolicy/ZnunyCodePolicy.yml'
+  - project: $INCLUDE_PROJECT
+    file: $INCLUDE_FILE
+    
