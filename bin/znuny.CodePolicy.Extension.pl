@@ -11,14 +11,16 @@ use strict;
 use warnings;
 use utf8;
 
-use Cwd            qw(getcwd abs_path);
-use File::Basename qw(dirname basename);
-use File::Find;
-use File::Path qw(make_path);
+use Cwd            qw(abs_path);
+use File::Basename qw(dirname);
+use File::Path     qw(make_path);
 use File::Spec;
 use FindBin qw($RealBin);
 use Getopt::Long;
 use Term::ANSIColor qw(colored);
+
+use lib dirname($RealBin) . '/Kernel';
+use TidyAll::Znuny::Extension;
 
 # Ensure UTF-8 output works.
 binmode( \*STDOUT, ':encoding(UTF-8)' );
@@ -26,7 +28,6 @@ binmode( \*STDERR, ':encoding(UTF-8)' );
 
 # Global variables
 my $TargetRepoRoot = dirname($RealBin);
-my $RemovedCount   = 0;
 my %Options;
 
 # Main function to run the script
@@ -241,6 +242,16 @@ sub Usage {
 }
 
 # Function to the add command
+sub ListAvailableExtensions {
+    my $ExtensionsDir = File::Spec->catdir( $TargetRepoRoot, 'Extensions' );
+    if ( !-d $ExtensionsDir ) {
+        Print( 'warning', "No extension directory found.\n" );
+        return;
+    }
+
+    return TidyAll::Znuny::Extension::Available( RepoRoot => $TargetRepoRoot );
+}
+
 sub AddCommand {
     my ( $ExtensionName, $ExtensionDir, $ExtensionsDir ) = @_;
 
@@ -253,33 +264,103 @@ sub AddCommand {
     return;
 }
 
-# Function to adding a single extension
+sub RemoveCommand {
+    my ( $ExtensionName, $ExtensionsDir ) = @_;
+
+    if ( $Options{All} ) {
+        RemoveAllExtensions();
+        RemoveGitignore();
+    }
+    else {
+        my $Result = TidyAll::Znuny::Extension::Remove(
+            RepoRoot => $TargetRepoRoot,
+            Name     => $ExtensionName,
+            Verbose  => $Options{Verbose},
+        );
+        PrintLog( $Result->{Log} );
+        RemoveGitignore();
+        AddGitignore();
+    }
+
+    Print("\n");
+    PrintRemovalSummary($ExtensionName);
+    return;
+}
+
+sub StatusCommand {
+    my $Status = TidyAll::Znuny::Extension::Status( RepoRoot => $TargetRepoRoot );
+
+    Print( 'header', "=== Extension Links Status ===" );
+    Print("\n\n");
+
+    my $Index = 0;
+    GROUP:
+    for my $Group ( @{ $Status->{Groups} } ) {
+        $Index++;
+        Print( 'step', "$Index. $Group->{Title}" );
+        Print("\n");
+
+        if ( $Group->{DirectoryMissing} ) {
+            Print( 'yellow', "  ℹ $Group->{DirectoryMissing}\n" );
+        }
+
+        my $Shown = 0;
+        LINK:
+        for my $Link ( @{ $Group->{Links} // [] } ) {
+            $Shown = 1;
+            if ( $Link->{Broken} ) {
+                Print( 'red', "  ✗ $Link->{Label}" );
+                Print( 'red', " -> $Link->{Target} (broken link)\n" );
+                next LINK;
+            }
+            Print( 'green', "  ✓ $Link->{Label}" );
+            Print( 'white', " -> $Link->{Target}\n" );
+        }
+
+        MISSING:
+        for my $Missing ( @{ $Group->{Missing} // [] } ) {
+            $Shown = 1;
+            Print( 'red', "  ✗ $Missing->{Label} ($Missing->{Reason})\n" );
+        }
+
+        if ( !$Shown && !$Group->{DirectoryMissing} ) {
+            Print( 'yellow', "  ℹ $Group->{Empty}\n" );
+        }
+        Print("\n");
+    }
+
+    if ( $Status->{Incomplete} ) {
+        Print( 'warning', "=== Status: Extension links are missing ===\n" );
+    }
+    elsif ( $Status->{Active} ) {
+        Print( 'success', "=== Status: Extensions are active ===\n" );
+    }
+    else {
+        Print( 'success', "=== Status: No extension links found ===\n\n" );
+        Print( 'info',    "Use 'add' command to activate extensions.\n" );
+    }
+    return;
+}
+
 sub AddSingleExtension {
     my ( $ExtensionName, $ExtensionDir ) = @_;
 
-    CleanupOldLinks($ExtensionName);
-    LinkTidyAllFiles( $ExtensionDir, $ExtensionName );
-    Print("\n");
-    LinkTidyAllPmFiles( $ExtensionDir, $ExtensionName );
-    Print("\n");
-    LinkPluginDirectories( $ExtensionDir, $ExtensionName );
-    Print("\n");
-    LinkTests( $ExtensionDir, $ExtensionName );
-    Print("\n");
-    LinkDocumentation( $ExtensionDir, $ExtensionName );
-    Print("\n");
+    my $Result = TidyAll::Znuny::Extension::Add(
+        RepoRoot => $TargetRepoRoot,
+        Name     => $ExtensionName,
+        Verbose  => $Options{Verbose},
+    );
+    PrintLog( $Result->{Log} );
     AddGitignore();
     Print("\n");
     PrintAdditionSummary( $ExtensionName, $ExtensionDir );
     return;
 }
 
-# Function to handle adding all extensions
 sub AddAllExtensions {
     my ($ExtensionsDir) = @_;
 
     my @AvailableExtensions = ListAvailableExtensions();
-
     if ( !@AvailableExtensions ) {
         Print( 'warning', "No extensions found in Extensions/ directory.\n" );
         exit 0;
@@ -287,9 +368,10 @@ sub AddAllExtensions {
 
     Print( 'warning', "⚠ WARNING: Adding ALL available extensions!\n" );
     Print( 'warning', "This will add the following extensions:" );
-    for my $Ext (@AvailableExtensions) {
+    EXTENSION:
+    for my $Extension (@AvailableExtensions) {
         Print("\n");
-        Print( 'warning', "  - $Ext" );
+        Print( 'warning', "  - $Extension" );
     }
     Print("\n\n");
     Print( 'magenta', "Are you sure you want to continue? [Y/n]: " );
@@ -298,7 +380,6 @@ sub AddAllExtensions {
     if ($Response) {
         chomp $Response;
     }
-
     if ( $Response && $Response =~ /^[nN]$/ ) {
         Print("\n");
         Print( 'success', "✓ Aborted." );
@@ -309,34 +390,31 @@ sub AddAllExtensions {
     Print( 'step', "Adding All Available Extensions..." );
     Print("\n");
 
-    # Cleanup all old links once before adding extensions
-    CleanupAllOldLinks();
+    my $Cleared = TidyAll::Znuny::Extension::Clear(
+        RepoRoot => $TargetRepoRoot,
+        Scope    => 'all',
+    );
+    PrintLog( $Cleared->{Log} );
     Print("\n");
 
+    EXTENSION:
     for my $Extension (@AvailableExtensions) {
-        my $CurrentExtensionDir = File::Spec->catdir( $ExtensionsDir, $Extension );
-        $CurrentExtensionDir = abs_path($CurrentExtensionDir);
-
         Print("\n");
         Print( 'header', "=== Adding Extension: $Extension ===" );
         Print("\n\n");
-        LinkTidyAllFiles( $CurrentExtensionDir, $Extension );
-        Print("\n");
-        LinkTidyAllPmFiles( $CurrentExtensionDir, $Extension );
-        Print("\n");
-        LinkPluginDirectories( $CurrentExtensionDir, $Extension );
-        Print("\n");
-        LinkTests( $CurrentExtensionDir, $Extension );
-        Print("\n");
-        LinkDocumentation( $CurrentExtensionDir, $Extension );
-        Print("\n");
+        my $Linked = TidyAll::Znuny::Extension::Link(
+            RepoRoot => $TargetRepoRoot,
+            Name     => $Extension,
+            Verbose  => $Options{Verbose},
+        );
+        PrintLog( $Linked->{Log} );
     }
 
-    # Print combined summary for all extensions
     Print("\n");
     Print( 'header', "=== Addition Summary (All Extensions) ===" );
     Print("\n\n");
     Print("Added extensions:\n");
+    EXTENSION:
     for my $Extension (@AvailableExtensions) {
         Print( 'green', "  - $Extension\n" );
     }
@@ -350,357 +428,14 @@ sub AddAllExtensions {
     return;
 }
 
-# Function to print addition summary
-sub PrintAdditionSummary {
-    my ( $ExtensionName, $ExtensionDir ) = @_;
-
-    Print( 'header', "=== Addition Summary ===" );
-    Print("\n\n");
-    Print( 'info', "Extension: $ExtensionName" );
-    Print("\n");
-    Print("Linked components:\n");
-
-    # Count linked components
-    my $TidyAllrcCount   = 0;
-    my $KernelTidyAllDir = File::Spec->catdir( $TargetRepoRoot, 'Kernel', 'TidyAll' );
-    if ( -d $KernelTidyAllDir ) {
-        opendir( my $DH, $KernelTidyAllDir );
-        $TidyAllrcCount = grep { /\.tidyallrc$/ && -l File::Spec->catfile( $KernelTidyAllDir, $_ ) } readdir($DH);
-        closedir($DH);
-    }
-    Print("- TidyAll configurations: ");
-    Print( $TidyAllrcCount > 0 ? 'green' : 'white', $TidyAllrcCount );
-    Print(" files\n");
-
-    my $PmCount = 0;
-    if ( -d $KernelTidyAllDir ) {
-        opendir( my $DH, $KernelTidyAllDir );
-        $PmCount = grep { /\.pm$/ && -l File::Spec->catfile( $KernelTidyAllDir, $_ ) } readdir($DH);
-        closedir($DH);
-    }
-    Print("- TidyAll PM files: ");
-    Print( $PmCount > 0 ? 'green' : 'white', $PmCount );
-    Print(" files\n");
-
-    my $TestsCount = 0;
-    my $TestsDir   = File::Spec->catdir( $TargetRepoRoot, 'scripts', 'test', $ExtensionName );
-    if ( -d $TestsDir ) {
-        File::Find::find( sub { $TestsCount++ if -f $_ && /\.t$/ }, $TestsDir );
-    }
-    Print("- Tests: ");
-    Print( $TestsCount > 0 ? 'green' : 'white', $TestsCount );
-    Print(" files\n");
-
-    my $ExtPluginDir = File::Spec->catdir( $ExtensionDir, 'Kernel', 'TidyAll', 'Plugin' );
-    my $PluginCount  = 0;
-    if ( -d $ExtPluginDir ) {
-        File::Find::find( sub { $PluginCount++ if -f $_ && /\.pm$/ }, $ExtPluginDir );
-    }
-    Print("- Plugins: ");
-    Print( $PluginCount > 0 ? 'green' : 'white', $PluginCount );
-    Print(" files\n");
-
-    my $ExtDocDir = File::Spec->catdir( $ExtensionDir, 'doc' );
-    my $DocCount  = 0;
-    if ( -d $ExtDocDir ) {
-        File::Find::find( sub { $DocCount++ if -f $_ }, $ExtDocDir );
-    }
-    Print("- Documentation: ");
-    Print( $DocCount > 0 ? 'green' : 'white', $DocCount );
-    Print(" files\n");
-
-    Print("\n");
-    Print( 'success', "=== Addition completed successfully! ===" );
-    Print("\n\n");
-    Print( 'info', "To test the extension:" );
-    Print("\n");
-    Print( 'magenta', "  perl bin/znuny.CodePolicy.pl --verbose --file-path README.md\n" );
-    Print("\n");
-
-    return;
-}
-
-# Function to the remove command
-sub RemoveCommand {
-    my ( $ExtensionName, $ExtensionsDir ) = @_;
-
-    if ( $Options{All} ) {
-        RemoveAllExtensions();
-        RemoveGitignore();
-    }
-    else {
-        RemoveSpecificExtension($ExtensionName);
-        RemoveGitignore();
-        AddGitignore();
-    }
-
-    Print("\n");
-    PrintRemovalSummary( $ExtensionName, $ExtensionsDir, 'remove' );
-    return;
-}
-
-# Function to show status of all linked files
-sub StatusCommand {
-
-    Print( 'header', "=== Extension Links Status ===" );
-    Print("\n\n");
-
-    my $KernelTidyAllDir = File::Spec->catdir( $TargetRepoRoot, 'Kernel', 'TidyAll' );
-    my $FoundAnyLinks    = 0;
-
-    # Check TidyAll configuration files (.tidyallrc)
-    Print( 'step', "1. TidyAll Configuration Files (.tidyallrc)" );
-    Print("\n");
-    if ( -d $KernelTidyAllDir ) {
-        opendir( my $DH, $KernelTidyAllDir ) || warn "Cannot open $KernelTidyAllDir: $!";
-        my @TidyAllrcFiles = grep { /\.tidyallrc$/ && -l File::Spec->catfile( $KernelTidyAllDir, $_ ) } readdir($DH);
-        closedir($DH);
-
-        if (@TidyAllrcFiles) {
-            for my $File (@TidyAllrcFiles) {
-                my $FilePath   = File::Spec->catfile( $KernelTidyAllDir, $File );
-                my $LinkTarget = CleanupPathForDisplay( readlink($FilePath) );
-                Print( 'green', "  ✓ $File" );
-                Print( 'white', " -> $LinkTarget\n" );
-                $FoundAnyLinks = 1;
-            }
-        }
-        else {
-            Print( 'yellow', "  ℹ No .tidyallrc links found\n" );
-        }
-    }
-
-    Print("\n");
-
-    # Check TidyAll PM files (.pm)
-    Print( 'step', "2. TidyAll PM Files (.pm)" );
-    Print("\n");
-    if ( -d $KernelTidyAllDir ) {
-        opendir( my $DH, $KernelTidyAllDir ) || warn "Cannot open $KernelTidyAllDir: $!";
-        my @PmFiles = grep { /\.pm$/ && -l File::Spec->catfile( $KernelTidyAllDir, $_ ) } readdir($DH);
-        closedir($DH);
-
-        if (@PmFiles) {
-            for my $File (@PmFiles) {
-                my $FilePath   = File::Spec->catfile( $KernelTidyAllDir, $File );
-                my $LinkTarget = CleanupPathForDisplay( readlink($FilePath) );
-                Print( 'green', "  ✓ $File" );
-                Print( 'white', " -> $LinkTarget\n" );
-                $FoundAnyLinks = 1;
-            }
-        }
-        else {
-            Print( 'yellow', "  ℹ No .pm links found\n" );
-        }
-    }
-
-    Print("\n");
-
-    # Check Plugin directories
-    Print( 'step', "3. Plugin Directories" );
-    Print("\n");
-    my $PluginDir = File::Spec->catdir( $KernelTidyAllDir, 'Plugin' );
-    if ( -d $PluginDir ) {
-        opendir( my $DH, $PluginDir ) || warn "Cannot open $PluginDir: $!";
-        my @PluginSubDirs = grep { $_ ne '.' && $_ ne '..' && -l File::Spec->catdir( $PluginDir, $_ ) } readdir($DH);
-        closedir($DH);
-
-        if (@PluginSubDirs) {
-            for my $SubDir (@PluginSubDirs) {
-                my $SubDirPath = File::Spec->catdir( $PluginDir, $SubDir );
-                my $LinkTarget = CleanupPathForDisplay( readlink($SubDirPath) );
-                Print( 'green', "  ✓ Plugin/$SubDir" );
-                Print( 'white', " -> $LinkTarget\n" );
-                $FoundAnyLinks = 1;
-            }
-        }
-        else {
-            Print( 'yellow', "  ℹ No plugin directory links found\n" );
-        }
-    }
-    else {
-        Print( 'yellow', "  ℹ Plugin directory not found\n" );
-    }
-
-    Print("\n");
-
-    # Check Test directories (recursively look for .t files)
-    Print( 'step', "4. Test Directories" );
-    Print("\n");
-    my $TestDir        = File::Spec->catdir( $TargetRepoRoot, 'scripts', 'test' );
-    my $TestLinksFound = 0;
-
-    if ( -d $TestDir ) {
-
-        # Look for test files recursively in extension subdirectories
-        File::Find::find(
-            sub {
-                return if !-f $_ || !/\.t$/ || !-l $_;
-
-                my $FullPath     = $File::Find::name;
-                my $RelativePath = File::Spec->abs2rel( $FullPath, File::Spec->catdir( $TargetRepoRoot, 'scripts' ) );
-                my $LinkTarget   = CleanupPathForDisplay( readlink($FullPath) );
-
-                Print( 'green', "  ✓ scripts/$RelativePath" );
-                Print( 'white', " -> $LinkTarget\n" );
-                $TestLinksFound = 1;
-                $FoundAnyLinks  = 1;
-            },
-            $TestDir
-        );
-
-        if ( !$TestLinksFound ) {
-            Print( 'yellow', "  ℹ No test file links found\n" );
-        }
-    }
-    else {
-        Print( 'yellow', "  ℹ Test directory not found\n" );
-    }
-
-    Print("\n");
-
-    # Check Documentation directories
-    Print( 'step', "5. Documentation Directories" );
-    Print("\n");
-    my $DocDir = File::Spec->catdir( $TargetRepoRoot, 'doc' );
-    if ( -d $DocDir ) {
-        opendir( my $DH, $DocDir ) || warn "Cannot open $DocDir: $!";
-        my @DocItems = grep { $_ ne '.' && $_ ne '..' && -l File::Spec->catdir( $DocDir, $_ ) } readdir($DH);
-        closedir($DH);
-
-        if (@DocItems) {
-            for my $Item (@DocItems) {
-                my $ItemPath   = File::Spec->catdir( $DocDir, $Item );
-                my $LinkTarget = CleanupPathForDisplay( readlink($ItemPath) );
-                Print( 'green', "  ✓ doc/$Item" );
-                Print( 'white', " -> $LinkTarget\n" );
-                $FoundAnyLinks = 1;
-            }
-        }
-        else {
-            Print( 'yellow', "  ℹ No documentation directory links found\n" );
-        }
-    }
-    else {
-        Print( 'yellow', "  ℹ Documentation directory not found\n" );
-    }
-
-    Print("\n");
-
-    # Summary
-    if ($FoundAnyLinks) {
-        Print( 'success', "=== Status: Extensions are active ===\n" );
-    }
-    else {
-        Print( 'success', "=== Status: No extension links found ===\n\n" );
-        Print( 'info',    "Use 'add' command to activate extensions.\n" );
-    }
-
-    return;
-}
-
-# Function to removing a specific extension
-sub RemoveSpecificExtension {
-    my ($ExtensionName) = @_;
-
-    Print("\n");
-    Print( 'header', "=== Removing specific extension links ===" );
-    Print("\n");
-
-    Print( 'step', "1. Removing TidyAll Configuration Files for: $ExtensionName..." );
-    Print("\n");
-    my $KernelTidyAllDir = File::Spec->catdir( $TargetRepoRoot, 'Kernel', 'TidyAll' );
-    if ( -d $KernelTidyAllDir ) {
-        opendir( my $DH, $KernelTidyAllDir ) || warn "Cannot open $KernelTidyAllDir: $!";
-        my @TidyAllrcFiles = grep {/\.tidyallrc$/} readdir($DH);
-        closedir($DH);
-
-        for my $File (@TidyAllrcFiles) {
-            my $FilePath = File::Spec->catfile( $KernelTidyAllDir, $File );
-            if ( -l $FilePath && IsLinkPointsToExtension( $FilePath, $ExtensionName ) ) {
-                RemoveLink( $FilePath, "TidyAll configuration" );
-            }
-        }
-    }
-
-    Print("\n");
-    Print( 'step', "2. Removing TidyAll PM Files for: $ExtensionName..." );
-    Print("\n");
-    if ( -d $KernelTidyAllDir ) {
-        opendir( my $DH, $KernelTidyAllDir ) || warn "Cannot open $KernelTidyAllDir: $!";
-        my @PmFiles = grep {/\.pm$/} readdir($DH);
-        closedir($DH);
-
-        for my $File (@PmFiles) {
-            my $FilePath = File::Spec->catfile( $KernelTidyAllDir, $File );
-            if ( -l $FilePath && IsLinkPointsToExtension( $FilePath, $ExtensionName ) ) {
-                RemoveLink( $FilePath, "TidyAll PM file" );
-            }
-        }
-    }
-
-    Print("\n");
-    Print( 'step', "3. Removing Plugin Subdirectories for: $ExtensionName..." );
-    Print("\n");
-
-    # Find and remove plugin subdirectories that belong to this extension
-    my $ExtensionDir = File::Spec->catdir( $TargetRepoRoot, 'Extensions', $ExtensionName );
-    my $ExtPluginDir = File::Spec->catdir( $ExtensionDir,   'Kernel',     'TidyAll', 'Plugin' );
-
-    if ( -d $ExtPluginDir ) {
-        opendir( my $DH, $ExtPluginDir ) || warn "Cannot open $ExtPluginDir: $!";
-        my @PluginSubDirs = grep { $_ ne '.' && $_ ne '..' && -d File::Spec->catdir( $ExtPluginDir, $_ ) } readdir($DH);
-        closedir($DH);
-
-        my $TargetPluginDir = File::Spec->catdir( $KernelTidyAllDir, 'Plugin' );
-        for my $SubDir (@PluginSubDirs) {
-            my $TargetSubDir = File::Spec->catdir( $TargetPluginDir, $SubDir );
-            RemoveLink( $TargetSubDir, "Plugin subdirectory" );
-        }
-    }
-
-    Print("\n");
-    Print( 'step', "4. Removing Test Directory for: $ExtensionName..." );
-    Print("\n");
-    my $TestDir = File::Spec->catdir( $TargetRepoRoot, 'scripts', 'test', $ExtensionName );
-    if ( -l $TestDir ) {
-        RemoveLink( $TestDir, "Test directory" );
-    }
-    elsif ( -d $TestDir ) {
-
-        # Remove all test links recursively
-        File::Find::finddepth(
-            sub {
-                if ( -l $_ ) {
-                    RemoveLink( $File::Find::name, "Test file" );
-                }
-                elsif ( -d $_ && $_ ne $TestDir ) {
-                    RemoveEmptyDir($_);
-                }
-            },
-            $TestDir
-        );
-        RemoveEmptyDir($TestDir);
-    }
-
-    Print("\n");
-    Print( 'step', "5. Removing Documentation Directory for: $ExtensionName..." );
-    Print("\n");
-    my $DocDir = File::Spec->catdir( $TargetRepoRoot, 'doc', $ExtensionName );
-    RemoveLink( $DocDir, "Documentation directory" );
-    return;
-}
-
-# Function to removing all extensions
 sub RemoveAllExtensions {
-
-    # Get list of currently linked extensions
-    my @LinkedExtensions = GetLinkedExtensions();
+    my @LinkedExtensions = TidyAll::Znuny::Extension::Linked( RepoRoot => $TargetRepoRoot );
 
     Print( 'warning', "⚠ WARNING: Removing ALL extension links!" );
     Print("\n");
     if (@LinkedExtensions) {
         Print( 'warning', "This will remove the following extensions:\n" );
+        EXTENSION:
         for my $Extension (@LinkedExtensions) {
             Print( 'yellow', "  - $Extension\n" );
         }
@@ -735,661 +470,11 @@ sub RemoveAllExtensions {
     }
 
     Print("\n");
-    Print( 'header', "=== Removing ALL extension links ===" );
-    Print("\n");
-
-    Print( 'step', "1. Removing All .tidyallrc Symbolic Links..." );
-    Print("\n");
-    my $KernelTidyAllDir = File::Spec->catdir( $TargetRepoRoot, 'Kernel', 'TidyAll' );
-    if ( -d $KernelTidyAllDir ) {
-        opendir( my $DH, $KernelTidyAllDir ) || warn "Cannot open $KernelTidyAllDir: $!";
-        my @TidyAllrcFiles = grep {/\.tidyallrc$/} readdir($DH);
-        closedir($DH);
-
-        for my $File (@TidyAllrcFiles) {
-            my $FilePath = File::Spec->catfile( $KernelTidyAllDir, $File );
-            RemoveLink( $FilePath, "TidyAll configuration" ) if -l $FilePath;
-        }
-    }
-
-    Print("\n");
-    Print( 'step', "2. Removing All TidyAll PM Links..." );
-    Print("\n");
-    if ( -d $KernelTidyAllDir ) {
-        opendir( my $DH, $KernelTidyAllDir ) || warn "Cannot open $KernelTidyAllDir: $!";
-        my @PmFiles = grep {/\.pm$/} readdir($DH);
-        closedir($DH);
-
-        for my $File (@PmFiles) {
-            my $FilePath = File::Spec->catfile( $KernelTidyAllDir, $File );
-            RemoveLink( $FilePath, "TidyAll PM file" ) if -l $FilePath;
-        }
-    }
-
-    Print("\n");
-    Print( 'step', "3. Removing All Plugin Directory Links..." );
-    Print("\n");
-    my $PluginDir = File::Spec->catdir( $KernelTidyAllDir, 'Plugin' );
-    if ( -d $PluginDir ) {
-        opendir( my $DH, $PluginDir ) || warn "Cannot open $PluginDir: $!";
-        my @PluginSubDirs = readdir($DH);
-        closedir($DH);
-
-        PLUGIN_SUBDIR:
-        for my $SubDir (@PluginSubDirs) {
-            next PLUGIN_SUBDIR if $SubDir eq '.' || $SubDir eq '..';
-            my $SubDirPath = File::Spec->catdir( $PluginDir, $SubDir );
-            RemoveLink( $SubDirPath, "Plugin directory" ) if -l $SubDirPath;
-        }
-    }
-
-    Print("\n");
-    Print( 'step', "4. Removing All Test Directory Links..." );
-    Print("\n");
-    my $TestDir = File::Spec->catdir( $TargetRepoRoot, 'scripts', 'test' );
-    if ( -d $TestDir ) {
-        opendir( my $DH, $TestDir ) || warn "Cannot open $TestDir: $!";
-        my @TestItems = readdir($DH);
-        closedir($DH);
-
-        TEST_ITEM:
-        for my $Item (@TestItems) {
-            next TEST_ITEM if $Item eq '.' || $Item eq '..';
-            my $ItemPath = File::Spec->catdir( $TestDir, $Item );
-            RemoveLink( $ItemPath, "Test directory" ) if -l $ItemPath;
-        }
-    }
-
-    Print("\n");
-    Print( 'step', "5. Removing All Documentation Directory Links..." );
-    Print("\n");
-    my $DocDir = File::Spec->catdir( $TargetRepoRoot, 'doc' );
-    if ( -d $DocDir ) {
-        opendir( my $DH, $DocDir ) || warn "Cannot open $DocDir: $!";
-        my @DocItems = readdir($DH);
-        closedir($DH);
-
-        DOC_ITEM:
-        for my $Item (@DocItems) {
-            next DOC_ITEM if $Item eq '.' || $Item eq '..';
-            my $ItemPath = File::Spec->catdir( $DocDir, $Item );
-            RemoveLink( $ItemPath, "Documentation directory" ) if -l $ItemPath;
-        }
-    }
-    return;
-}
-
-# Function to print removal summary
-sub PrintRemovalSummary {
-    my ( $ExtensionName, $ExtensionsDir, $Command ) = @_;
-
-    Print("\n");
-    Print("\n");
-    Print( 'header', "=== Removal Summary ===" );
-    Print("\n");
-    if ( $ExtensionName eq '--all' ) {
-        Print( 'info', "Removed ALL extension links from ZnunyCodePolicy" );
-    }
-    else {
-        Print( 'info', "Extension: $ExtensionName" );
-        Print( 'info', "Removed symbolic links and empty directories" );
-    }
-
-    # Count remaining links (approximate)
-    my $RemainingTidyallrc = 0;
-    my $RemainingPm        = 0;
-    my $RemainingPlugins   = 0;
-    my $RemainingTests     = 0;
-    my $RemainingDocs      = 0;
-
-    my $KernelTidyAllDir = File::Spec->catdir( $TargetRepoRoot, 'Kernel', 'TidyAll' );
-    if ( -d $KernelTidyAllDir ) {
-        opendir( my $DH, $KernelTidyAllDir );
-        $RemainingTidyallrc = grep { /\.tidyallrc$/ && -l File::Spec->catfile( $KernelTidyAllDir, $_ ) } readdir($DH);
-        closedir($DH);
-    }
-
-    if ( -d $KernelTidyAllDir ) {
-        opendir( my $DH, $KernelTidyAllDir );
-        $RemainingPm = grep { /\.pm$/ && -l File::Spec->catfile( $KernelTidyAllDir, $_ ) } readdir($DH);
-        closedir($DH);
-    }
-
-    my $PluginDir = File::Spec->catdir( $KernelTidyAllDir, 'Plugin' );
-    if ( -d $PluginDir ) {
-        opendir( my $DH, $PluginDir );
-        $RemainingPlugins = grep { $_ ne '.' && $_ ne '..' && -l File::Spec->catdir( $PluginDir, $_ ) } readdir($DH);
-        closedir($DH);
-    }
-
-    my $TestDir = File::Spec->catdir( $TargetRepoRoot, 'scripts', 'test' );
-    if ( -d $TestDir ) {
-        opendir( my $DH, $TestDir );
-        $RemainingTests = grep { $_ ne '.' && $_ ne '..' && -l File::Spec->catdir( $TestDir, $_ ) } readdir($DH);
-        closedir($DH);
-    }
-
-    my $DocDir = File::Spec->catdir( $TargetRepoRoot, 'doc' );
-    if ( -d $DocDir ) {
-        opendir( my $DH, $DocDir );
-        $RemainingDocs = grep { $_ ne '.' && $_ ne '..' && -l File::Spec->catdir( $DocDir, $_ ) } readdir($DH);
-        closedir($DH);
-    }
-
-    Print("Remaining extension links:\n");
-    Print("- TidyAll configurations: ");
-    Print( $RemainingTidyallrc == 0 ? 'green' : 'red', $RemainingTidyallrc );
-    Print(" files\n");
-    Print("- TidyAll PM files: ");
-    Print( $RemainingPm == 0 ? 'green' : 'red', $RemainingPm );
-    Print(" files\n");
-    Print("- Plugins: ");
-    Print( $RemainingPlugins == 0 ? 'green' : 'red', $RemainingPlugins );
-    Print(" files\n");
-    Print("- Tests: ");
-    Print( $RemainingTests == 0 ? 'green' : 'red', $RemainingTests );
-    Print(" files\n");
-    Print("- Documentation: ");
-    Print( $RemainingDocs == 0 ? 'green' : 'red', $RemainingDocs );
-    Print(" files\n");
-
-    Print( 'success', "\n=== Removal completed successfully! ===\n" );
-
-    if ( $ExtensionName ne '--all' && $Command eq 'remove' ) {
-        my $ExtensionCheckDir = File::Spec->catdir( $ExtensionsDir, $ExtensionName );
-        if ( -d $ExtensionCheckDir ) {
-            Print( 'info', "Note: The extension directory '$ExtensionName' still exists in Extensions/." );
-            Print( 'info', "If it's a git submodule, you can remove it with:" );
-            Print( 'info', "  cd Extensions && git submodule deinit -f $ExtensionName\n" );
-            Print( 'info', "  cd Extensions && git rm $ExtensionName\n" );
-            Print( 'info', "  rm -rf .git/modules/Extensions/$ExtensionName\n" );
-        }
-        else {
-            Print( 'info', "Extension directory '$ExtensionName' not found or already removed from Extensions/." );
-        }
-    }
-
-    Print( 'info', "\nTo verify removal:" );
-    Print( 'info', " perl bin/znuny.CodePolicy.pl --verbose --file-path README.md\n\n" );
-    return;
-}
-
-# Function to list available extensions
-sub ListAvailableExtensions {
-    my $ExtensionsDir = File::Spec->catdir( $TargetRepoRoot, 'Extensions' );
-
-    if ( !-d $ExtensionsDir ) {
-        Print( 'warning', "No extension directory found.\n" );
-        return ();
-    }
-
-    opendir( my $DH, $ExtensionsDir ) || return ();
-    my @Extensions = grep { $_ ne '.' && $_ ne '..' && -d File::Spec->catdir( $ExtensionsDir, $_ ) } readdir($DH);
-    closedir($DH);
-
-    @Extensions = sort @Extensions;
-    return @Extensions;
-}
-
-# Function to get list of currently linked extensions
-sub GetLinkedExtensions {
-    my @LinkedExtensions;
-    my %ExtensionSeen;
-
-    # Check TidyAll plugin directories
-    my $KernelTidyAllDir = File::Spec->catdir( $TargetRepoRoot,   'Kernel', 'TidyAll' );
-    my $PluginDir        = File::Spec->catdir( $KernelTidyAllDir, 'Plugin' );
-    if ( -d $PluginDir ) {
-        opendir( my $DH, $PluginDir ) || warn "Cannot open $PluginDir: $!";
-        my @PluginSubDirs = grep { $_ ne '.' && $_ ne '..' && -l File::Spec->catdir( $PluginDir, $_ ) } readdir($DH);
-        closedir($DH);
-
-        for my $Extension (@PluginSubDirs) {
-            $ExtensionSeen{$Extension} = 1;
-        }
-    }
-
-    # Check test directories
-    my $TestDir = File::Spec->catdir( $TargetRepoRoot, 'scripts', 'test' );
-    if ( -d $TestDir ) {
-        opendir( my $DH, $TestDir ) || warn "Cannot open $TestDir: $!";
-        my @TestItems = grep { $_ ne '.' && $_ ne '..' && -l File::Spec->catdir( $TestDir, $_ ) } readdir($DH);
-        closedir($DH);
-
-        for my $Extension (@TestItems) {
-            $ExtensionSeen{$Extension} = 1;
-        }
-    }
-
-    # Check doc directories
-    my $DocDir = File::Spec->catdir( $TargetRepoRoot, 'doc' );
-    if ( -d $DocDir ) {
-        opendir( my $DH, $DocDir ) || warn "Cannot open $DocDir: $!";
-        my @DocItems = grep { $_ ne '.' && $_ ne '..' && -l File::Spec->catdir( $DocDir, $_ ) } readdir($DH);
-        closedir($DH);
-
-        for my $Extension (@DocItems) {
-            $ExtensionSeen{$Extension} = 1;
-        }
-    }
-
-    @LinkedExtensions = sort keys %ExtensionSeen;
-    return @LinkedExtensions;
-}
-
-# Function to cleanup path for display (remove relative path components)
-sub CleanupPathForDisplay {
-    my ($Path) = @_;
-
-    # Remove leading relative path components like ../../ or ../
-    $Path =~ s|^(?:\.\./)+||;
-
-    return $Path;
-}
-
-# Function to check if a link points to our extension
-sub IsLinkPointsToExtension {
-    my ( $LinkPath, $ExtensionName ) = @_;
-
-    my $LinkTarget = readlink($LinkPath);
-    return 0 if !defined $LinkTarget;
-
-    return $LinkTarget =~ /\Q$ExtensionName\E/;
-}
-
-# Function to create directory if it doesn't exist
-sub CreateDir {
-    my ($Dir) = @_;
-
-    if ( !-d $Dir ) {
-        make_path($Dir) || die "Cannot create directory $Dir: $!";
-        if ( $Options{Verbose} ) {
-            Print( 'green', "  ✓ Created directory: $Dir\n" );
-        }
-    }
-    return 1;
-}
-
-# Function to create symbolic link
-sub CreateLink {
-    my ( $Source, $Target, $Description ) = @_;
-
-    # Remove existing link if present
-    if ( -l $Target ) {
-        unlink $Target || warn "Cannot remove existing link $Target: $!";
-    }
-    elsif ( -e $Target ) {
-        Print( 'warning', "  WARNING: $Target exists and is not a symbolic link. Skipping..." );
-        return 0;
-    }
-
-    # Calculate relative path from target to source
-    my $RelSource = File::Spec->abs2rel( $Source, dirname($Target) );
-
-    # Create the symbolic link
-    symlink( $RelSource, $Target ) || do {
-        Print( 'error', "Cannot create symbolic link $Target -> $RelSource: $!" );
-        return 0;
-    };
-
-    Print( 'green', "  ✓ Linked: " );
-    Print( 'info',  basename($Source) . " -> $Target\n" );
-    return 1;
-}
-
-# Function to link TidyAll files
-sub LinkTidyAllFiles {
-    my ( $ExtensionDir, $ExtensionName ) = @_;
-
-    Print( 'step', "2. Linking TidyAll Configuration Files for: $ExtensionName..." );
-    Print("\n");
-
-    my $ExtTidyAllDir    = File::Spec->catdir( $ExtensionDir,   'Kernel', 'TidyAll' );
-    my $TargetTidyAllDir = File::Spec->catdir( $TargetRepoRoot, 'Kernel', 'TidyAll' );
-
-    if ( !-d $ExtTidyAllDir ) {
-        Print( 'warning', "  ⚠ No Kernel/TidyAll directory found in extension" );
-        return;
-    }
-
-    # Link .tidyallrc files (1:1, no prefix modification)
-    opendir( my $DH, $ExtTidyAllDir ) || warn "Cannot open $ExtTidyAllDir: $!";
-    my @TidyAllrcFiles = grep { /\.tidyallrc$/ && -f File::Spec->catfile( $ExtTidyAllDir, $_ ) } readdir($DH);
-    closedir($DH);
-
-    for my $File (@TidyAllrcFiles) {
-        my $SourceFile = File::Spec->catfile( $ExtTidyAllDir,    $File );
-        my $TargetFile = File::Spec->catfile( $TargetTidyAllDir, $File );
-        CreateLink( $SourceFile, $TargetFile, "TidyAll configuration" );
-    }
-    return;
-}
-
-# Function to link TidyAll PM files
-sub LinkTidyAllPmFiles {
-    my ( $ExtensionDir, $ExtensionName ) = @_;
-
-    Print( 'step', "3. Linking TidyAll PM Files for: $ExtensionName..." );
-    Print("\n");
-
-    my $ExtTidyAllDir    = File::Spec->catdir( $ExtensionDir,   'Kernel', 'TidyAll' );
-    my $TargetTidyAllDir = File::Spec->catdir( $TargetRepoRoot, 'Kernel', 'TidyAll' );
-
-    if ( !-d $ExtTidyAllDir ) {
-        Print( 'warning', "  ⚠ No Kernel/TidyAll directory found in extension" );
-        return;
-    }
-
-    # Link .pm files (1:1, no prefix modification)
-    opendir( my $DH, $ExtTidyAllDir ) || warn "Cannot open $ExtTidyAllDir: $!";
-    my @PmFiles = grep { /\.pm$/ && -f File::Spec->catfile( $ExtTidyAllDir, $_ ) } readdir($DH);
-    closedir($DH);
-
-    for my $File (@PmFiles) {
-        my $SourceFile = File::Spec->catfile( $ExtTidyAllDir,    $File );
-        my $TargetFile = File::Spec->catfile( $TargetTidyAllDir, $File );
-        CreateLink( $SourceFile, $TargetFile, "TidyAll PM file" );
-    }
-    return;
-}
-
-# Function to link plugin directories
-sub LinkPluginDirectories {
-    my ( $ExtensionDir, $ExtensionName ) = @_;
-
-    Print( 'step', "4. Linking Plugin Directories for: $ExtensionName..." );
-    Print("\n");
-
-    my $ExtTidyAllDir    = File::Spec->catdir( $ExtensionDir,   'Kernel', 'TidyAll' );
-    my $TargetTidyAllDir = File::Spec->catdir( $TargetRepoRoot, 'Kernel', 'TidyAll' );
-
-    if ( !-d $ExtTidyAllDir ) {
-        Print( 'warning', "  ⚠ No Kernel/TidyAll directory found in extension" );
-        return;
-    }
-
-    # Link Plugin directory contents
-    my $ExtPluginDir = File::Spec->catdir( $ExtTidyAllDir, 'Plugin' );
-    if ( -d $ExtPluginDir ) {
-        my $TargetPluginDir = File::Spec->catdir( $TargetTidyAllDir, 'Plugin' );
-
-        # Link each subdirectory in the Plugin directory individually
-        opendir( my $DH, $ExtPluginDir ) || warn "Cannot open $ExtPluginDir: $!";
-        my @PluginSubDirs = grep { $_ ne '.' && $_ ne '..' && -d File::Spec->catdir( $ExtPluginDir, $_ ) } readdir($DH);
-        closedir($DH);
-
-        for my $SubDir (@PluginSubDirs) {
-            my $SourceSubDir = File::Spec->catdir( $ExtPluginDir,    $SubDir );
-            my $TargetSubDir = File::Spec->catdir( $TargetPluginDir, $SubDir );
-            CreateLink( $SourceSubDir, $TargetSubDir, "Plugin subdirectory" );
-        }
-    }
-    else {
-        Print( 'warning', "  ⚠ No Plugin directory found in extension" );
-    }
-    return;
-}
-
-# Function to link tests
-sub LinkTests {
-    my ( $ExtensionDir, $ExtensionName ) = @_;
-
-    Print( 'step', "5. Linking Test Directory for: $ExtensionName..." );
-    Print("\n");
-
-    my $ExtTestDir    = File::Spec->catdir( $ExtensionDir,   'scripts', 'test' );
-    my $TargetTestDir = File::Spec->catdir( $TargetRepoRoot, 'scripts', 'test', $ExtensionName );
-
-    if ( !-d $ExtTestDir ) {
-        Print( 'warning', "  ⚠ No scripts/test directory found in extension" );
-        return;
-    }
-
-    CreateDir($TargetTestDir);
-
-    # Link all test files recursively
-    File::Find::find(
-        sub {
-            return if !/\.t$/;
-            return if !-f $_ && !( -l $_ && -f readlink($_) );
-
-            my $SourceFile = $File::Find::name;
-            my $RelPath    = File::Spec->abs2rel( $SourceFile, $ExtTestDir );
-            my $TargetFile = File::Spec->catfile( $TargetTestDir, $RelPath );
-            my $TargetDir  = dirname($TargetFile);
-
-            CreateDir($TargetDir);
-            CreateLink( $SourceFile, $TargetFile, "Test file" );
-        },
-        $ExtTestDir
+    my $Result = TidyAll::Znuny::Extension::Remove(
+        RepoRoot => $TargetRepoRoot,
+        All      => 1,
     );
-    return;
-}
-
-# Function to link documentation
-sub LinkDocumentation {
-    my ( $ExtensionDir, $ExtensionName ) = @_;
-
-    Print( 'step', "6. Linking Documentation Directory for: $ExtensionName..." );
-    Print("\n");
-
-    # Documentation
-    my $ExtDocDir = File::Spec->catdir( $ExtensionDir, 'doc' );
-    if ( -d $ExtDocDir ) {
-        my $TargetDocDir = File::Spec->catdir( $TargetRepoRoot, 'doc', $ExtensionName );
-        CreateLink( $ExtDocDir, $TargetDocDir, "Documentation directory" );
-    }
-    else {
-        Print( 'warning', "  ⚠ No documentation directory found in extension" );
-    }
-    return;
-}
-
-# Function to safely remove symbolic link
-sub RemoveLink {
-    my ( $Target, $Description ) = @_;
-
-    if ( -l $Target ) {
-        if ( unlink $Target ) {
-
-            Print( 'green', "  ✓ Removed: " );
-            Print( 'info',  "$Target ($Description)\n" );
-            $RemovedCount++;
-            return 1;
-        }
-        else {
-            Print( 'error', "  Cannot remove $Target: $!" );
-            return 0;
-        }
-    }
-    elsif ( -e $Target ) {
-        Print( 'warning', "  ⚠ WARNING: $Target exists but is not a symbolic link. Skipping for safety." );
-        return 0;
-    }
-    else {
-        if ( $Options{Verbose} ) {
-            Print( 'cyan', "  ℹ Not found: $Target\n" );
-        }
-        return 1;
-    }
-}
-
-# Function to remove directory if empty and it's a symbolic link directory
-sub RemoveEmptyDir {
-    my ($Dir) = @_;
-
-    if ( -l $Dir ) {
-        if ( unlink $Dir ) {
-            Print( 'green', "  ✓ Removed directory link: $Dir\n" );
-            return 1;
-        }
-    }
-    elsif ( -d $Dir && !glob("$Dir/*") && !glob("$Dir/.*") ) {
-
-        # Only remove if truly empty (no files, no hidden files except . and ..)
-        if ( rmdir $Dir ) {
-            Print( 'green', "  ✓ Removed empty directory: $Dir\n" );
-            return 1;
-        }
-    }
-    return 0;
-}
-
-# Function to remove old extension links
-sub CleanupOldLinks {
-    my ($ExtensionName) = @_;
-
-    Print( 'step', "1. Cleaning Up Old Extension Links for: $ExtensionName..." );
-    Print("\n");
-
-    # Remove tidyallrc links
-    my $KernelTidyAllDir = File::Spec->catdir( $TargetRepoRoot, 'Kernel', 'TidyAll' );
-    if ( -d $KernelTidyAllDir ) {
-        opendir( my $DH, $KernelTidyAllDir ) || warn "Cannot open $KernelTidyAllDir: $!";
-        my @TidyAllrcFiles = grep { /\.tidyallrc$/ && -l File::Spec->catfile( $KernelTidyAllDir, $_ ) } readdir($DH);
-        closedir($DH);
-
-        for my $File (@TidyAllrcFiles) {
-            my $FilePath = File::Spec->catfile( $KernelTidyAllDir, $File );
-            unlink $FilePath;
-        }
-    }
-
-    # Remove PM links
-    if ( -d $KernelTidyAllDir ) {
-        opendir( my $DH, $KernelTidyAllDir ) || warn "Cannot open $KernelTidyAllDir: $!";
-        my @PmFiles = grep { /\.pm$/ && -l File::Spec->catfile( $KernelTidyAllDir, $_ ) } readdir($DH);
-        closedir($DH);
-
-        for my $File (@PmFiles) {
-            my $FilePath = File::Spec->catfile( $KernelTidyAllDir, $File );
-            unlink $FilePath;
-        }
-    }
-
-    # Remove plugin directory links
-    my $PluginDir = File::Spec->catdir( $KernelTidyAllDir, 'Plugin', $ExtensionName );
-    if ( -l $PluginDir ) {
-        unlink $PluginDir;
-    }
-
-    # Remove doc directory link
-    my $DocDir = File::Spec->catdir( $TargetRepoRoot, 'doc', $ExtensionName );
-    if ( -l $DocDir ) {
-        unlink $DocDir;
-    }
-
-    Print( 'green', "  ✓ Cleanup completed\n" );
-    Print("\n");
-    return;
-}
-
-# Function to cleanup all old extension links (for --all)
-sub CleanupAllOldLinks {
-
-    Print( 'step', "1. Cleaning Up All Old Extension Links..." );
-    Print("\n");
-
-    my $KernelTidyAllDir = File::Spec->catdir( $TargetRepoRoot, 'Kernel', 'TidyAll' );
-
-    # Remove all tidyallrc links
-    if ( -d $KernelTidyAllDir ) {
-        opendir( my $DH, $KernelTidyAllDir ) || warn "Cannot open $KernelTidyAllDir: $!";
-        my @TidyAllrcFiles = grep { /\.tidyallrc$/ && -l File::Spec->catfile( $KernelTidyAllDir, $_ ) } readdir($DH);
-        closedir($DH);
-
-        for my $File (@TidyAllrcFiles) {
-            my $FilePath = File::Spec->catfile( $KernelTidyAllDir, $File );
-            unlink $FilePath;
-        }
-    }
-
-    # Remove all PM links
-    if ( -d $KernelTidyAllDir ) {
-        opendir( my $DH, $KernelTidyAllDir ) || warn "Cannot open $KernelTidyAllDir: $!";
-        my @PmFiles = grep { /\.pm$/ && -l File::Spec->catfile( $KernelTidyAllDir, $_ ) } readdir($DH);
-        closedir($DH);
-
-        for my $File (@PmFiles) {
-            my $FilePath = File::Spec->catfile( $KernelTidyAllDir, $File );
-            unlink $FilePath;
-        }
-    }
-
-    # Remove all plugin directory links
-    my $PluginDir = File::Spec->catdir( $KernelTidyAllDir, 'Plugin' );
-    if ( -d $PluginDir ) {
-        opendir( my $DH, $PluginDir ) || warn "Cannot open $PluginDir: $!";
-        my @PluginSubDirs = grep { $_ ne '.' && $_ ne '..' && -l File::Spec->catdir( $PluginDir, $_ ) } readdir($DH);
-        closedir($DH);
-
-        for my $SubDir (@PluginSubDirs) {
-            my $SubDirPath = File::Spec->catdir( $PluginDir, $SubDir );
-            unlink $SubDirPath if -l $SubDirPath;
-        }
-    }
-
-    # Remove all test directory links
-    my $TestDir = File::Spec->catdir( $TargetRepoRoot, 'scripts', 'test' );
-    if ( -d $TestDir ) {
-        opendir( my $DH, $TestDir ) || warn "Cannot open $TestDir: $!";
-        my @TestItems = grep { $_ ne '.' && $_ ne '..' && -l File::Spec->catdir( $TestDir, $_ ) } readdir($DH);
-        closedir($DH);
-
-        for my $Item (@TestItems) {
-            my $ItemPath = File::Spec->catdir( $TestDir, $Item );
-            unlink $ItemPath if -l $ItemPath;
-        }
-    }
-
-    # Remove all doc directory links
-    my $DocDir = File::Spec->catdir( $TargetRepoRoot, 'doc' );
-    if ( -d $DocDir ) {
-        opendir( my $DH, $DocDir ) || warn "Cannot open $DocDir: $!";
-        my @DocItems = grep { $_ ne '.' && $_ ne '..' && -l File::Spec->catdir( $DocDir, $_ ) } readdir($DH);
-        closedir($DH);
-
-        for my $Item (@DocItems) {
-            my $ItemPath = File::Spec->catdir( $DocDir, $Item );
-            unlink $ItemPath if -l $ItemPath;
-        }
-    }
-
-    Print( 'green', "  ✓ All old extension links cleaned up\n" );
-    return;
-}
-
-sub Print {
-    my ( $Color, $Text ) = @_;
-
-    my %ColorMap = (
-        'success' => 'green',
-        'info'    => 'white',
-        'warning' => 'yellow',
-        'error'   => 'red',
-        'header'  => 'cyan',
-        'step'    => 'blue',
-    );
-
-    if ( !defined $Text ) {
-        $Text  = $Color;
-        $Color = 'info';
-    }
-
-    my $ActualColor;
-    if ( defined $Color && exists $ColorMap{$Color} ) {
-        $ActualColor = $ColorMap{$Color};
-    }
-    elsif ( defined $Color ) {
-        $ActualColor = $Color;    # Assume it's already a color name
-    }
-    else {
-        $ActualColor = $ColorMap{info};    # Default to 'white' if no argument or undef
-    }
-
-    my $ColoredText = $ENV{ZNUNY_CODE_POLICY_NO_COLOR_OUTPUT} ? $Text : colored( $Text, $ActualColor );
-    print $ColoredText;
-
+    PrintLog( $Result->{Log} );
     return;
 }
 
@@ -1491,6 +576,137 @@ sub RemoveGitignore {
         Print( 'warning', "  ⚠ Could not find template: $!\n" );
         return;
     }
+    return;
+}
+
+sub PrintAdditionSummary {
+    my ( $ExtensionName, $ExtensionDir ) = @_;
+
+    my $Summary = TidyAll::Znuny::Extension::LinkSummary(
+        RepoRoot     => $TargetRepoRoot,
+        Name         => $ExtensionName,
+        ExtensionDir => $ExtensionDir,
+    );
+
+    Print( 'header', "=== Addition Summary ===" );
+    Print("\n\n");
+    Print( 'info', "Extension: $ExtensionName" );
+    Print("\n");
+    Print("Linked components:\n");
+    _PrintCount( 'TidyAll configurations', $Summary->{Config} );
+    _PrintCount( 'TidyAll PM files',       $Summary->{Module} );
+    _PrintCount( 'Tests',                  $Summary->{Test} );
+    _PrintCount( 'Plugins',                $Summary->{Plugin} );
+    _PrintCount( 'Documentation',          $Summary->{Documentation} );
+
+    Print("\n");
+    Print( 'success', "=== Addition completed successfully! ===" );
+    Print("\n\n");
+    Print( 'info', "To test the extension:" );
+    Print("\n");
+    Print( 'magenta', "  perl bin/znuny.CodePolicy.pl --verbose --file-path README.md\n" );
+    Print("\n");
+    return;
+}
+
+sub PrintRemovalSummary {
+    my ($ExtensionName) = @_;
+
+    my $Remaining = TidyAll::Znuny::Extension::RemainingSummary( RepoRoot => $TargetRepoRoot );
+
+    Print("\n");
+    Print("\n");
+    Print( 'header', "=== Removal Summary ===" );
+    Print("\n");
+    if ( $ExtensionName eq '--all' ) {
+        Print( 'info', "Removed ALL extension links from ZnunyCodePolicy" );
+    }
+    else {
+        Print( 'info', "Extension: $ExtensionName" );
+        Print( 'info', "Removed symbolic links and empty directories" );
+    }
+
+    Print("Remaining extension links:\n");
+    _PrintRemaining( 'TidyAll configurations', $Remaining->{Config} );
+    _PrintRemaining( 'TidyAll PM files',       $Remaining->{Module} );
+    _PrintRemaining( 'Plugins',                $Remaining->{Plugin} );
+    _PrintRemaining( 'Tests',                  $Remaining->{Test} );
+    _PrintRemaining( 'Documentation',          $Remaining->{Documentation} );
+
+    Print( 'success', "\n=== Removal completed successfully! ===\n" );
+
+    Print( 'info', "\nTo verify removal:" );
+    Print( 'info', " perl bin/znuny.CodePolicy.pl --verbose --file-path README.md\n\n" );
+    return;
+}
+
+sub PrintLog {
+    my ($Log) = @_;
+
+    ENTRY:
+    for my $Entry ( @{ $Log // [] } ) {
+        next ENTRY if !defined $Entry->{Text};
+        if ( defined $Entry->{Color} && length $Entry->{Color} ) {
+            Print( $Entry->{Color}, $Entry->{Text} );
+        }
+        else {
+            Print( $Entry->{Text} );
+        }
+    }
+    return;
+}
+
+sub Print {
+    my ( $Color, $Text ) = @_;
+
+    my %ColorMap = (
+        'success' => 'green',
+        'info'    => 'white',
+        'warning' => 'yellow',
+        'error'   => 'red',
+        'header'  => 'cyan',
+        'step'    => 'blue',
+    );
+
+    if ( !defined $Text ) {
+        $Text  = $Color;
+        $Color = 'info';
+    }
+
+    my $ActualColor;
+    if ( defined $Color && exists $ColorMap{$Color} ) {
+        $ActualColor = $ColorMap{$Color};
+    }
+    elsif ( defined $Color ) {
+        $ActualColor = $Color;    # Assume it's already a color name
+    }
+    else {
+        $ActualColor = $ColorMap{info};    # Default to 'white' if no argument or undef
+    }
+
+    my $ColoredText = $ENV{ZNUNY_CODE_POLICY_NO_COLOR_OUTPUT} ? $Text : colored( $Text, $ActualColor );
+    print $ColoredText;
+
+    return;
+}
+
+sub _PrintCount {
+    my ( $Label, $Count ) = @_;
+
+    $Count //= 0;
+    Print("- $Label: ");
+    Print( $Count > 0 ? 'green' : 'white', $Count );
+    Print(" files\n");
+    return;
+}
+
+sub _PrintRemaining {
+    my ( $Label, $Count ) = @_;
+
+    $Count //= 0;
+    Print("- $Label: ");
+    Print( $Count == 0 ? 'green' : 'red', $Count );
+    Print(" files\n");
     return;
 }
 

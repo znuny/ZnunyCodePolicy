@@ -24,6 +24,7 @@
 - [Extension Repository Structure](#extension-repository-structure)
 - [Debugging Extensions](#debugging-extensions)
   - [Extension Status](#extension-status)
+  - [Load check on every run](#load-check-on-every-run)
   - [Verbose Output](#verbose-output)
 - [Troubleshooting](#troubleshooting)
   - [Common Issues](#common-issues)
@@ -85,7 +86,7 @@ The `znuny.CodePolicy.pl` script automatically scans the `Kernel/TidyAll/` direc
 
 This means that we only need to add new files and they will then be used directly.
 
-`bin/znuny.CodePolicy.Extension.pl` helps us make these available (via linking).
+`TidyAll::Znuny::Extension` links those files, reports the link status, and checks that a policy run loaded them. `bin/znuny.CodePolicy.Extension.pl` is the command line for linking and status.
 
 ---
 
@@ -300,7 +301,7 @@ ZnunyCodePolicy/
   │   │           └── README.t
   │   └── TidyAll/
           ├── Plugin/                     # Main Plugin tests
-          └── Extensions.t
+          └── Extension.t
   │
   └──doc/
       ├── en
@@ -339,13 +340,54 @@ Output example:
   ✓ Plugin/Extension -> ../../Extensions/Example/Kernel/TidyAll/Plugin/Extension
 
 4. Test Directories
-  ✓ scripts/test/Example/README.t -> ../../../../Extensions/Example/scripts/test/TidyAll/Plugin/Extension/Example/README.t
+  ✓ scripts/test/Example -> ../Extensions/Example/scripts/test
 
 5. Documentation Directories
   ✓ doc/Example -> ../Extensions/Example/doc
 
 === Status: Extensions are active ===
 ```
+
+A missing or broken link is printed in the same group:
+
+```
+  ✗ Kernel/TidyAll/Example.pm (link is missing)
+  ✗ Extensions/Example/Kernel/TidyAll/Plugin/Znuny/Example.pm (plugin file is missing in the extension)
+
+=== Status: Extension links are missing ===
+```
+
+`scripts/test/<Name>`, `Kernel/TidyAll/Plugin/<Name>` and `doc/<Name>` are directory symlinks. A new file inside them is available at once.
+
+`*.tidyallrc` and `*.pm` directly in `Kernel/TidyAll/` stay file symlinks, because that directory already holds the core files. `bin/znuny.CodePolicy.pl` creates a missing file symlink for an active extension before the load check.
+
+`link is missing` means the file or directory exists in the extension and the symlink in the CodePolicy tree does not point at it.
+`plugin file is missing in the extension` means the tidyallrc enables `[+TidyAll::Plugin::...]` and the `.pm` file is not there yet. Write that file at the printed path. The package name must match the class. Run `add` again when the plugin directory itself is not linked.
+
+### Load check on every run
+
+`bin/znuny.CodePolicy.pl` checks each active extension before the policy run.
+An extension is active when a symlink points into `Extensions/<name>/`.
+
+Checked files:
+
+- `Kernel/TidyAll/*.tidyallrc` (included in the combined configuration)
+- `Kernel/TidyAll/*.pm`
+- every file under `Kernel/TidyAll/Plugin/`
+- every enabled `[+TidyAll::Plugin::...]` class in those tidyallrc files
+
+Tests and documentation are not part of this check. The run exits with code 1 when a file is missing.
+
+```
+================================================================================
+Code policy context:         OPM
+Vendor:                      Znuny GmbH
+Product name:                ExamplePackage
+Extensions:                  Example (config 1/1, plugin files 2/2, plugins 1/1)
+================================================================================
+```
+
+`--verbose` lists each loaded file. A local `custom.tidyallrc` that is not a symlink into `Extensions/` stays visible in the verbose tidyallrc list and is not an active extension.
 
 ### Verbose Output
 
@@ -355,6 +397,14 @@ perl bin/znuny.CodePolicy.pl --verbose --file-path YourFile.pm
 
 Output example:
 ```
+================================================================================
+Code policy context:         OPM
+Vendor:                      Znuny GmbH
+Product name:                ExamplePackage
+Extensions:                  Example (config 1/1, plugins 1/1)
+                             config: Kernel/TidyAll/100-example.tidyallrc
+                             plugin: TidyAll::Plugin::Example::README
+================================================================================
 Found extensions tidyallrc files:
   - custom.tidyallrc
   - 100-example.tidyallrc
@@ -374,6 +424,7 @@ Created combined configuration with 2 additional file(s)
 2. **Plugin not found**:
    - Verify plugin path and class name
    - Check if plugin directory is properly linked in status output
+   - `plugin file is missing in the extension` — write the `.pm` at the path from `status` or from the policy report, then link the extension again when the directory link is missing
 
 3. **Syntax errors**:
    - Validate INI syntax in configuration files

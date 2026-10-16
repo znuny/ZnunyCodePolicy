@@ -38,6 +38,7 @@ use lib dirname($RealBin) . '/Kernel/cpan-lib';
 use lib dirname($RealBin) . '/Custom';
 
 use TidyAll::Znuny;
+use TidyAll::Znuny::Extension;
 
 # Ensure UTF-8 output works.
 binmode( \*STDOUT, ':encoding(UTF-8)' );
@@ -65,6 +66,10 @@ Usage: bin/znuny.CodePolicy.pl
     By default it will process all changed files (staged and unstaged) that are already known to Git.
     Other file selection options are --all-files, --staged-files, --file-path and --directory.
 
+    Active extensions (symlinks into Extensions/<name>/) are checked on every run.
+    The check covers tidyallrc files, TidyAll modules, plugin files and enabled plugins.
+    The run stops when an active extension did not load all of those files.
+
         Extensions Configuration Files:
     This script automatically loads extensions .tidyallrc configuration files from Kernel/TidyAll/:
     - custom.tidyallrc
@@ -75,7 +80,7 @@ Usage: bin/znuny.CodePolicy.pl
 
 Options:
     -h, --help                 Show this usage message
-    -v, --verbose              Activate diagnostics (shows loaded extensions config files)
+    -v, --verbose              Activate diagnostics (lists loaded extension files)
     -i, --install-eslint       Install ESLint via npm
     -m, --mode                 Use custom Code::TidyAll mode (default: cli)
     -p, --process-limit        Max. number of processes to use (default: environment variable ZNUNY_CODE_POLICY_PROCESS_LIMIT if set, otherwise 6)
@@ -191,9 +196,61 @@ sub CreateCombinedTidyAllRC {
     return $TempConfig;
 }
 
+sub AddSyncedGitignore {
+    my ( $RepoRoot, $Paths ) = @_;
+
+    my $GitignoreFile = File::Spec->catfile( $RepoRoot, '.gitignore' );
+    return if !-f $GitignoreFile;
+
+    my %Existing;
+    if ( open my $ReadFH, '<', $GitignoreFile ) {
+        LINE:
+        while ( my $Line = <$ReadFH> ) {
+            chomp $Line;
+            next LINE if !length $Line;
+            $Existing{$Line} = 1;
+        }
+        close $ReadFH;
+    }
+
+    my @New;
+    PATH:
+    for my $Path ( @{$Paths} ) {
+        my $Relative = File::Spec->abs2rel( $Path, $RepoRoot );
+        next PATH if $Existing{$Relative};
+        $Existing{$Relative} = 1;
+        push @New, $Relative;
+    }
+    return if !@New;
+
+    if ( open my $WriteFH, '>>', $GitignoreFile ) {
+        for my $Relative (@New) {
+            print $WriteFH "$Relative\n";
+        }
+        close $WriteFH;
+    }
+    return;
+}
+
 # Find and combine extensions files
-my $MainTidyAllrc            = $BinDir . '/../Kernel/TidyAll/tidyallrc';
+my $MainTidyAllrc = $BinDir . '/../Kernel/TidyAll/tidyallrc';
+my $RepoRoot      = dirname($RealBin);
+my $Synced        = TidyAll::Znuny::Extension::Sync( RepoRoot => $RepoRoot );
+if ( $Synced->{Created} ) {
+    print "Linked missing extension files:\n";
+    ENTRY:
+    for my $Entry ( @{ $Synced->{Log} } ) {
+        next ENTRY if !defined $Entry->{Text};
+        print $Entry->{Text};
+    }
+    AddSyncedGitignore( $RepoRoot, $Synced->{Paths} );
+}
 my @ExtensionsTidyAllrcFiles = FindExtensionsTidyAllrc();
+
+my $ExtensionReport = TidyAll::Znuny::Extension::Check(
+    RepoRoot        => dirname($RealBin),
+    LoadedTidyAllrc => \@ExtensionsTidyAllrcFiles,
+);
 
 # Show found extensions files in verbose mode
 if ( $Options{Verbose} && @ExtensionsTidyAllrcFiles ) {
@@ -243,7 +300,15 @@ print "=========================================================================
 print "Code policy context:         " . ( $TidyAllSettings->{'Context::Framework'} ? 'Framework' : 'OPM' ) . "\n";
 print "Vendor:                      $TidyAllSettings->{Vendor}\n";
 print "Product name:                $TidyAllSettings->{ProductName}\n";
+print TidyAll::Znuny::Extension::FormatReport(
+    Report  => $ExtensionReport,
+    Verbose => $Options{Verbose},
+);
 print "================================================================================\n";
+
+if ( !$ExtensionReport->{Complete} ) {
+    exit 1;
+}
 
 if ( !@{ $TidyAllSettings->{'FilePaths::Check'} // [] } ) {
     print "No files to check.\n";
