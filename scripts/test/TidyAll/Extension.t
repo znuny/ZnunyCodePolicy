@@ -14,7 +14,7 @@ use vars qw($Self);
 use utf8;
 
 use File::Basename qw(dirname);
-use FindBin qw($RealBin);
+use FindBin        qw($RealBin);
 use lib (
     dirname($RealBin) . '/Kernel',
     dirname($RealBin) . '/../../../Kernel',
