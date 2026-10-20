@@ -13,7 +13,9 @@ use utf8;
 
 use Cwd            qw(abs_path);
 use File::Basename qw(dirname);
-use File::Path     qw(make_path);
+use File::Copy     qw(copy);
+use File::Find;
+use File::Path qw(make_path);
 use File::Spec;
 use FindBin qw($RealBin);
 use Getopt::Long;
@@ -269,7 +271,6 @@ sub RemoveCommand {
 
     if ( $Options{All} ) {
         RemoveAllExtensions();
-        RemoveGitignore();
     }
     else {
         my $Result = TidyAll::Znuny::Extension::Remove(
@@ -278,9 +279,9 @@ sub RemoveCommand {
             Verbose  => $Options{Verbose},
         );
         PrintLog( $Result->{Log} );
-        RemoveGitignore();
-        AddGitignore();
     }
+
+    RebuildGitignore();
 
     Print("\n");
     PrintRemovalSummary($ExtensionName);
@@ -351,7 +352,7 @@ sub AddSingleExtension {
         Verbose  => $Options{Verbose},
     );
     PrintLog( $Result->{Log} );
-    AddGitignore();
+    RebuildGitignore();
     Print("\n");
     PrintAdditionSummary( $ExtensionName, $ExtensionDir );
     return;
@@ -363,6 +364,7 @@ sub AddAllExtensions {
     my @AvailableExtensions = ListAvailableExtensions();
     if ( !@AvailableExtensions ) {
         Print( 'warning', "No extensions found in Extensions/ directory.\n" );
+        RebuildGitignore();
         exit 0;
     }
 
@@ -410,6 +412,7 @@ sub AddAllExtensions {
         PrintLog( $Linked->{Log} );
     }
 
+    RebuildGitignore();
     Print("\n");
     Print( 'header', "=== Addition Summary (All Extensions) ===" );
     Print("\n\n");
@@ -442,7 +445,8 @@ sub RemoveAllExtensions {
         Print("\n");
     }
     else {
-        Print( 'info', "No extension links found to remove." );
+        Print( 'info', "No extension links found to remove.\n" );
+        RebuildGitignore();
         exit 0;
     }
 
@@ -478,70 +482,45 @@ sub RemoveAllExtensions {
     return;
 }
 
-# Function to update .gitignore after adding extension (append symbolic links)
-sub AddGitignore {
+# Rebuild .gitignore from the template and the extension symlinks that exist now.
+sub RebuildGitignore {
 
-    Print( 'step', "7. Adding symbolic links to .gitignore file..." );
+    Print( 'step', "Rebuilding .gitignore from template..." );
     Print("\n");
 
     my $GitignoreFile = File::Spec->catfile( $TargetRepoRoot, '.gitignore' );
+    my $TemplateFile  = File::Spec->catfile( $TargetRepoRoot, '.gitignore.template' );
 
-    # Get all symbolic links
-    my $FindCommand = "cd '$TargetRepoRoot' && find . -type l | sed -e 's/^\.\\///g'";
-    my @SymLinks    = `$FindCommand`;
-    chomp @SymLinks;
-
-    if ( $? != 0 ) {
-        Print( 'warning', "  ⚠ Could not find symbolic links: $!\n" );
+    if ( !-f $TemplateFile ) {
+        Print( 'warning', "  ⚠ Template not found: $TemplateFile\n" );
         return;
     }
 
+    if ( !copy( $TemplateFile, $GitignoreFile ) ) {
+        Print( 'warning', "  ⚠ Could not copy template: $!\n" );
+        return;
+    }
+
+    Print( 'green', "  ✓ Restored .gitignore from template\n" );
+
+    my @SymLinks = _ExtensionSymlinks();
     if ( !@SymLinks ) {
-        Print( 'info', "  ℹ No symbolic links found\n" );
+        Print( 'info', "  ℹ No extension symbolic links found\n" );
         return;
     }
 
-    # Read existing .gitignore content
-    my %ExistingPatterns;
-    if ( -f $GitignoreFile ) {
-        if ( open my $FH, '<', $GitignoreFile ) {    ## no critic
-            LINE:
-            while ( my $Line = <$FH> ) {
-                chomp $Line;
-                $Line =~ s/^\s+|\s+$//g;                           # Trim whitespace
-                next LINE if !$Line || $Line =~ /^#/;              # Skip empty lines and comments
-                $ExistingPatterns{$Line} = 1;
-            }
-            close $FH;
-        }
-    }
-
-    # Collect new links that are not yet in .gitignore
-    my @NewLinks;
-    LINK:
-    for my $Link (@SymLinks) {
-        next LINK if exists $ExistingPatterns{$Link};
-        push @NewLinks, $Link;
-    }
-
-    if ( !@NewLinks ) {
-        Print( 'green', "  ✓ All symbolic links are already in .gitignore.\n" );
-        return;
-    }
-
-    # Add new links to .gitignore
     if ( open my $FH, '>>', $GitignoreFile ) {    ## no critic
-        for my $Link (@NewLinks) {
+        LINK:
+        for my $Link (@SymLinks) {
             print $FH "$Link\n";
             Print( 'green', "  ✓ Added: " );
             Print( 'info',  $Link . "\n" );
         }
         close $FH;
 
-        my $Count = scalar @NewLinks;
-
+        my $Count = scalar @SymLinks;
         Print("\n");
-        Print( 'green', "  ✓ Added $Count new symbolic links successfully\n" );
+        Print( 'green', "  ✓ Rebuilt .gitignore with $Count extension symbolic link(s)\n" );
     }
     else {
         Print( 'warning', "  ⚠ Could not write to .gitignore: $!\n" );
@@ -550,33 +529,37 @@ sub AddGitignore {
     return;
 }
 
-# Function to update .gitignore after removing extension (regenerate symbolic links section)
-sub RemoveGitignore {
+# Relative paths of symlinks that point into Extensions/.
+# Skips Extensions/, node_modules and .git so unrelated links stay out.
+sub _ExtensionSymlinks {
+    my @Links;
 
-    Print( 'step', "6. Restoring .gitignore file from template..." );
-    Print("\n");
+    File::Find::find(
+        {
+            wanted => sub {
+                my $Path = $File::Find::name;
 
-    my $GitignoreFile = File::Spec->catfile( $TargetRepoRoot, '.gitignore' );
-    my $TemplateFile  = File::Spec->catfile( $TargetRepoRoot, '.gitignore.template' );
+                if ( -d $Path && $Path =~ m{/(?:\.git|node_modules|Extensions)\z} ) {
+                    $File::Find::prune = 1;
+                    return;
+                }
 
-    # Use template if available, otherwise keep existing content up to marker
-    if ( -f $TemplateFile ) {
+                return if !-l $Path;
 
-        # Copy template as base
-        my $CopyCommand = "cd '$TargetRepoRoot' && cp .gitignore.template .gitignore";
-        if ( system($CopyCommand) == 0 ) {
-            Print( 'green', "  ✓ Restored successfully\n" );
-        }
-        else {
-            Print( 'warning', "  ⚠ Could not copy template: $!\n" );
-            return;
-        }
-    }
-    else {
-        Print( 'warning', "  ⚠ Could not find template: $!\n" );
-        return;
-    }
-    return;
+                my $Target = readlink $Path;
+                return if !defined $Target;
+                return if $Target !~ m{(?:^|/)Extensions/};
+
+                push @Links, File::Spec->abs2rel( $Path, $TargetRepoRoot );
+                return;
+            },
+            no_chdir => 1,
+        },
+        $TargetRepoRoot,
+    );
+
+    my @Sorted = sort @Links;
+    return @Sorted;
 }
 
 sub PrintAdditionSummary {
