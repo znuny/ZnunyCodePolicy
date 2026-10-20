@@ -667,6 +667,11 @@ select = Kernel/Config/**/*.xml
 [+TidyAll::Plugin::Znuny::XML::Configuration::XSDValidator]
 select = Kernel/Config/**/*.xml
 
+[+TidyAll::Plugin::Znuny::XML::Database::AuditColumns]
+select = scripts/database/*.xml
+select = scripts/database/update/*.xml
+select = *.{sopm}
+
 [+TidyAll::Plugin::Znuny::XML::Database::KeyLength]
 select = scripts/database/otrs-schema.xml
 select = *.{sopm}
