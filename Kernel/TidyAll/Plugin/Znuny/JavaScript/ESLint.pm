@@ -13,6 +13,7 @@ use strict;
 use warnings;
 
 use Encode;
+use JSON ();
 use parent qw(TidyAll::Plugin::Znuny::Base);
 
 our $NodePath;
@@ -68,15 +69,59 @@ sub transform_file {
     $ESLintRulesPath =~ s{ESLint\.pm}{ESLint/Rules};
 
     my $Command = sprintf(
-        'cd "%s" && "%s" "%s" --config "%s" --no-eslintrc --resolve-plugins-relative-to "%s" --rulesdir Rules --fix "%s" --quiet',
+        'cd "%s" && "%s" "%s" --config "%s" --no-eslintrc --resolve-plugins-relative-to "%s" --rulesdir Rules --fix --format=json "%s"',
         $ESLintPluginsPath, $NodePath, $ESLintPath, $ESLintConfigPath, $ESLintPluginsPath, $Filename
     );
 
     my $Output = `$Command`;
-    if ( ${^CHILD_ERROR_NATIVE} || $Output ) {
-        Encode::_utf8_on($Output);    ## no critic
-        $Self->AddErrorMessage($Output);
+    return if !( ${^CHILD_ERROR_NATIVE} || $Output );
+
+    my $Result = JSON::decode_json( $Output );
+    if( ! (
+            ref $Result eq 'ARRAY' &&
+            ref $Result->[0] eq 'HASH' && # we pass only one file so there shouldn't be any other results
+            ref $Result->[0]->{messages} eq 'ARRAY'
+        )
+    ) {
+        $Self->AddErrorMessage("Malformed result from eslint: $Output");
+        return;
     }
+    return if ! @{ $Result->[0]->{messages} }; # nothing to do
+
+    my @SourceLines = split /\n/, ( $Result->[0]->{source} // $Result->[0]->{output} // '');
+    my @Priorities = ( 'success', 'warning', 'error' ); # 'success' should not actually occur
+    my %Messages;
+    for my $MsgDesc ( @{ $Result->[0]->{messages} } ) {
+        # eslint output:
+        # {
+        #   "ruleId": "prefer-const",
+        #   "severity": 1,
+        #   "message": "'PossibleActionsList' is never reassigned. Use 'const' instead.",
+        #   "line": 877,
+        #   "column": 33,
+        #   "nodeType": "Identifier",
+        #   "messageId": "useConst",
+        #   "endLine": 877,
+        #   "endColumn": 52
+        # }
+        my $Printable = sprintf(
+            "Line %d column %d: %s\n%s\n%s",
+            $MsgDesc->{line}, $MsgDesc->{column}, $MsgDesc->{message},
+            $SourceLines[ $MsgDesc->{line}-1 ] // '### line not found!?',
+            (' ' x ($MsgDesc->{column}-1)) . ('^' x ($MsgDesc->{endColumn}-$MsgDesc->{column}))
+        );
+        my $Priority = $Priorities[ $MsgDesc->{severity} ] // 'error';
+        push @{ $Messages{ $Priority }}, $Printable;
+    }
+
+    for my $Priority ( sort keys %Messages ) {
+        $Self->AddMessage(
+            Message => join("\n", @{ $Messages{$Priority} }),
+            Priority => $Priority,
+        );
+    }
+
+    return;
 }
 
 1;

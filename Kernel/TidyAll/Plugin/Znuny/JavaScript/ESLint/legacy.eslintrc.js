@@ -6,11 +6,13 @@
 // the enclosed file COPYING for license information (GPL). If you
 // did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 // --
+const isFixMode = process.argv.includes('--fix');
 
 module.exports = {
     "env": {
         "browser": true,
-        "jquery": true
+        "jquery": true,
+        "es6": true
     },
     "globals": {
         "Core": true,
@@ -48,6 +50,9 @@ module.exports = {
         "space-in-parens": [2, "never"],
         "no-eval": 2,
         "no-implied-eval": 2,
+// Enable this for ES6
+//        "prefer-const": 1,
+//        "no-var": 1,
 
         // OTRS-specific rules
         "no-window": 2,
