@@ -207,6 +207,33 @@ EOF
         ExpectedSource => undef,
     },
     {
+        Name     => 'ObjectDependencies, Kernel::System::DateTime created, but not declared',
+        Filename => 'Test.pm',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::Perl::ObjectDependencies)],
+        Source   => <<'EOF',
+our @ObjectDependencies = ('Kernel::System::Ticket');
+$Kernel::OM->Get('Kernel::System::Ticket');
+my $DateTimeObject = $Kernel::OM->Create('Kernel::System::DateTime');
+my $OtherDateTimeObject = $Kernel::OM->Create(
+    'Kernel::System::DateTime',
+    ObjectParams => {
+        String => '2026-11-02 16:00:00',
+    },
+);
+EOF
+        ExpectedSource => undef,
+    },
+    {
+        Name     => 'ObjectDependencies, Kernel::System::DateTime created and declared',
+        Filename => 'Test.pm',
+        Plugins  => [qw(TidyAll::Plugin::Znuny::Perl::ObjectDependencies)],
+        Source   => <<'EOF',
+our @ObjectDependencies = ('Kernel::System::DateTime');
+my $DateTimeObject = $Kernel::OM->Create('Kernel::System::DateTime');
+EOF
+        ExpectedSource => undef,
+    },
+    {
         Name     => 'ObjectDependencies, deprecated ObjectManagerAware flag',
         Filename => 'Test.pm',
         Plugins  => [qw(TidyAll::Plugin::Znuny::Perl::ObjectDependencies)],

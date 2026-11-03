@@ -103,6 +103,10 @@ sub validate_source {    ## no critic
     USED_OBJECT:
     for my $UsedObject (@UsedObjects) {
         next USED_OBJECT if $Seen{$UsedObject}++;
+
+        # DateTime is not handled by object manager.
+        next USED_OBJECT if $UsedObject eq 'Kernel::System::DateTime';
+
         if ( !exists $DeclaredObjectDependencyLookup{$UsedObject} ) {
             push @UndeclaredObjectDependencies, $UsedObject;
         }
