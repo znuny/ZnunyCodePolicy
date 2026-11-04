@@ -13,6 +13,22 @@
 ; Extension plugins can be placed in the Kernel/TidyAll/Plugin directory
 ; and configured in the corresponding .tidyallrc files.
 ;
+; Plugin placement
+;
+; The directory Kernel/TidyAll/Plugin/Znuny/<Section>/ matches the section
+; name below. The section is the kind of check. select is only the set of
+; files that contain the thing being checked. The file extension does not
+; pick the section.
+;
+; Put a new plugin in the first section that fits:
+;   - Deprecated, when an old name or call must be renamed or removed.
+;     select follows the file type that still contains that old name.
+;   - A file-type section (Perl, XML, SOPM, SQL, TT, JavaScript, PO,
+;     Documentation, SeleniumTest, UnitTest, RichTextEditor), when the
+;     check is about that file type and the API is still current.
+;   - CodeStyle, Common, Config, Legal, Translation, Whitespace, Autoload
+;     or Misc. The note on that section says what belongs there.
+;
 ; Global ignores
 ;
 
@@ -45,12 +61,14 @@ ignore = Extensions/**/*
 
 ;
 ; Autoload
+; Modules loaded from Kernel/Autoload.
 ;
 [+TidyAll::Plugin::Znuny::Autoload::ObjectManagerDisabled]
 select = Kernel/Autoload/**/*.pm
 
 ;
 ; CodeStyle
+; Style rules that Perl::Critic and PerlTidy do not cover.
 ;
 
 [+TidyAll::Plugin::Znuny::CodeStyle::CodeMarkerPackageName]
@@ -102,6 +120,8 @@ ignore = **/*.po
 
 ;
 ; Common
+; Headers, origin markers, contributors, filenames and the nofilter switch.
+; Any file type.
 ;
 
 [+TidyAll::Plugin::Znuny::Common::Contributors]
@@ -132,6 +152,7 @@ select = *
 
 ;
 ; Config
+; SysConfig registrations that must stay in sync, such as ACL actions.
 ;
 
 [+TidyAll::Plugin::Znuny::Config::ACLKeysLevel3Actions]
@@ -142,6 +163,10 @@ select = Kernel/Config/**/*.pm
 
 ;
 ; Deprecated
+; An old name or call that must be renamed or rejected. select follows the
+; file type of that old name. OTRSStats selects XML. OTRSInfoGet selects
+; Perl. A still-valid call that only gained a required argument stays in
+; the file-type section (Perl, XML, ...).
 ;
 
 ;[+TidyAll::Plugin::Znuny::Deprecated::AjaxAttachment]
@@ -191,6 +216,12 @@ ignore = COPYING,RELEASE,CREDITS
 ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
 ignore = Kernel/System/Environment.pm
 
+[+TidyAll::Plugin::Znuny::Deprecated::OTRSStats]
+select = **/*.xml
+ignore = development/samples/config/*.xml
+; ignore XML files in documentation
+ignore = doc/**/*.xml
+
 [+TidyAll::Plugin::Znuny::Deprecated::OTRSTimeZoneGet]
 select = **/*.{pl,pm,t}
 ignore = Custom/Kernel/**/*
@@ -202,6 +233,7 @@ ignore = Kernel/System/DateTime.pm
 
 ;
 ; Documentation
+; Markdown under doc/.
 ;
 
 [+TidyAll::Plugin::Znuny::Documentation::ImagePath]
@@ -214,6 +246,7 @@ select = doc/**/*.md
 
 ;
 ; JavaScript
+; Frontend JavaScript. Editor-specific calls belong in RichTextEditor.
 ;
 
 [+TidyAll::Plugin::Znuny::JavaScript::AlertFunction]
@@ -243,6 +276,7 @@ select = **/*.js **/*.tt
 
 ;
 ; Legal
+; License and copyright headers.
 ;
 
 [+TidyAll::Plugin::Znuny::Legal::LicenseValidator]
@@ -277,6 +311,7 @@ only_modes = cli ci editor commit
 
 ;
 ; Misc
+; Product rules that fit no other section.
 ;
 
 [+TidyAll::Plugin::Znuny::Misc::NotificationEvent]
@@ -295,6 +330,8 @@ ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
 
 ;
 ; Perl
+; Current Perl: Perl::Critic, PerlTidy, ObjectManager, syntax and calls
+; that are still valid.
 ;
 
 [+TidyAll::Plugin::Znuny::Perl::PerlCritic]
@@ -507,6 +544,8 @@ ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
 
 ;
 ; POT/PO
+; Translation catalogs (.pot, .po). Strings inside source files belong
+; in Translation.
 ;
 
 [+TidyAll::Plugin::Znuny::PO::DocbookLint]
@@ -522,6 +561,7 @@ select = locale/**/*.{pot,po}
 
 ;
 ; RichTextEditor
+; Znuny rich text editor calls, not general JavaScript.
 ;
 
 [+TidyAll::Plugin::Znuny::RichTextEditor::GetInstance]
@@ -551,6 +591,7 @@ select = **/*.{t,js}
 
 ;
 ; SeleniumTest
+; Selenium test files.
 ;
 
 [+TidyAll::Plugin::Znuny::SeleniumTest::RestoreDatabase]
@@ -559,6 +600,7 @@ ignore = Kernel/cpan-lib/**/* Custom/Kernel/cpan-lib/**/*
 
 ;
 ; SOPM
+; Package definition files (.sopm).
 ;
 
 [+TidyAll::Plugin::Znuny::SOPM::CodeTags]
@@ -585,6 +627,7 @@ select = *.sopm
 
 ;
 ; SQL
+; Schema and SQL fragments.
 ;
 
 [+TidyAll::Plugin::Znuny::SQL::PermissionGroups]
@@ -595,6 +638,7 @@ select = **/*.{xml,sopm}
 
 ;
 ; Translation
+; Translatable strings in source files. The .po catalogs belong in POT/PO.
 ;
 
 [+TidyAll::Plugin::Znuny::Translation::Empty]
@@ -605,6 +649,7 @@ select = Kernel/Language/**/*.pm Custom/Kernel/Language/*.pm
 
 ;
 ; TT
+; Template Toolkit templates.
 ;
 
 [+TidyAll::Plugin::Znuny::TT::Breadcrumb]
@@ -622,6 +667,7 @@ select = Kernel/Output/HTML/**/*.tt
 
 ;
 ; UnitTest
+; Unit test layout. General Perl rules for tests stay in Perl.
 ;
 
 [+TidyAll::Plugin::Znuny::UnitTest::Path]
@@ -629,6 +675,7 @@ select = *.{t}
 
 ;
 ; Whitespace
+; Indentation, tabs and trailing space. Any text file.
 ;
 
 [+TidyAll::Plugin::Znuny::Whitespace::FourSpaces]
@@ -644,6 +691,8 @@ ignore = Kernel/Config.pm Kernel/Config/**/ZZZ*.pm
 
 ;
 ; XML
+; Well-formedness and schema: lint, XSD, SysConfig syntax. Renaming a
+; legacy tag belongs in Deprecated.
 ;
 
 [+TidyAll::Plugin::Znuny::XML::ConfigDescription]
