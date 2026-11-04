@@ -231,6 +231,19 @@ ignore = COPYING,RELEASE,CREDITS
 ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
 ignore = Kernel/System/DateTime.pm
 
+[+TidyAll::Plugin::Znuny::Deprecated::OTRSTimeZoneSetting]
+select = **/*.{pl,pm,t,xml,sopm}
+ignore = Custom/Kernel/**/*
+ignore = Kernel/cpan-lib/**/* Custom/Kernel/cpan-lib/**/*
+ignore = scripts/test/sample/**/*
+ignore = COPYING,RELEASE,CREDITS
+ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
+ignore = development/samples/config/*.xml
+ignore = doc/**/*.xml
+ignore = Kernel/System/DateTime.pm
+ignore = scripts/Migration/Znuny/MigrateZnunyTimeZoneFromLegacyOTRSTimeZone.pm
+ignore = scripts/test/DateTime.t
+
 ;
 ; Documentation
 ; Markdown under doc/.
