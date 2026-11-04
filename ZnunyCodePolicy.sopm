@@ -80,6 +80,7 @@
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Deprecated/CreateTimeUnix.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Deprecated/ToOTRSTimeZone.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Deprecated/OTRSInfoGet.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Deprecated/OTRSSessionName.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Deprecated/OTRSStats.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Deprecated/OTRSTimeZoneGet.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/Deprecated/OTRSTimeZoneSetting.pm"/>
@@ -232,6 +233,7 @@
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Deprecated/CreateTimeUnix.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Deprecated/ToOTRSTimeZone.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Deprecated/OTRSInfoGet.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Deprecated/OTRSSessionName.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Deprecated/OTRSStats.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Deprecated/OTRSTimeZoneGet.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/Deprecated/OTRSTimeZoneSetting.t"/>
