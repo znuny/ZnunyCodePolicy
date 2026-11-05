@@ -207,9 +207,9 @@ ignore = COPYING,RELEASE,CREDITS
 ignore = var/{article,log,run,sessions,spool,tmp,virtualfs}/**/*
 ignore = Kernel/System/DateTime.pm
 
-[+TidyAll::Plugin::Znuny::Deprecated::OTRSGenericInterfaceTags]
-select = **/webservices/**/*.{yml,yaml}
-ignore = scripts/test/sample/**/*
+;[+TidyAll::Plugin::Znuny::Deprecated::OTRSGenericInterfaceTags]
+;select = **/webservices/**/*.{yml,yaml}
+;ignore = scripts/test/sample/**/*
 
 [+TidyAll::Plugin::Znuny::Deprecated::OTRSInfoGet]
 select = **/*.{pl,pm,t}
