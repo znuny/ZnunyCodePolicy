@@ -1,4 +1,4 @@
-# Configuration Options
+# Configuration
 
 ## Override Existing Rules
 
