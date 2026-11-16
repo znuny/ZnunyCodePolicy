@@ -765,6 +765,9 @@ select = *.{sopm}
 select = scripts/database/otrs-schema.xml
 select = *.{sopm}
 
+[+TidyAll::Plugin::Znuny::XML::Database::PrimaryKey]
+select = *.{sopm}
+
 [+TidyAll::Plugin::Znuny::XML::Database::XSDValidator]
 select = scripts/database/*.xml
 select = scripts/database/update/*.xml

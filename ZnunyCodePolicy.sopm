@@ -195,6 +195,7 @@
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/XML/Configuration/XSDValidator.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/XML/Database/AuditColumns.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/XML/Database/KeyLength.pm"/>
+        <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/XML/Database/PrimaryKey.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/XML/Database/XSDValidator.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/XML/Lint.pm"/>
         <File Permission="660" Location="Kernel/TidyAll/Plugin/Znuny/XML/LintWithOurParsers.pm"/>
@@ -298,6 +299,7 @@
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/XML/Configuration/XSDValidator.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/XML/Database/AuditColumns.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/XML/Database/KeyLength.t"/>
+        <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/XML/Database/PrimaryKey.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Plugin/Znuny/XML/Database/XSDValidator.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Znuny/FrameworkVersion.t"/>
         <File Permission="660" Location="scripts/test/TidyAll/Znuny/GetSemanticVersion.t"/>
