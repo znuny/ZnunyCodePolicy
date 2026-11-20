@@ -1,4 +1,4 @@
-image: $JOB_IMAGE
+image: $IMAGE
 
 include:
   - project: $INCLUDE_PROJECT
